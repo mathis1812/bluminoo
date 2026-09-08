@@ -62,7 +62,11 @@ describe("les prompts restent alignés sur le catalogue", () => {
 
 describe("resolveTemplatePrompt", () => {
   it("rend le prompt d'un gabarit simple", () => {
-    expect(resolveTemplatePrompt("minecraft")).toContain("voxel");
+    // Ancré sur le nom de l'univers, pas sur un mot de rédaction : ce test
+    // vérifie que le slug résout vers le BON prompt, pas comment il est
+    // écrit. Il assertait « voxel » et cassait dès qu'on reformulait — ce
+    // qui arrive à chaque essai de prompt.
+    expect(resolveTemplatePrompt("minecraft")).toContain("Minecraft");
   });
 
   it("rend null pour un gabarit inconnu", () => {
