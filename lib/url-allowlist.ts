@@ -13,6 +13,12 @@
  * (photos sources, upload direct navigateur → Supabase dans
  * `lib/studio-image.ts`), le bucket `video-uploads` et le bucket `gallery`.
  *
+ * `photo-uploads` étant privé depuis la migration 0012, ses URLs sont
+ * désormais signées. Le contrôle ci-dessous ne porte que sur le protocole et
+ * l'hôte : le jeton en query et le chemin `/object/sign/` passent donc sans
+ * modification, et il ne faut surtout pas restreindre au préfixe
+ * `/object/public/`, qui exclurait les photos sources.
+ *
  * L'hébergeur tiers kie.ai a été retiré d'ici en même temps que du chemin
  * critique : ses deux hôtes (upload et CDN de téléchargement) n'ont plus
  * aucune raison d'être joignables par notre serveur, et la route
