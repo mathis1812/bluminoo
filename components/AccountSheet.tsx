@@ -11,12 +11,16 @@ import { createClient } from "@/lib/supabase/client";
  * statut, deux boutons, et la déconnexion en simple lien texte rouge — pas
  * un bouton plein, contrairement aux deux au-dessus.
  *
- * « Subscription & packs » mène à /subscription, l'écran de gestion de
- * l'abonnement (solde, formule en cours, changement de palier, packs,
- * résiliation). Il ouvrait auparavant RechargeSheet, qui ne sait que
- * *vendre* : un abonné n'y trouvait ni sa formule ni sa date de
- * renouvellement. La feuille reste atteignable par la pastille de crédits
- * du studio, son vrai rôle sur le modèle.
+ * « Subscription & packs » mène à /pricing, le catalogue à deux onglets
+ * (abonnements, packs de crédits) — la même grille que RechargeSheet, dans
+ * une coquille de page.
+ *
+ * Ce bouton a pointé vers /subscription du 31/08 au 14/09, pour qu'un
+ * abonné voie sa formule et sa date de renouvellement. Repointé ici : le
+ * catalogue est ce qu'on attend depuis le compte, et l'écran de gestion
+ * n'apporte rien tant qu'aucun abonnement n'est actif. /subscription
+ * existe toujours et n'a plus d'entrée dans l'interface — lui en rendre
+ * une quand il y aura de vrais abonnés.
  *
  * « Réglages » mène en fait vers une vraie page (/reglages sur le modèle,
  * /settings ici) — ma première vérification l'avait ratée en cliquant trop
@@ -121,7 +125,7 @@ export default function AccountSheet({
           </div>
 
           <Link
-            href="/subscription"
+            href="/pricing"
             onClick={onClose}
             className="flex h-14 w-full items-center justify-center rounded-3xl bg-white text-[17px] font-medium text-black transition active:opacity-70"
           >

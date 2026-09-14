@@ -6,7 +6,7 @@ import MainShell from "@/components/MainShell";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
-const SITE_URL = "https://bluminoo.vercel.app";
+const SITE_URL = "https://bluminoo.com";
 const SITE_TITLE = "Bluminoo Studio";
 const SITE_DESCRIPTION =
   "Create a hyper-realistic photo or video of the life you dream about — a place, a scene, a moment — and post it to your story to stun everyone you know.";

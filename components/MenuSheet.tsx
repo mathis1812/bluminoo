@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
+import GradientText from "@/components/react-bits/GradientText";
 import {
   asPlanId,
   hasRedSnap as planHasRedSnap,
@@ -196,8 +197,8 @@ export default function MenuSheet({
         </button>
 
         <div className="flex flex-col gap-2 px-6 pt-8">
-          <p className="text-[1.8rem] font-bold leading-none tracking-tight text-white">
-            Bluminoo
+          <p className="text-[1.8rem] font-bold leading-none tracking-tight">
+            <GradientText>Bluminoo</GradientText>
           </p>
 
           {/* Solde et recharge, ou invitation à se connecter : une ligne de

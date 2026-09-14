@@ -3,12 +3,11 @@ import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { refundCredits, spendCredits } from "@/lib/credits";
-import { EDIT_COST } from "@/lib/generation-cost";
+import { EDIT_COST, IMAGE_GENERATION_COST } from "@/lib/generation-cost";
 import { persistImageBytes } from "@/lib/gallery-server";
 import {
   assessTemplateResult,
   generateGeminiImage,
-  LITE_IMAGE_MODEL_ID,
 } from "@/lib/gemini-jobs";
 import {
   buildInPlaceEditPrompt,
@@ -303,10 +302,21 @@ export async function POST(req: NextRequest) {
     }
   }
   const resolution = QUALITY_LABEL[quality];
-  // Une retouche a son propre tarif, annoncé au client sur le bouton d'envoi
-  // par `EDIT_COST`. Le dériver de `quality`, qui décrit le studio libre,
-  // ferait payer autre chose que ce qui est affiché.
-  const cost = isEditRequest ? EDIT_COST : photoCost(quality);
+  // Chaque parcours facture EXACTEMENT ce que son écran a annoncé :
+  //
+  // — une retouche, `EDIT_COST`, affiché sur le bouton d'envoi d'`EditPanel` ;
+  // — un gabarit, `IMAGE_GENERATION_COST`, affiché par `TemplateGenerator` ;
+  // — le studio libre, `photoCost(quality)`, affiché par `PromptBar` et qui
+  //   suit le cran de résolution choisi.
+  //
+  // Le coût d'un gabarit est délibérément DÉCOUPLÉ de sa résolution depuis le
+  // 09/09 : le passer en 2K aurait sinon fait payer 150 pour un écran qui
+  // annonce 100, puisque `photoCost("high")` vaut 150.
+  const cost = isEditRequest
+    ? EDIT_COST
+    : isTemplateRequest
+      ? IMAGE_GENERATION_COST
+      : photoCost(quality);
 
   let hasCredits: boolean;
   try {
@@ -381,14 +391,18 @@ export async function POST(req: NextRequest) {
     finalPrompt = buildScenePrompt(prompt as string);
   }
 
-  // Certaines catégories rendent mieux sur un autre modèle que le défaut.
-  // Cf. `modelForTemplate`. Une retouche est une édition chirurgicale, donc
-  // exactement l'exercice où le Lite s'est montré le meilleur.
-  const model = isEditRequest
-    ? LITE_IMAGE_MODEL_ID
-    : isTemplateRequest
-      ? modelForTemplate(templateSlug as string)
-      : undefined;
+  // Un seul modèle d'image sur tout le produit depuis le 09/09 : Nano Banana
+  // 2, que `modelForTemplate` renvoie pour les gabarits et que `MODEL_ID`
+  // applique par défaut au studio libre comme aux retouches.
+  //
+  // La retouche tournait sur le Lite, retenu parce qu'elle est une édition
+  // chirurgicale — l'exercice où il excellait. Elle repasse au défaut avec le
+  // reste : garder un modèle à part ici lui interdisait `imageConfig.imageSize`
+  // (le Lite le refuse), donc une retouche sortait toujours à la taille fixe
+  // du Lite, plus petite que le rendu qu'elle est censée reprendre.
+  const model = isTemplateRequest
+    ? modelForTemplate(templateSlug as string)
+    : undefined;
   const temperature = isTemplateRequest
     ? temperatureForTemplate(templateSlug as string)
     : undefined;

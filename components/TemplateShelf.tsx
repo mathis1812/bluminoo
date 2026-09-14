@@ -43,6 +43,20 @@ export default function TemplateShelf() {
             sizes="(max-width: 900px) 96vw, 880px"
             className="object-cover"
           />
+          {/* Photo d'origine superposée, révélée en boucle par un fondu CSS :
+              la carte montre ainsi la transformation, pas seulement son
+              résultat. Le cadrage des deux visuels doit être identique — cf.
+              `featuredBeforeImage` dans lib/templates.ts. */}
+          {featured.featuredBeforeImage && (
+            <Image
+              src={featured.featuredBeforeImage}
+              alt=""
+              aria-hidden
+              fill
+              sizes="(max-width: 900px) 96vw, 880px"
+              className="before-after-fade object-cover opacity-0"
+            />
+          )}
           <span
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/80 to-transparent"

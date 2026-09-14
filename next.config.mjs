@@ -1,6 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    /**
+     * AVIF avant WebP. À poids égal il tient nettement mieux les aplats et
+     * les dégradés — précisément ce qui compose nos visuels de gabarits
+     * (ciels, carrosseries, eau). Next retombe seul sur WebP, puis sur
+     * l'original, si le navigateur ne suit pas.
+     *
+     * Ne corrige PAS un visuel trop petit : une image de 648 px affichée sur
+     * 880 px reste agrandie, quel que soit le format.
+     */
+    formats: ["image/avif", "image/webp"],
+  },
   async redirects() {
     return [
       { source: "/tarifs", destination: "/pricing", permanent: true },

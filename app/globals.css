@@ -149,7 +149,10 @@ body {
   .animate-page-in,
   .magic-frame,
   .magic-sparkle,
-  .magic-burst {
+  .magic-burst,
+  .wordmark-working,
+  .gradient-text--animated,
+  .before-after-fade {
     animation: none !important;
   }
 }
@@ -219,5 +222,143 @@ html[data-intro="1"] .intro-titre {
   }
   html[data-intro="1"] .intro-titre {
     animation: none;
+  }
+}
+
+/*
+ * Mot-symbole pendant une génération : il respire et un reflet le traverse.
+ *
+ * La respiration reprend les valeurs du produit de référence (classe
+ * `marque-respire` : scale 1 → 1.06 → 1 sur 2,4 s). Le reflet est en plus —
+ * seul, le battement d'échelle se remarque à peine, et c'est le passage de
+ * lumière qui dit « quelque chose se fabrique ».
+ *
+ * Le reflet est un dégradé découpé sur le texte (`background-clip: text`),
+ * donc il n'existe que là où il y a des lettres. Le repli est important :
+ * sans le `@supports`, un navigateur sans cette propriété afficherait un
+ * texte transparent, c'est-à-dire invisible.
+ */
+.wordmark-working {
+  transform-origin: 50%;
+  animation: wordmark-breathe 2.4s ease-in-out infinite;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .wordmark-working {
+    background-image: linear-gradient(
+      100deg,
+      #ffffff 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      #ffffff 58%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation:
+      wordmark-breathe 2.4s ease-in-out infinite,
+      wordmark-sheen 2.8s linear infinite;
+  }
+}
+
+@keyframes wordmark-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes wordmark-sheen {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/*
+ * Dégradé animé du mot-symbole (cf. components/react-bits/GradientText).
+ *
+ * Le dégradé lui-même est posé en style inline par le composant — il dépend
+ * des couleurs passées en props. Ne vivent ici que le découpage sur le texte
+ * et le mouvement, qui ne changent jamais.
+ *
+ * `background-size: 300%` laisse de la course au dégradé : à 100% il n'y
+ * aurait rien à déplacer et l'animation ne se verrait pas.
+ *
+ * Le repli du `@supports` est indispensable : sans `background-clip: text`,
+ * la couleur transparente rendrait le logo INVISIBLE. Le blanc plein reste
+ * donc la valeur de base, et le dégradé n'est appliqué que là où il peut
+ * réellement être découpé.
+ */
+.gradient-text {
+  display: inline-block;
+  color: #ffffff;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .gradient-text {
+    /* 100% figé : le dégradé couvre exactement le mot, de la première lettre
+       à la dernière. Une taille plus grande n'en montrerait qu'une portion,
+       et la dernière couleur — le violet — n'apparaîtrait jamais. */
+    background-size: 100% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Variante animée, opt-in. Il lui faut de la course, donc une taille
+     supérieure au mot, et la première couleur répétée côté composant pour
+     que la boucle ne saute pas. */
+  .gradient-text--animated {
+    background-size: 300% 100%;
+    background-repeat: repeat;
+    animation: gradient-text-pan var(--gradient-text-duration, 8s) linear
+      infinite;
+  }
+}
+
+@keyframes gradient-text-pan {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 300% 50%;
+  }
+}
+
+/*
+ * Fondu avant/après en boucle sur la carte vedette de l'étagère.
+ *
+ * Écrit en CSS et non avec le hook `useBeforeAfterLoop` de
+ * `TemplateGenerator` : celui-ci imposerait de rendre `TemplateShelf`
+ * cliente pour une animation qui ne dépend d'aucun état. En CSS, elle tourne
+ * sur le thread de composition et l'étagère reste un composant serveur.
+ *
+ * Les temps reprennent ceux du hook, relevés sur le produit de référence :
+ * 2600 ms sur l'après, 700 ms de fondu, 1400 ms sur l'avant, 700 ms de
+ * retour — soit 5400 ms en tout. L'après est tenu bien plus longtemps :
+ * c'est le résultat qu'on vend, l'avant n'est là que pour donner l'échelle
+ * de la transformation.
+ */
+.before-after-fade {
+  animation: before-after-loop 5.4s ease-in-out infinite;
+}
+
+@keyframes before-after-loop {
+  0%,
+  48.15% {
+    opacity: 0;
+  }
+  61.11%,
+  87.04% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }

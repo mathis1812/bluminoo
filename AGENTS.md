@@ -88,7 +88,8 @@ qu'une piste a déjà été essayée et abandonnée, et pourquoi.
 | Allonger le prompt de swap véhicule | N'a jamais corrigé les proportions : le défaut venait du modèle | `lib/place-prompt.ts`, `buildVehicleSwapPrompt` |
 | Joindre une 2ᵉ image de référence au swap véhicule | Le décor de la référence contamine tout le rendu | commit `730025f`, annulé par `0ff70c1` |
 | Écraser la photo d'entrée sous la taille de sortie | Le modèle agrandit et invente le micro-détail | `lib/studio-image.ts`, `ENCODE_STEPS` |
-| Remplacer le prompt d'un univers par le `userQuery` d'usenoway | Échoué 2 fois sur 2 (GTA le 04/09, Minecraft le 08/09) : le décor n'est pas reconstruit. Ce champ est l'INTENTION de l'utilisateur, pas leur prompt serveur — que leur champ `bloc` désigne et qu'on ne voit pas | `lib/world-prompts.ts`, en-têtes |
+| Remplacer le prompt d'un univers par le `userQuery` d'usenoway | Échoué 2 fois sur 2 (GTA le 04/09, Minecraft le 08/09) : le décor n'est pas reconstruit, seul un HUD est plaqué. Ce champ est l'INTENTION de l'utilisateur, pas leur prompt serveur — leur page ne transmet que `presetId`, le prompt ne quitte jamais leur serveur | `lib/world-prompts.ts`, en-têtes |
+| Nano Banana 2 Lite sur les univers | Leurs prompts décrivent une transformation sélective — reconstruire le décor, préserver le sujet — et le Lite appliquait le style à toute l'image, sujet compris. Il restait bon sur les swaps véhicule, mais un seul modèle sert désormais tout le produit | `lib/gemini-jobs.ts`, `FLASH_IMAGE_MODEL_ID` |
 | Seedance 2.5 comme moteur photo → vidéo | 0,221 $/s en 480p et 0,473 $/s en 720p, contre 0,126 $/s pour Kling 3.0 à qualité jugée équivalente : la marge tombait de ~79 % à ~63 %, voire ~21 % | `lib/kling-video.ts`, en-tête |
 
 ## 6. Secrets

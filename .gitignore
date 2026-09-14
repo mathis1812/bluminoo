@@ -40,3 +40,6 @@ next-env.d.ts
 
 # Claude Code local session data
 .claude/
+
+# Cache local de la CLI Supabase
+supabase/.temp/

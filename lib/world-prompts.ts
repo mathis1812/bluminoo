@@ -17,19 +17,43 @@ import "server-only";
  * mais la consigne texte reste utile comme second garde-fou.
  */
 
-export const MINECRAFT_WORLD_PROMPT = `Rebuild the world around the person in this photo as a Minecraft-style voxel world, while keeping the person completely untouched.
+/**
+ * Réécrit le 09/09 à partir du rendu de référence (photo d'origine + résultat
+ * usenoway, lac de Braies). La version précédente décrivait un Minecraft
+ * générique ; la comparaison a montré quatre écarts qui expliquaient les
+ * mauvais rendus :
+ *
+ * — elle imposait de l'herbe au sol, là où la référence GARDE le matériau
+ *   d'origine (une rive de gravier reste du gravier) ;
+ * — elle demandait des blocs d'eau, là où la référence garde une surface
+ *   liquide et réfléchissante, et ne cube que le fond immergé ;
+ * — elle exigeait des arêtes dures et une texture 16×16, là où la référence
+ *   a une texture fine et laisse aux reliefs lointains leur silhouette
+ *   réelle ;
+ * — elle ne disait rien de l'ombre portée par le sujet, que la référence
+ *   conserve et projette sur les blocs.
+ *
+ * Le principe directeur est désormais « reconstruire CE lieu », pas
+ * « fabriquer un monde Minecraft » : c'est la fidélité au décor qui était
+ * demandée.
+ */
+export const MINECRAFT_WORLD_PROMPT = `Rebuild the environment of this photograph as a Minecraft world, and composite the original person into it untouched.
 
-KEEP EXACTLY AS IN THE ORIGINAL PHOTO — this is the most important instruction: the person stays fully photorealistic and unedited. Preserve their face, skin texture, hair, body proportions, exact pose, hand position, head angle, and their entire outfit including every garment, its color, its fabric texture, its folds, plus any cap, hood, backpack, belt and shoes. Keep them at the exact same position, size and framing within the image. Do not stylize, redraw, smooth, or blockify the person in any way. Do not change the camera angle or crop. Output the final image in the exact same aspect ratio, framing and crop as the input photograph — no cropping, no zooming, no added borders, bars or padding, no change to the composition.
+THE PERSON — DO NOT EDIT. Keep them exactly as photographed: same face, skin, hair, glasses, jewellery, every garment with its exact colour, fabric, folds and creases, whatever they hold in their hands, their footwear, their precise pose, the angle of their head, and their position and scale in the frame. They remain a real photograph — never stylised, blockified, redrawn, smoothed or relit. Keep the shadow they cast: same direction, same length, same softness, now falling across the rebuilt ground.
 
-REBUILD EVERYTHING ELSE OUT OF CUBES: reconstruct the entire environment from uniform one-meter voxel blocks with hard ninety-degree edges, flat faces and sharp silhouettes, using visible 16x16 pixel-art block textures with crisp texel edges and no blurring. Follow the real shape of the original landscape closely — the terrain should read as the same place, rebuilt in blocks. Turn the ground into grass blocks with pixelated green tops and brown dirt sides, arranged in stepped terraces that follow the original slope. Turn any path or trail into a stepped walkway of coarse dirt, gravel and podzol blocks. Turn hills, mountains and cliffs into massive stacked stone and andesite blocks forming staircase-shaped terrain that mirrors the original ridgelines. Replace vegetation with flat cross-shaped pixel-art sprites of tall grass, poppies, dandelions, white daisies and oxeye flowers planted on the grass blocks.
+KEEP THE SAME PLACE. Do not invent a new landscape. Read the real geometry of this location — the line of the shore, the slope of the ground, the ridgelines of the mountains, the edge of the treeline, the position of every object — and rebuild THAT in blocks. Someone who knows this place must still recognise it. Same camera angle, same framing, same crop, same aspect ratio as the input photograph: no zoom, no added borders or padding, no recomposition.
 
-ADAPT TO WHAT YOU SEE: identify the type of environment in the photo and choose the matching block palette. Mountains use stone, andesite and cobblestone with snow blocks on the highest peaks. Forests use oak and birch log blocks with cubic layered leaf canopies. Beaches use sand and sandstone blocks with flat translucent blue water blocks. Cities use stone bricks, quartz blocks, grid-patterned glass block windows and stone slab streets. Snow scenes use snow blocks and packed ice with cubic spruce trees. Deserts use sand, sandstone and layered terracotta mesa cliffs. Fields use grass blocks, hay bales and wheat crop sprites. Interiors use plank block walls, stone brick floors, glass pane windows and lantern blocks.
+HOW TO BLOCKIFY. Build the terrain from cubic voxel blocks on a single consistent grid, with clean stepped edges where surfaces meet. Use the material that is ALREADY THERE: a gravel shore stays gravel, stone stays stone, grass stays grass, sand stays sand, a rock face stays rock. Never substitute grass for a surface that is not grass. Block faces carry a fine, dense pixel texture — like a high-resolution texture pack — not large flat areas of colour. Ground close to the camera shows full, readable cubes; distant terrain keeps its true silhouette with only its edges stepping into blocks.
 
-SKY AND LIGHT: keep the sky as a smooth photographic gradient, not voxelized, matching the original sky colors and time of day. Add flat rectangular slab-shaped clouds floating horizontally at several depths. If the moon or sun is visible, render it as a low-resolution pixelated shape. Preserve the original lighting exactly: same sun direction, same warmth, same rim light on the person, same shadow direction, same overall color grade.
+WATER STAYS WATER. The surface of any lake, river or sea remains a smooth, flat, reflective plane — do not cube the surface. It mirrors the rebuilt mountains, trees and sky. Below the waterline, the submerged ground reads as translucent blocks fading into the depth. That contrast between a liquid surface and a blocky bed is essential to the look.
 
-FINISH: cinematic 3D voxel render with soft global illumination, ambient occlusion in the block crevices, gentle volumetric light, warm atmospheric haze on distant blocks, subtle lens bloom, shallow depth of field on the far terrain and sharp focus on the person. The person must remain a real photograph composited into a blocky world — that contrast is the entire point of the image.
+VEGETATION AND OBJECTS. Trees become cubic canopies of layered leaf blocks on block trunks, planted where the real trees stand and following the same treeline and density. Low vegetation becomes flat cross-shaped sprites of grass tufts and small flowers, sparse, and only where vegetation already grows. Boats, vehicles and man-made objects are rebuilt as simple block models in their exact original positions, at their original scale; if people were aboard, they may appear as small blocky figures.
 
-The final image contains only the person and the voxel landscape: no game interface, no hotbar, no crosshair, no health or hunger bar, no text, no logo, and no Minecraft game characters or creatures.`;
+LIGHT AND ATMOSPHERE. Keep the sun exactly where it is — same direction, same height, same warmth — and keep every shadow in the scene pointing the same way as in the original. The sky stays a smooth photographic gradient, never voxelised, with its original colours and time of day. Add gentle aerial haze over distant blocks so the depth of the landscape still reads.
+
+RENDER QUALITY. A cinematic, high-fidelity 3D render: soft global illumination, ambient occlusion settling into the seams between blocks, accurate reflections on the water, crisp contact shadows under every raised block, subtle depth of field on the far terrain, and the person in sharp focus. This is a rendered world — not flat pixel art, and not a filter applied over the photograph.
+
+The final image contains only the person and the rebuilt world: no game interface, no hotbar, no crosshair, no health or hunger bar, no text, no logo, no watermark, and no added characters or creatures beyond people already present in the original photo.`;
 
 /**
  * ⚠️ ESSAI 04/09 — remplacé par la requête du produit de référence, 51

@@ -138,22 +138,17 @@ export function videoCost(duration: VideoDuration): number {
  * gabarit a un rendu de référence montré au client, il doit sortir au même
  * niveau pour tout le monde.
  *
- * ⚠️ Depuis que tous les gabarits tournent sur Nano Banana 2 Lite, cette
- * constante ne pilote plus que le PRIX. Le modèle refuse `imageSize`, filtré
- * par `MODELS_WITHOUT_IMAGE_SIZE` dans `gemini-jobs` : la résolution que
- * `QUALITY_LABEL` en déduit n'est jamais envoyée, et le rendu sort à la
- * taille fixe du modèle quoi qu'on mette ici.
+ * ⚠️ Cette constante ne décrit QUE la résolution de sortie, plus le prix.
  *
- * D'où `"normal"` depuis le 05/09 : `photoCost` rend 100 crédits au lieu de
- * 150, sans toucher au rendu. La valeur doit rester alignée sur
- * `IMAGE_GENERATION_COST`, qui est le montant annoncé au client avant qu'il
- * ne lance sa génération — les faire diverger ferait payer autre chose que
- * ce qui est affiché.
+ * Du 05/09 au 09/09 elle valait `"normal"` uniquement pour ramener le coût à
+ * 100 crédits : les gabarits tournaient alors sur Nano Banana 2 Lite, qui
+ * refuse `imageSize`, donc la résolution n'était de toute façon jamais
+ * envoyée. Depuis la bascule sur Nano Banana 2 — qui l'accepte, vérifié le
+ * 09/09 sur les trois crans — elle redevient réelle, et le 2K est demandé.
  *
- * Le 4K a été essayé le 03/09 puis abandonné : plus lourd et plus lent, sans
- * gain visible. La photo d'entrée dépasse rarement 4000 px, donc demander du
- * 4K en sortie revient à faire agrandir le modèle — le défaut même que la
- * pleine résolution d'entrée avait corrigé (cf. `ENCODE_STEPS` dans
- * `lib/studio-image.ts`).
+ * Le PRIX d'un gabarit ne s'en déduit plus : `app/api/generate/route.ts`
+ * facture `IMAGE_GENERATION_COST`, la même constante que `TemplateGenerator`
+ * affiche avant la génération. Les deux ne peuvent donc plus diverger, et
+ * passer un gabarit en 2K ne le fait plus payer 150.
  */
-export const TEMPLATE_QUALITY: ImageQuality = "normal";
+export const TEMPLATE_QUALITY: ImageQuality = "high";

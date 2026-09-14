@@ -94,7 +94,6 @@ export default function Home() {
             onReset={studio.reset}
             onOpenViewer={() => setViewerOpen(true)}
             loadingMessageIndex={studio.loadingMessageIndex}
-            elapsedSeconds={studio.elapsedSeconds}
             progressPercent={studio.progressPercent}
           >
             {studio.error && (
