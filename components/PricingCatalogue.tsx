@@ -58,7 +58,19 @@ const TOPUP_TIERS: { id: TopupId; badge?: string }[] = [
   { id: "large", badge: "−20%" },
 ];
 
-type Feature = { label: string; included: boolean };
+/**
+ * `tone: "red"` teinte la ligne du rouge Red Snap de l'app (#ff453a, le même
+ * que la pastille du studio) et `strong` l'épaissit : deux avantages doivent
+ * se voir avant les autres dans la liste, le Red Snap et la résolution.
+ * Sans effet sur une ligne non incluse, qui reste grisée — une ligne barrée
+ * mise en avant vendrait ce qu'on n'a pas.
+ */
+type Feature = {
+  label: string;
+  included: boolean;
+  tone?: "red";
+  strong?: boolean;
+};
 
 /**
  * La liste dépend du palier sélectionné : Lite n'a ni Red Snap ni vidéo, et
@@ -68,9 +80,17 @@ type Feature = { label: string; included: boolean };
  */
 function subscriptionFeatures(planId: PlanId): Feature[] {
   return [
-    { label: "Red Snap access", included: planHasRedSnap(planId) },
+    {
+      label: "Red Snap access",
+      included: planHasRedSnap(planId),
+      tone: "red",
+    },
     { label: "All effects unlocked", included: true },
-    { label: `Images up to ${PLANS[planId].imageResolution}`, included: true },
+    {
+      label: `Images up to ${PLANS[planId].imageResolution}`,
+      included: true,
+      strong: true,
+    },
     { label: "Videos with sound, 4 to 8s", included: isVideoOpen(planId) },
     { label: "Credits renewed weekly", included: true },
   ];
@@ -267,10 +287,20 @@ export default function PricingCatalogue() {
         ).map((feature) => (
           <li
             key={feature.label}
-            className={`flex items-start gap-2.5 text-[14px] font-medium leading-5 ${
-              feature.included ? "text-white" : "text-white/35"
+            className={`flex items-start gap-2.5 leading-5 ${
+              feature.strong
+                ? "text-[15px] font-bold"
+                : "text-[14px] font-medium"
+            } ${
+              !feature.included
+                ? "text-white/35"
+                : feature.tone === "red"
+                  ? "text-[#ff453a]"
+                  : "text-white"
             }`}
           >
+            {/* `currentColor` suit la teinte de la ligne : la coche du Red
+                Snap passe au rouge avec son libellé. */}
             <svg
               width="14"
               height="14"
