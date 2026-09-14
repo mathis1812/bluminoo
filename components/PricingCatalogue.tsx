@@ -125,7 +125,7 @@ export default function PricingCatalogue() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col justify-between">
       <div
         role="tablist"
         className="relative flex h-12 shrink-0 items-center rounded-full p-1"
@@ -162,7 +162,14 @@ export default function PricingCatalogue() {
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      {/* Groupe central : cartes + fonctions. Isole en un seul enfant flex
+          pour que `justify-between` ci-dessus repartisse l'espace libre en
+          deux ecarts egaux — onglets en haut, ce bloc centre, CTA en bas —
+          au lieu de le laisser s'accumuler en un seul trou avant le bouton.
+          Le catalogue occupe toute la hauteur dans les deux coquilles :
+          /pricing (min-h-dvh) comme RechargeSheet (feuille plein ecran). */}
+      <div className="flex flex-1 flex-col justify-evenly gap-5 py-2">
+        <div className="grid grid-cols-3 gap-2">
         {tab === "subscription"
           ? SUBSCRIPTION_TIERS.map(({ id, badge }) => {
               const plan = PLANS[id];
@@ -192,7 +199,7 @@ export default function PricingCatalogue() {
                     <span className="absolute left-2.5 top-2 z-10 text-[11px] font-semibold uppercase leading-4 tracking-wide text-white/50">
                       {plan.name}
                     </span>
-                    <span className="flex aspect-square w-full flex-col items-center justify-center gap-2">
+                    <span className="flex aspect-[5/6] w-full flex-col items-center justify-center gap-2">
                       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                         <path d={LIGHTNING_PATH} />
                       </svg>
@@ -232,7 +239,7 @@ export default function PricingCatalogue() {
                     </span>
                   )}
                   <span className="flex w-full flex-col overflow-hidden rounded-[15.5px]">
-                    <span className="flex aspect-square w-full flex-col items-center justify-center gap-2">
+                    <span className="flex aspect-[5/6] w-full flex-col items-center justify-center gap-2">
                       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                         <path d={LIGHTNING_PATH} />
                       </svg>
@@ -253,7 +260,7 @@ export default function PricingCatalogue() {
             })}
       </div>
 
-      <ul className="mt-5 flex flex-col gap-2.5">
+      <ul className="flex flex-col gap-3.5">
         {(tab === "subscription"
           ? subscriptionFeatures(selectedPlan)
           : TOPUP_FEATURES
@@ -287,13 +294,14 @@ export default function PricingCatalogue() {
         ))}
       </ul>
 
-      {error && (
-        <p role="alert" className="mt-3 text-[14px] text-red-400">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p role="alert" className="mt-3 text-[14px] text-red-400">
+            {error}
+          </p>
+        )}
+      </div>
 
-      <div className="mt-auto flex flex-col gap-3 pt-5">
+      <div className="flex flex-col gap-3 pt-5">
         <button
           type="button"
           onClick={handleContinue}
