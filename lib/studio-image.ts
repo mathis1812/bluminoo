@@ -238,6 +238,16 @@ export function validateImageFile(file: File): string | null {
 
 const UPLOAD_BUCKET = "photo-uploads";
 
+/**
+ * Durée de validité de l'URL signée d'une photo source, en secondes.
+ *
+ * Elle doit couvrir la génération la plus lente qui la consomme : la vidéo
+ * Kling, dont `app/api/generate-video` abandonne au bout de 230 s
+ * (`POLL_TIMEOUT_MS`), file d'attente fal.ai comprise. Quinze minutes
+ * laissent la marge sans transformer l'URL en lien durable.
+ */
+export const SIGNED_URL_TTL_SECONDS = 15 * 60;
+
 function extensionForMimeType(mimeType: string): string {
   if (mimeType === "image/png") return "png";
   if (mimeType === "image/webp") return "webp";
@@ -245,8 +255,14 @@ function extensionForMimeType(mimeType: string): string {
 }
 
 /**
- * Héberge la photo dans notre bucket Supabase Storage et renvoie son URL
- * publique, transmise ensuite à `POST /api/generate` en `sourceImageUrl`.
+ * Héberge la photo dans notre bucket Supabase Storage et renvoie une URL
+ * signée, transmise ensuite à `POST /api/generate` en `sourceImageUrl`.
+ *
+ * Le bucket est privé (migration 0012) : les photos sources sont le contenu
+ * le plus sensible du projet. L'URL signée reste néanmoins joignable sans
+ * authentification par qui la détient — c'est indispensable, car
+ * `/api/generate-video` la transmet à fal.ai en `start_image_url` et fal.ai
+ * va chercher l'image depuis son propre réseau. Elle expire, elle.
  *
  * Upload direct navigateur → Supabase, sans passer par nos routes : c'est ce
  * qui sort l'hébergeur tiers kie.ai du chemin critique. La photo faisait
@@ -256,8 +272,9 @@ function extensionForMimeType(mimeType: string): string {
  * source n'a jamais servi à autre chose qu'à ce transport — seule
  * `result_url` est persistée (cf. `persistImageBytes`).
  *
- * Le chemin doit commencer par l'id de l'utilisateur : la policy d'insertion
- * du bucket (migration 0008) n'autorise que son propre dossier.
+ * Le chemin doit commencer par l'id de l'utilisateur : les policies du bucket
+ * n'autorisent que son propre dossier, à l'insertion (migration 0008) comme
+ * à la lecture (migration 0011, requise pour pouvoir signer).
  */
 export async function uploadImage(file: File): Promise<string> {
   const supabase = createClient();
@@ -276,10 +293,13 @@ export async function uploadImage(file: File): Promise<string> {
     throw new Error(error.message || "Image upload failed.");
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(UPLOAD_BUCKET).getPublicUrl(path);
-  return publicUrl;
+  const { data, error: signError } = await supabase.storage
+    .from(UPLOAD_BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  if (signError || !data?.signedUrl) {
+    throw new Error(signError?.message || "Image upload failed.");
+  }
+  return data.signedUrl;
 }
 
 /** Relit l'aperçu compressé, vérifie sa taille, puis l'héberge. */
