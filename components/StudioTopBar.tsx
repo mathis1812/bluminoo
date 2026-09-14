@@ -5,6 +5,7 @@ import { useState } from "react";
 import AccountSheet from "@/components/AccountSheet";
 import MenuSheet from "@/components/MenuSheet";
 import RechargeSheet from "@/components/RechargeSheet";
+import GradientText from "@/components/react-bits/GradientText";
 
 /**
  * Barre supérieure partagée par le studio et la page des gabarits — les deux
@@ -101,9 +102,9 @@ export default function StudioTopBar({
         ) : (
           <Link
             href="/landing"
-            className="pointer-events-auto absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[1.8rem] font-bold tracking-tight text-white transition active:opacity-70"
+            className="pointer-events-auto absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[1.8rem] font-bold tracking-tight transition active:opacity-70"
           >
-            Bluminoo
+            <GradientText>Bluminoo</GradientText>
           </Link>
         )}
 

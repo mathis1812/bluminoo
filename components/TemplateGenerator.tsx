@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RevealBurst, SparkleFrame } from "@/components/MagicSparkles";
+import { RevealBurst } from "@/components/MagicSparkles";
+import GeneratingCard from "@/components/studio/GeneratingCard";
+import {
+  GENERATION_LOADING_MESSAGES,
+  IMAGE_EXPECTED_SECONDS,
+  useElapsedProgress,
+} from "@/components/studio/useElapsedProgress";
 import ResultActions from "@/components/ResultActions";
 import ResultViewer from "@/components/ResultViewer";
 import {
@@ -33,22 +39,12 @@ import type { TemplateView, VariantView } from "@/lib/templates";
  * ou en attribut.
  */
 
-/** Durée typique observée d'une génération, pour calibrer la progression. */
-const IMAGE_EXPECTED_SECONDS = 30;
-
 /**
  * Durée du chargement simulé du paywall, calée sur `app/page.tsx` : un
  * visiteur non abonné parcourt tout le flux mais n'obtient qu'un aperçu
  * verrouillé, sans qu'aucun appel fournisseur ait lieu.
  */
 const PAYWALL_PREVIEW_DELAY_MS = 6_000;
-
-const GENERATION_LOADING_MESSAGES = [
-  "Analyzing the light…",
-  "Adjusting the reflections…",
-  "Adding the finishing touches…",
-  "Finalizing the render…",
-];
 
 /**
  * Rythme du fondu avant/après en boucle : le résultat reste visible le plus
@@ -99,7 +95,6 @@ export default function TemplateGenerator({
   const [canShare, setCanShare] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [planId, setPlanId] = useState<string | null>(null);
   const [paywalled, setPaywalled] = useState(false);
@@ -145,30 +140,30 @@ export default function TemplateGenerator({
     setCanShare(isMobileUserAgent && typeof navigator.share === "function");
   }, []);
 
+  // Progression perçue, mutualisée avec le studio. Ce fichier en portait sa
+  // propre copie — mêmes constantes, même formule — qui aurait divergé au
+  // premier ajustement.
+  const { progressPercent } = useElapsedProgress(
+    loading,
+    IMAGE_EXPECTED_SECONDS,
+  );
+
+  // 2,6 s entre deux messages, comme au studio : la cadence d'une seconde
+  // qu'ils partageaient avec l'ancien compteur de secondes les faisait
+  // défiler trop vite pour être lus.
   useEffect(() => {
-    if (!loading) {
-      setElapsedSeconds(0);
-      return;
-    }
+    if (!loading) return;
     const interval = setInterval(() => {
-      setElapsedSeconds((s) => s + 1);
       setLoadingMessageIndex(
         (i) => (i + 1) % GENERATION_LOADING_MESSAGES.length,
       );
-    }, 1_000);
+    }, 2_600);
     return () => clearInterval(interval);
   }, [loading]);
 
   useEffect(() => {
     if (result) playRevealChime();
   }, [result]);
-
-  const progressPercent = Math.min(
-    92,
-    Math.round(
-      100 * (1 - Math.exp((-2 * elapsedSeconds) / IMAGE_EXPECTED_SECONDS)),
-    ),
-  );
 
   /**
    * Hébergement lancé dès la sélection, pendant que le client lit les
@@ -337,22 +332,11 @@ export default function TemplateGenerator({
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 px-6 text-center">
-              <SparkleFrame />
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-              <p className="text-[15px] text-white/70">
-                {GENERATION_LOADING_MESSAGES[loadingMessageIndex]}
-              </p>
-              <div className="h-1 w-40 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-linear"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <p className="text-[12px] tabular-nums text-white/40">
-                {elapsedSeconds}s
-              </p>
-            </div>
+            <GeneratingCard
+              message={GENERATION_LOADING_MESSAGES[loadingMessageIndex]}
+              progressPercent={progressPercent}
+              previewUrl={prepared?.previewUrl}
+            />
           )}
 
           {paywalled && (

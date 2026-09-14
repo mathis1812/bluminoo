@@ -126,6 +126,15 @@ export type TemplateCategory = {
   featured?: boolean;
   /** Visuel de la carte vedette, plus large que les vignettes de grille. */
   featuredImage?: string;
+  /**
+   * Photo d'origine du fondu avant/après de la carte vedette. Absente, la
+   * carte reste fixe.
+   *
+   * Elle doit être cadrée EXACTEMENT comme `featuredImage` — même scène, même
+   * angle, même échelle : le fondu superpose les deux, et le moindre écart de
+   * cadrage fait sauter l'image au lieu de montrer la transformation.
+   */
+  featuredBeforeImage?: string;
   templates: Template[];
 };
 
@@ -171,7 +180,10 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
     slug: "swap-vehicule",
     title: "Swap vehicle",
     featured: true,
-    featuredImage: "/templates/aventador-svj-card.jpg",
+    // Deux recadrages 16:9 du même plan de rue, pour que le fondu se
+    // superpose : la 208 d'origine, puis l'Aventador qui l'a remplacée.
+    featuredImage: "/templates/swap-vehicule-featured.jpg",
+    featuredBeforeImage: "/templates/swap-vehicule-before.jpg",
     templates: VEHICLE_MODELS.map(({ slug, label }) => ({
       slug,
       label,

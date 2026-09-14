@@ -4,7 +4,7 @@ import {
   buildInPlaceEditPrompt,
   buildVehicleSwapPrompt,
 } from "@/lib/place-prompt";
-import { LITE_IMAGE_MODEL_ID } from "@/lib/gemini-jobs";
+import { FLASH_IMAGE_MODEL_ID } from "@/lib/gemini-jobs";
 import { categoryOfTemplate, VEHICLE_MODELS } from "@/lib/templates";
 import {
   GTA5_WORLD_PROMPT,
@@ -196,7 +196,7 @@ export function templateUsesStyleReference(templateSlug: string): boolean {
  * les gabarits, contre 2390 px auparavant sur les univers.
  */
 export function modelForTemplate(templateSlug: string): string | undefined {
-  return categoryOfTemplate(templateSlug) ? LITE_IMAGE_MODEL_ID : undefined;
+  return categoryOfTemplate(templateSlug) ? FLASH_IMAGE_MODEL_ID : undefined;
 }
 
 /**

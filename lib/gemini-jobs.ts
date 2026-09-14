@@ -11,15 +11,29 @@ const GEMINI_TIMEOUT_MS = 240_000;
 // gemini-3-pro-image-preview a été retiré par Google le 25/06/2026 ;
 // gemini-3-pro-image (Nano Banana Pro, sans suffixe -preview) est son
 // remplacement officiel — voir ai.google.dev/gemini-api/docs/deprecations.
-const MODEL_ID = "gemini-3-pro-image";
 /**
- * « Nano Banana 2 Lite ». Identifiant relevé le 04/09 sur l'endpoint
- * `/v1beta/models` de notre propre clé, pas déduit du nom commercial.
+ * « Nano Banana 2 ». Identifiant relevé sur l'endpoint `/v1beta/models` de
+ * notre propre clé, pas déduit du nom commercial.
  *
- * Retenu pour les swaps véhicule après comparaison des modèles : plus rapide
- * que Nano Banana Pro, et surtout meilleur sur les proportions de
- * carrosserie — le seul défaut que ni le prompt ni les paramètres d'image
- * n'avaient réussi à corriger sur cette catégorie.
+ * Modèle par défaut depuis le 09/09, pour le studio libre comme pour les
+ * gabarits. Il remplace le Lite, qui rendait bien les swaps véhicule mais
+ * échouait sur les univers : leurs prompts décrivent une transformation
+ * SÉLECTIVE — reconstruire le décor, ne pas toucher au sujet — et le Lite
+ * appliquait le style à toute l'image, sujet compris.
+ *
+ * Contrairement au Lite, il ACCEPTE `imageConfig.imageSize` : vérifié le
+ * 09/09 sur les trois crans, 1K, 2K et 4K répondent 200 et renvoient une
+ * image. C'est ce qui redonne un effet réel au sélecteur de résolution.
+ */
+export const FLASH_IMAGE_MODEL_ID = "gemini-3.1-flash-image";
+
+const MODEL_ID = FLASH_IMAGE_MODEL_ID;
+
+/**
+ * « Nano Banana 2 Lite ». Plus rapide, et longtemps utilisé pour tous les
+ * gabarits — abandonné le 09/09 (cf. `FLASH_IMAGE_MODEL_ID`). Conservé parce
+ * qu'il reste le seul modèle connu à refuser `imageConfig.imageSize`, et que
+ * le garde-fou ci-dessous doit continuer à le nommer.
  */
 export const LITE_IMAGE_MODEL_ID = "gemini-3.1-flash-lite-image";
 

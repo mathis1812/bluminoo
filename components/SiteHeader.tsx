@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
 import { hasOwnHeader } from "@/lib/app-shell-routes";
 import { createClient } from "@/lib/supabase/client";
+import GradientText from "@/components/react-bits/GradientText";
 
 /**
  * En-tête partagé, réduit au strict nécessaire comme sur le modèle : la
@@ -50,9 +51,9 @@ export default function SiteHeader() {
     <header className="flex items-center justify-between px-4 pt-3 sm:px-6">
       <Link
         href="/"
-        className="text-2xl font-bold tracking-[-0.03em] text-white sm:text-[26px]"
+        className="text-2xl font-bold tracking-[-0.03em] sm:text-[26px]"
       >
-        Bluminoo
+        <GradientText>Bluminoo</GradientText>
       </Link>
 
       {isLoggedIn !== null &&

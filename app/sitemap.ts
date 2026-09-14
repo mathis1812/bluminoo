@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { TEMPLATE_CATEGORIES } from "@/lib/templates";
 
-const SITE_URL = "https://bluminoo.vercel.app";
+const SITE_URL = "https://bluminoo.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Les pages de gabarit sont dérivées du catalogue plutôt qu'énumérées à la

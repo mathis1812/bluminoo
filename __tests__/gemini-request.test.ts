@@ -112,7 +112,10 @@ describe("generateGeminiImage : corps de la requête", () => {
     });
 
     const call = captured[0];
-    expect(call.url).toContain("gemini-3-pro-image");
+    // Nano Banana 2 depuis le 09/09 — il accepte `imageSize`, contrairement
+    // au Lite, ce qui rend le cran de résolution réel jusqu'au modèle.
+    expect(call.url).toContain("gemini-3.1-flash-image");
+    expect(call.url).not.toContain("lite");
     expect(imageConfigOf(call)).toEqual({ imageSize: "2K" });
   });
 

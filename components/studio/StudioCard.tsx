@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { SparkleFrame, RevealBurst } from "@/components/MagicSparkles";
+import { RevealBurst } from "@/components/MagicSparkles";
+import GeneratingCard from "./GeneratingCard";
 import type { GenerationMode } from "@/lib/generation-tiers";
 import type { PreparedImage } from "@/lib/studio-image";
 import { GENERATION_LOADING_MESSAGES } from "./useElapsedProgress";
@@ -37,7 +38,6 @@ export default function StudioCard({
   onReset,
   onOpenViewer,
   loadingMessageIndex,
-  elapsedSeconds,
   progressPercent,
   children,
 }: {
@@ -55,7 +55,6 @@ export default function StudioCard({
   onReset: () => void;
   onOpenViewer: () => void;
   loadingMessageIndex: number;
-  elapsedSeconds: number;
   progressPercent: number;
   children?: ReactNode;
 }) {
@@ -208,22 +207,11 @@ export default function StudioCard({
               </div>
             </div>
           ) : loading ? (
-            <div className="relative flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
-              <SparkleFrame />
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-              <p className="text-[15px] text-white/60">
-                {GENERATION_LOADING_MESSAGES[loadingMessageIndex]}
-              </p>
-              <div className="h-1 w-40 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-linear"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <p className="text-[12px] tabular-nums text-white/30">
-                {elapsedSeconds}s
-              </p>
-            </div>
+            <GeneratingCard
+              message={GENERATION_LOADING_MESSAGES[loadingMessageIndex]}
+              progressPercent={progressPercent}
+              previewUrl={prepared?.previewUrl}
+            />
           ) : prepared ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}

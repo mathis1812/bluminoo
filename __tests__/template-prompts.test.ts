@@ -19,7 +19,7 @@ import {
   templateLocksAspectRatio,
   templateUsesStyleReference,
 } from "@/lib/template-prompts";
-import { LITE_IMAGE_MODEL_ID } from "@/lib/gemini-jobs";
+import { FLASH_IMAGE_MODEL_ID } from "@/lib/gemini-jobs";
 
 describe("le catalogue client ne fuite aucun prompt", () => {
   const serialized = JSON.stringify(TEMPLATE_CATEGORIES).toLowerCase();
@@ -154,28 +154,28 @@ describe("templateLocksAspectRatio", () => {
 });
 
 describe("modelForTemplate", () => {
-  it("Nano Banana 2 Lite pour toutes les voitures", () => {
+  it("Nano Banana 2 pour toutes les voitures", () => {
     const cars =
       TEMPLATE_CATEGORIES.find((c) => c.slug === "swap-vehicule")?.templates ??
       [];
     expect(cars.length).toBeGreaterThan(0);
     for (const car of cars) {
-      expect(modelForTemplate(car.slug), car.slug).toBe(LITE_IMAGE_MODEL_ID);
+      expect(modelForTemplate(car.slug), car.slug).toBe(FLASH_IMAGE_MODEL_ID);
     }
   });
 
-  it("Nano Banana 2 Lite aussi pour les pranks et les univers", () => {
+  it("Nano Banana 2 aussi pour les pranks et les univers", () => {
     for (const slug of ["voiture-accidentee", "minecraft", "gta-5", "lego"]) {
-      expect(modelForTemplate(slug), slug).toBe(LITE_IMAGE_MODEL_ID);
+      expect(modelForTemplate(slug), slug).toBe(FLASH_IMAGE_MODEL_ID);
     }
   });
 
   it("tous les gabarits du catalogue sont couverts", () => {
-    // Un gabarit ajouté plus tard hériterait du Lite sans qu'on y pense :
+    // Un gabarit ajouté plus tard hériterait du modèle sans qu'on y pense :
     // ce test le rend explicite plutôt qu'implicite.
     for (const template of allTemplates()) {
       expect(modelForTemplate(template.slug), template.slug).toBe(
-        LITE_IMAGE_MODEL_ID,
+        FLASH_IMAGE_MODEL_ID,
       );
     }
   });
