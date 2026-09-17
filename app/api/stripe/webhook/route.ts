@@ -60,6 +60,38 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createServiceClient();
+
+  /**
+   * Réservation de l'événement — doit précéder tout traitement.
+   *
+   * Stripe livre *au moins une fois* : il rejoue ce qu'il n'a pas vu acquitté
+   * en 2xx, et peut livrer deux fois le même événement même quand tout va
+   * bien. Sans ça, un `checkout.session.completed` de pack rejoué rappelait
+   * `addCredits` — mille crédits pour un seul paiement.
+   *
+   * `23505` est la violation de clé primaire : l'événement est déjà traité,
+   * on ressort en 200 sans rien refaire. Une erreur d'insertion d'un autre
+   * genre (base injoignable) renvoie 500 pour que Stripe rejoue plus tard,
+   * plutôt que de traiter un événement qu'on ne saurait pas dédupliquer.
+   */
+  const { error: claimError } = await supabase
+    .from("stripe_events")
+    .insert({ id: event.id, type: event.type });
+
+  if (claimError) {
+    if (claimError.code === "23505") {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    console.error(
+      `[stripe-webhook] unable to claim event ${event.id}:`,
+      claimError,
+    );
+    return NextResponse.json(
+      { error: "Unable to record the event, please retry." },
+      { status: 500 },
+    );
+  }
+
   let dbWriteFailed = false;
 
   if (event.type === "checkout.session.completed") {
@@ -257,6 +289,20 @@ export async function POST(req: NextRequest) {
   }
 
   if (dbWriteFailed) {
+    // La réservation saute avec l'échec : sans ça le rejeu de Stripe verrait
+    // l'événement comme déjà traité et le paiement resterait sans effet —
+    // on aurait échangé le double crédit contre une perte pure.
+    const { error: releaseError } = await supabase
+      .from("stripe_events")
+      .delete()
+      .eq("id", event.id);
+    if (releaseError) {
+      console.error(
+        `[stripe-webhook] failed to release event ${event.id} after a write error; Stripe's retry will be ignored:`,
+        releaseError,
+      );
+    }
+
     return NextResponse.json(
       { error: "Profile update failed, please try again." },
       { status: 500 },
