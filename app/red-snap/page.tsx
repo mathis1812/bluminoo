@@ -29,14 +29,21 @@ export const metadata: Metadata = {
     "Send your Bluminoo generations as a Red Snap, straight from your camera roll.",
 };
 
-/** Format exact du tutoriel du modèle : capture d'écran de téléphone. */
-const VIDEO_ASPECT_RATIO = "1080 / 2346";
+/**
+ * Format exact de notre tutoriel : capture d'écran de téléphone, 384 × 848.
+ *
+ * Valait 1080 / 2346 jusqu'au 20/09 — le format du tutoriel du produit de
+ * référence, relevé avant qu'on ait le nôtre. L'écart n'était que de 1,6 %,
+ * donc invisible, mais il rognait la vidéo d'une fine bande. À recaler si le
+ * tutoriel est réenregistré dans une autre définition.
+ */
+const VIDEO_ASPECT_RATIO = "384 / 848";
 /**
  * Hauteur maximale laissée à la vidéo. La largeur en découle par le ratio,
  * moins les 16px de marge intérieure du cadre (`p-2`) — même calcul que le
  * modèle, écrit ici lisiblement plutôt qu'en constante pré-multipliée.
  */
-const VIDEO_MAX_WIDTH = "min(100%, calc((84dvh - 16px) * (1080 / 2346)))";
+const VIDEO_MAX_WIDTH = "min(100%, calc((84dvh - 16px) * (384 / 848)))";
 
 export default function RedSnapPage() {
   const videoUrl = process.env.NEXT_PUBLIC_RED_SNAP_VIDEO_URL;
