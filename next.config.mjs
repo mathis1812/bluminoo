@@ -13,6 +13,44 @@ const nextConfig = {
      */
     formats: ["image/avif", "image/webp"],
   },
+  /**
+   * En-têtes de sécurité, appliqués à toutes les routes.
+   *
+   * Le plus utile ici est `X-Frame-Options` : l'application expose la
+   * suppression de compte et le changement de formule en un clic, et sans lui
+   * elle est encadrable dans une iframe — un overlay suffit alors à faire
+   * cliquer quelqu'un sur « supprimer mon compte » en croyant cliquer
+   * ailleurs.
+   *
+   * `Referrer-Policy` compte depuis que `photo-uploads` est privé (migration
+   * 0012) : ses URLs portent un jeton en query, et l'en-tête `Referer` par
+   * défaut le laisserait fuiter vers un site tiers depuis une page qui
+   * l'affiche.
+   *
+   * Pas de `preload` sur HSTS : c'est un engagement difficile à défaire, à
+   * n'ajouter qu'une fois le domaine stabilisé. Pas de CSP non plus pour
+   * l'instant — Stripe et Supabase demandent une liste d'origines à établir
+   * avec soin, et une CSP approximative casse le paiement.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains",
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       { source: "/tarifs", destination: "/pricing", permanent: true },
