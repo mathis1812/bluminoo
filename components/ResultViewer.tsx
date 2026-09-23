@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import ResultActions from "@/components/ResultActions";
 
 /**
@@ -25,6 +26,18 @@ import ResultActions from "@/components/ResultActions";
  * Les actions viennent de `ResultActions`, celui-là même que la vignette
  * utilise. Un jeu de boutons propre au visualiseur finirait par diverger du
  * premier — un bouton ajouté d'un côté et pas de l'autre.
+ *
+ * **Rendu dans un portail vers `document.body`, et ce n'est pas un détail.**
+ * Le rail de l'accueil porte `transform: translateY(...)` (useRailScreens),
+ * et un élément transformé devient le bloc conteneur de ses descendants en
+ * `position: fixed`. Rendu à sa place naturelle — dans les enfants de
+ * `StudioCard`, donc dans le rail — le `fixed inset-0` ci-dessous ne visait
+ * plus l'écran mais le rail, haut de DEUX panneaux : l'overlay faisait deux
+ * écrans, son contenu se centrait un écran plus bas, et l'on découvrait un
+ * grand vide noir surmontant un rendu coupé en pied d'écran, avec les
+ * actions qui semblaient flotter par-dessus les gabarits. Mesuré : 412 × 1688
+ * pour un écran de 412 × 844. Le portail sort du rail, le `fixed` retrouve
+ * l'écran. Ne pas le remettre dans l'arbre du rail.
  */
 export default function ResultViewer({
   resultUrl,
@@ -57,7 +70,10 @@ export default function ResultViewer({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
-  return (
+  // Jamais rendu côté serveur : le parent ne le monte que sur un clic.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -127,6 +143,7 @@ export default function ResultViewer({
           editLabel={editLabel}
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
