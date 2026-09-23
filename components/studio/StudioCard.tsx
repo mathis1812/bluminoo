@@ -68,6 +68,7 @@ export default function StudioCard({
    * (--accueil-carte-boite), pas en CSS déclaratif pur.
    */
   const cardWrapRef = useRef<HTMLDivElement>(null);
+  const belowRef = useRef<HTMLDivElement>(null);
   const [cardSize, setCardSize] = useState<{ w: number; h: number } | null>(
     null,
   );
@@ -77,8 +78,26 @@ export default function StudioCard({
     if (!wrap) return;
     const compute = () => {
       const availW = wrap.clientWidth;
-      const availH = wrap.clientHeight;
-      if (!availW || !availH) return;
+      if (!availW) return;
+      /**
+       * La hauteur disponible est celle du conteneur MOINS ce qui vit sous
+       * la carte — `children`, c'est-à-dire la rangée d'actions dès qu'un
+       * rendu existe.
+       *
+       * Sans cette soustraction, la carte prenait toute la hauteur du
+       * conteneur et les actions débordaient du panneau. Deux symptômes,
+       * une seule cause : le rendu poussé trop bas et coupé en pied
+       * d'écran, et les boutons qui se dessinaient par-dessus le panneau
+       * des gabarits — un panneau du rail qui déborde se peint sur le
+       * suivant, `overflow-hidden` ne clippant que l'extérieur du rail.
+       *
+       * Mesuré plutôt que codé en dur : la rangée change de hauteur selon
+       * le palier (le bouton Red Snap n'apparaît pas pour tout le monde) et
+       * un message d'erreur peut s'y ajouter.
+       */
+      const belowH = belowRef.current?.offsetHeight ?? 0;
+      const availH = wrap.clientHeight - belowH;
+      if (availH <= 0) return;
       // La plus grande boîte au ratio 3:4 qui tient dans l'espace
       // disponible, plafonnée à 92% de la largeur — mêmes deux contraintes
       // que le modèle, juste résolues côté client au lieu d'une variable
@@ -86,11 +105,19 @@ export default function StudioCard({
       const capW = availW * 0.92;
       const w = Math.min(capW, availH * (3 / 4));
       const h = w * (4 / 3);
-      setCardSize({ w: Math.round(w), h: Math.round(h) });
+      setCardSize((prev) =>
+        prev && prev.w === Math.round(w) && prev.h === Math.round(h)
+          ? prev
+          : { w: Math.round(w), h: Math.round(h) },
+      );
     };
     compute();
+    // Les deux sont observés : le conteneur pour les rotations et la barre
+    // d'adresse mobile, le bloc du dessous parce qu'il apparaît à la
+    // première génération — la carte doit alors se réduire.
     const observer = new ResizeObserver(compute);
     observer.observe(wrap);
+    if (belowRef.current) observer.observe(belowRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -267,7 +294,9 @@ export default function StudioCard({
           )}
         </div>
 
-        {children}
+        <div ref={belowRef} className="w-full shrink-0">
+          {children}
+        </div>
       </div>
     </div>
   );
