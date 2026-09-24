@@ -78,7 +78,13 @@ export async function prepareShareFile(blob: Blob): Promise<File> {
 export interface ShareDeps {
   /** Convert the raw result blob to the final File to share. Defaults to prepareShareFile. */
   prepareFile?: (blob: Blob) => Promise<File>;
-  /** Override window.location.href assignment (used by sendAsRedSnap). */
+  /**
+   * Point d'injection d'une redirection. **Délibérément inutilisé** : le flux
+   * Red Snap s'arrête à la feuille de partage depuis le 24/09. Il reste
+   * déclaré pour que le test de non-régression puisse vérifier que personne
+   * n'a réintroduit de redirection automatique — elle arrachait de l'écran
+   * les gens qui venaient de partager vers Snapchat.
+   */
   redirect?: (url: string) => void;
 }
 
@@ -147,26 +153,33 @@ export async function shareToSnapchat(
 export interface SendAsRedSnapState {
   sendingRedSnap: boolean;
   error: string;
+  /** Passe à true après un partage abouti : l'UI peut alors proposer le repli. */
+  sharedOnce: boolean;
 }
 
 /**
- * Two-step "Red Snap" flow:
- *   1. Opens the native share sheet so the user can save the image to their camera roll.
- *   2. Deep-links directly to the Snapchat "Camera Roll" lens so the user can
- *      pick the saved photo without searching for the filter manually.
+ * "Red Snap" : on ouvre la feuille de partage native, et c'est tout.
  *
- * Note: no Web API can save directly to the camera roll — Apple/Google block it
- * for privacy reasons, so step 1 always requires a user action.
+ * Snapchat y figure comme destination, et son extension de partage ouvre
+ * l'application avec la photo déjà chargée, prête à envoyer. Deux gestes en
+ * tout : Red Snap, puis Snapchat dans la liste. La photo ne passe jamais par
+ * la pellicule, et aucun filtre n'est à retrouver.
+ *
+ * Cette fonction redirigeait auparavant vers le lens « Camera Roll » juste
+ * après la feuille. Ça poussait tout le monde vers le chemin long — tout
+ * enregistrer, ouvrir le lens, retrouver la photo, quatre gestes — et ça
+ * arrachait de l'écran ceux qui venaient justement de partager vers
+ * Snapchat. Le lens reste accessible, mais en repli proposé par l'UI
+ * (`sharedOnce`), pour qui a enregistré la photo au lieu de la partager.
+ *
+ * Rien de tout cela ne permet d'écrire dans la pellicule sans geste de
+ * l'utilisateur : Apple et Google le bloquent, aucune API web n'y donne
+ * accès. La feuille de partage est le plus court chemin qui existe.
  */
 export async function sendAsRedSnap(
   result: string,
   setState: (patch: Partial<SendAsRedSnapState>) => void,
-  {
-    prepareFile = prepareShareFile,
-    redirect = (url) => {
-      window.location.href = url;
-    },
-  }: ShareDeps = {},
+  { prepareFile = prepareShareFile }: ShareDeps = {},
 ): Promise<void> {
   if (!result) return;
   if (!navigator.share) {
@@ -193,8 +206,10 @@ export async function sendAsRedSnap(
 
     await navigator.share({ files: [file] });
 
-    // Step 2: jump directly to the Snapchat Camera Roll lens.
-    redirect(SNAP_UPLOAD_LENS_URL);
+    // Pas de redirection : si l'utilisateur a choisi Snapchat, il y est déjà
+    // avec sa photo. On signale seulement que le partage a eu lieu, pour que
+    // l'UI propose le lens à qui aurait plutôt enregistré l'image.
+    setState({ sharedOnce: true });
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") return;
     setState({
