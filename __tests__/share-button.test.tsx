@@ -172,12 +172,12 @@ describe("shareToSnapchat", () => {
 // ---------------------------------------------------------------------------
 
 describe("sendAsRedSnap", () => {
-  let state: { sendingRedSnap: boolean; error: string };
+  let state: { sendingRedSnap: boolean; error: string; sharedOnce: boolean };
   let setState: (patch: Partial<typeof state>) => void;
   let redirectFn: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    state = { sendingRedSnap: false, error: "" };
+    state = { sendingRedSnap: false, error: "", sharedOnce: false };
     setState = (patch) => Object.assign(state, patch);
     redirectFn = vi.fn();
 
@@ -200,7 +200,13 @@ describe("sendAsRedSnap", () => {
     vi.unstubAllGlobals();
   });
 
-  it("happy path — sendingRedSnap resets to false, error empty, redirect called", async () => {
+  /**
+   * Garde-fou de la décision du 24/09 : le flux Red Snap s'arrête à la feuille
+   * de partage. Une redirection automatique vers le lens arrachait de l'écran
+   * les gens qui venaient de choisir Snapchat — ils y étaient déjà, avec leur
+   * photo prête à envoyer. Si ce test casse, c'est que quelqu'un l'a remise.
+   */
+  it("happy path — partage abouti, sharedOnce à true, AUCUNE redirection", async () => {
     await sendAsRedSnap("https://cdn.example.com/result.jpg", setState, {
       prepareFile: stubPrepareFile,
       redirect: redirectFn,
@@ -208,7 +214,10 @@ describe("sendAsRedSnap", () => {
 
     expect(state.sendingRedSnap).toBe(false);
     expect(state.error).toBe("");
-    expect(redirectFn).toHaveBeenCalledWith(SNAP_UPLOAD_LENS_URL);
+    expect(state.sharedOnce).toBe(true);
+    expect(redirectFn).not.toHaveBeenCalled();
+    // Le lens reste exporté : l'UI le propose en repli (cf. ResultActions).
+    expect(SNAP_UPLOAD_LENS_URL).toContain("snapchat.com/lens/");
   });
 
   it("AbortError — sendingRedSnap resets to false, no error, no redirect", async () => {

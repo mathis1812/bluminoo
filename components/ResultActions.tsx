@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import EditPanel from "@/components/EditPanel";
-import { sendAsRedSnap as sendAsRedSnapFn } from "@/lib/share-utils";
+import {
+  sendAsRedSnap as sendAsRedSnapFn,
+  SNAP_UPLOAD_LENS_URL,
+} from "@/lib/share-utils";
 
 /**
  * Actions proposées une fois le rendu obtenu, partagées par le studio et
@@ -37,6 +40,7 @@ export default function ResultActions({
   editLabel?: string;
 }) {
   const [sendingRedSnap, setSendingRedSnap] = useState(false);
+  const [sharedOnce, setSharedOnce] = useState(false);
   const [editing, setEditing] = useState(false);
 
   const download = useCallback(async () => {
@@ -76,6 +80,7 @@ export default function ResultActions({
     await sendAsRedSnapFn(resultUrl, (patch) => {
       if (patch.sendingRedSnap !== undefined)
         setSendingRedSnap(patch.sendingRedSnap);
+      if (patch.sharedOnce !== undefined) setSharedOnce(patch.sharedOnce);
       if (patch.error !== undefined) onError(patch.error);
     });
   }, [resultUrl, onError]);
@@ -131,6 +136,20 @@ export default function ResultActions({
           <GhostIcon />
           Unlock Red Snap
         </Link>
+      )}
+
+      {/* Repli, affiché seulement après un partage. Choisir Snapchat dans la
+          feuille suffit — la photo y arrive prête à envoyer. Mais certains
+          l'enregistrent dans leurs photos par réflexe : pour ceux-là, et pour
+          eux seuls, on propose le filtre qui va la rechercher. L'afficher
+          d'emblée renverrait tout le monde vers le chemin long. */}
+      {sharedOnce && (
+        <a
+          href={SNAP_UPLOAD_LENS_URL}
+          className="text-center text-[14px] leading-5 text-white/45 underline underline-offset-4 transition active:opacity-70"
+        >
+          Saved to your photos instead? Open the Snapchat filter
+        </a>
       )}
 
       {/* Repartir de zéro n'agit pas sur le rendu : le garder discret évite
