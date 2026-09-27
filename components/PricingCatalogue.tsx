@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { openAuthSheet } from "@/components/AuthSheet";
 import { PLANS, TOPUPS, formatPrice, type PlanId, type TopupId } from "@/lib/stripe";
 import {
   hasRedSnap as planHasRedSnap,
@@ -124,6 +125,16 @@ export default function PricingCatalogue() {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
+        // 401 : il faut un compte pour payer, mais pas pour arriver ici — le
+        // paywall du studio envoie sur cette page un visiteur non connecte
+        // (cf. useStudioGeneration). Lui afficher « Sign in to continue » en
+        // rouge le laissait devant une impasse, au moment precis ou il
+        // voulait payer. On ouvre la creation de compte : il revient ensuite
+        // sur ce meme choix de palier.
+        if (res.status === 401) {
+          openAuthSheet("signup");
+          return;
+        }
         setError(data?.error || "Unable to start checkout. Please try again.");
         return;
       }
