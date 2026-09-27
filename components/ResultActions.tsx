@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import EditPanel from "@/components/EditPanel";
 import {
   sendAsRedSnap as sendAsRedSnapFn,
-  SNAP_UPLOAD_LENS_URL,
+  SNAPCHAT_APP_URL,
+  SNAPCHAT_FALLBACK_DELAY_MS,
 } from "@/lib/share-utils";
 
 /**
@@ -40,7 +41,13 @@ export default function ResultActions({
   editLabel?: string;
 }) {
   const [sendingRedSnap, setSendingRedSnap] = useState(false);
-  const [sharedOnce, setSharedOnce] = useState(false);
+  const [savedOnce, setSavedOnce] = useState(false);
+  // Passe à true si la page est encore là après la redirection : Safari l'a
+  // bloquée, faute de geste utilisateur frais (cf. SNAPCHAT_FALLBACK_DELAY_MS).
+  const [snapchatBlocked, setSnapchatBlocked] = useState(false);
+  const fallbackTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(fallbackTimer.current), []);
   const [editing, setEditing] = useState(false);
 
   const download = useCallback(async () => {
@@ -80,7 +87,15 @@ export default function ResultActions({
     await sendAsRedSnapFn(resultUrl, (patch) => {
       if (patch.sendingRedSnap !== undefined)
         setSendingRedSnap(patch.sendingRedSnap);
-      if (patch.sharedOnce !== undefined) setSharedOnce(patch.sharedOnce);
+      if (patch.savedOnce !== undefined) {
+        setSavedOnce(patch.savedOnce);
+        // Armé au moment de l'enregistrement, donc juste avant la redirection.
+        // S'il arrive à échéance, c'est qu'on n'a pas quitté la page.
+        fallbackTimer.current = setTimeout(
+          () => setSnapchatBlocked(true),
+          SNAPCHAT_FALLBACK_DELAY_MS,
+        );
+      }
       if (patch.error !== undefined) onError(patch.error);
     });
   }, [resultUrl, onError]);
@@ -104,7 +119,7 @@ export default function ResultActions({
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
       <button type="button" onClick={download} className={LIGHT_BUTTON}>
-        {canShare ? "Save" : "Download"}
+        {canShare ? "Share" : "Download"}
       </button>
 
       {onEdited && (
@@ -128,7 +143,7 @@ export default function ResultActions({
           className={SNAP_BUTTON}
         >
           <GhostIcon />
-          {sendingRedSnap ? "Preparing…" : "Red Snap"}
+          {sendingRedSnap ? "Saving…" : "Red Snap"}
           <NewSnapSquare />
         </button>
       ) : (
@@ -138,18 +153,28 @@ export default function ResultActions({
         </Link>
       )}
 
-      {/* Repli, affiché seulement après un partage. Choisir Snapchat dans la
-          feuille suffit — la photo y arrive prête à envoyer. Mais certains
-          l'enregistrent dans leurs photos par réflexe : pour ceux-là, et pour
-          eux seuls, on propose le filtre qui va la rechercher. L'afficher
-          d'emblée renverrait tout le monde vers le chemin long. */}
-      {sharedOnce && (
-        <a
-          href={SNAP_UPLOAD_LENS_URL}
-          className="text-center text-[14px] leading-5 text-white/45 underline underline-offset-4 transition active:opacity-70"
-        >
-          Saved to your photos instead? Open the Snapchat filter
-        </a>
+      {/* Après l'enregistrement : les trois gestes qui restent, et qui se
+          déroulent dans Snapchat où l'on ne peut plus rien pour l'utilisateur.
+          Le tutoriel vidéo les enseigne en entier — ces lignes ne sont qu'un
+          rappel, pas un mode d'emploi bis.
+
+          Le bouton n'apparaît que si la redirection a été bloquée : quand
+          elle passe, la page est déjà quittée et personne ne le voit. */}
+      {savedOnce && (
+        <div className="mt-2 w-full">
+          <ol className="mx-auto flex max-w-[22rem] list-decimal flex-col gap-1 pl-5 text-left text-[14px] leading-5 text-white/45">
+            <li>Green screen, then pick the photo you just saved</li>
+            <li>Step out of the frame</li>
+            <li>Take the shot, then send it</li>
+          </ol>
+
+          {snapchatBlocked && (
+            <a href={SNAPCHAT_APP_URL} className={`${SNAP_BUTTON} mt-3 w-full`}>
+              <GhostIcon />
+              Open Snapchat
+            </a>
+          )}
+        </div>
       )}
 
       {/* Repartir de zéro n'agit pas sur le rendu : le garder discret évite
