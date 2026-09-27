@@ -51,6 +51,19 @@ describe("middleware — la landing sur la racine", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 
+  /**
+   * `/templates` redirige vers `/?screen=templates`. Reecrire cette URL vers
+   * la landing rendait les gabarits inatteignables deconnecte — Googlebot
+   * compris, alors que le sitemap les annonce.
+   */
+  it("laisse passer une demande d'ecran explicite", async () => {
+    getUser.mockResolvedValue({ data: { user: null } });
+
+    const response = await middleware(requestFor("/?screen=templates"));
+
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+  });
+
   it("n'intercepte que la racine", async () => {
     getUser.mockResolvedValue({ data: { user: null } });
 

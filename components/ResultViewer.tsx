@@ -129,7 +129,14 @@ export default function ResultViewer({
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+      {/* `max-h` + defilement : en temps normal cette barre ne fait qu'une
+          rangee de boutons, mais « Edit » y monte `EditPanel`, qui affiche la
+          photo source en pleine largeur. Sur une source 9:16 et un ecran de
+          412 px, cette seule image fait ~675 px ; avec le champ et les deux
+          boutons, le panneau depassait l'ecran et ses boutons Cancel/Edit
+          devenaient inatteignables — la boite de dialogue est en `fixed
+          inset-0` et ne defile pas. */}
+      <div className="max-h-[78dvh] shrink-0 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
         <ResultActions
           resultUrl={resultUrl}
           hasRedSnap={hasRedSnap}
