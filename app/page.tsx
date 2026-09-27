@@ -56,7 +56,12 @@ export default function Home() {
     // `viewportRef` : c'est CET élément qui porte `h-dvh`, donc la hauteur
     // qu'un panneau occupe réellement. On la mesure ici plutôt que de la
     // déduire de `window.innerHeight` — cf. `panelHeight` dans useRailScreens.
-    <div ref={viewportRef} className="h-dvh overflow-hidden">
+    <div
+      ref={viewportRef}
+      // `mx-auto max-w-app` : la colonne de telephone sur ordinateur, posee
+      // ici plutot que dans MainShell — cf. le commentaire de `/` la-bas.
+      className="mx-auto h-dvh w-full max-w-app overflow-hidden md:border-x md:border-white/[0.06]"
+    >
       <StudioTopBar
         credits={account.credits}
         planId={account.planId}

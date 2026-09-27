@@ -49,6 +49,19 @@ const config: Config = {
         body: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
       },
+      maxWidth: {
+        // Largeur de l'app sur ordinateur. Le produit est concu pour le
+        // telephone — le trafic vient de TikTok, le rendu part sur Snapchat —
+        // et aucun ecran de l'app n'avait de point de rupture. Sur 1920 px,
+        // tout s'etirait : une vignette de gabarit a 37,6 % du conteneur
+        // faisait 720 px au lieu de 150, et comme son `sizes` annonce 210 px
+        // au navigateur, il telechargeait une petite image puis l'etirait.
+        //
+        // 480 px : un peu plus large que le plus grand telephone, et la
+        // largeur a laquelle l'etagere montre encore ~2,7 vignettes, ce qui
+        // signale qu'elle defile (cf. TemplateShelf).
+        app: "480px",
+      },
       letterSpacing: {
         // L'interlettrage négatif des titres est la signature typographique
         // du modèle : -1px à 40px, -0.8px à 32px.
