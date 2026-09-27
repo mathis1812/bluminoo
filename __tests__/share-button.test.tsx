@@ -17,7 +17,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   shareToSnapchat,
   sendAsRedSnap,
-  SNAP_UPLOAD_LENS_URL,
+  SNAPCHAT_APP_URL,
 } from "@/lib/share-utils";
 
 // ---------------------------------------------------------------------------
@@ -172,12 +172,12 @@ describe("shareToSnapchat", () => {
 // ---------------------------------------------------------------------------
 
 describe("sendAsRedSnap", () => {
-  let state: { sendingRedSnap: boolean; error: string; sharedOnce: boolean };
+  let state: { sendingRedSnap: boolean; error: string; savedOnce: boolean };
   let setState: (patch: Partial<typeof state>) => void;
   let redirectFn: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    state = { sendingRedSnap: false, error: "", sharedOnce: false };
+    state = { sendingRedSnap: false, error: "", savedOnce: false };
     setState = (patch) => Object.assign(state, patch);
     redirectFn = vi.fn();
 
@@ -201,12 +201,18 @@ describe("sendAsRedSnap", () => {
   });
 
   /**
-   * Garde-fou de la décision du 24/09 : le flux Red Snap s'arrête à la feuille
-   * de partage. Une redirection automatique vers le lens arrachait de l'écran
-   * les gens qui venaient de choisir Snapchat — ils y étaient déjà, avec leur
-   * photo prête à envoyer. Si ce test casse, c'est que quelqu'un l'a remise.
+   * Ce test exigeait l'INVERSE jusqu'au 27/09 — aucune redirection — et c'était
+   * juste tant que le bouton partageait : il déposait la photo dans Snapchat,
+   * donc rediriger arrachait de l'écran quelqu'un qui y était déjà.
+   *
+   * Le bouton enregistre maintenant dans la pellicule, parce que la méthode
+   * Red Snap se joue dans la caméra de Snapchat : fond green screen, sortir du
+   * cadre, déclencher. Partir vers l'application est la suite du geste.
+   *
+   * Ce qu'on garde donc : la redirection part après un enregistrement abouti,
+   * et jamais autrement. La suite du fichier vérifie chaque cas d'échec.
    */
-  it("happy path — partage abouti, sharedOnce à true, AUCUNE redirection", async () => {
+  it("happy path — enregistrement abouti, savedOnce à true, redirection vers Snapchat", async () => {
     await sendAsRedSnap("https://cdn.example.com/result.jpg", setState, {
       prepareFile: stubPrepareFile,
       redirect: redirectFn,
@@ -214,12 +220,17 @@ describe("sendAsRedSnap", () => {
 
     expect(state.sendingRedSnap).toBe(false);
     expect(state.error).toBe("");
-    expect(state.sharedOnce).toBe(true);
-    expect(redirectFn).not.toHaveBeenCalled();
-    // Le lens reste exporté : l'UI le propose en repli (cf. ResultActions).
-    expect(SNAP_UPLOAD_LENS_URL).toContain("snapchat.com/lens/");
+    expect(state.savedOnce).toBe(true);
+    expect(redirectFn).toHaveBeenCalledWith(SNAPCHAT_APP_URL);
+    // Un lien profond, pas un lens : celui qu'on visait n'existe plus.
+    expect(SNAPCHAT_APP_URL).toBe("snapchat://");
   });
 
+  /**
+   * Feuille refermée sans rien enregistrer : rien dans la pellicule, donc
+   * rien à faire dans Snapchat. Rediriger ici enverrait l'utilisateur dans
+   * une application où il n'a aucune photo à mettre en fond.
+   */
   it("AbortError — sendingRedSnap resets to false, no error, no redirect", async () => {
     Object.defineProperty(navigator, "share", {
       writable: true,

@@ -16,12 +16,28 @@ export const SNAP_SHARE_MAX_DIMENSION = 1600;
 export const SNAP_SHARE_JPEG_QUALITY = 0.85;
 
 /**
- * Official Snapchat "Camera Roll" lens — opens directly in Snapchat's camera
- * on mobile, letting the user pick a photo from their library and apply it as
- * a filter without having to search manually.
+ * Lien profond vers l'application Snapchat.
+ *
+ * Remplace le lens « Camera Roll » (`snapchat.com/lens/a9cd4b5d…`) visé
+ * jusqu'au 27/09 : ce lens n'est plus d'actualité, et le lien de repli affiché
+ * sous le bouton Red Snap envoyait donc les utilisateurs dans le vide.
+ *
+ * On ouvre l'application, pas un outil : l'outil green screen vit dans la
+ * caméra de Snapchat et n'a pas d'URL publique qui l'active. C'est le tutoriel
+ * vidéo intégré qui apprend à l'atteindre.
  */
-export const SNAP_UPLOAD_LENS_URL =
-  "https://www.snapchat.com/lens/a9cd4b5d2687457eb0be82bd332a2a74";
+export const SNAPCHAT_APP_URL = "snapchat://";
+
+/**
+ * Délai avant d'afficher le bouton de repli « Open Snapchat ».
+ *
+ * Safari bloque une navigation qui ne part pas d'un geste utilisateur, et
+ * `await navigator.share()` consomme le geste du clic d'origine : la
+ * redirection automatique qui suit peut donc ne rien faire du tout. Si la page
+ * est toujours là passé ce délai, c'est qu'elle a été bloquée, et on rend la
+ * main à l'utilisateur — dont le tap fournira un geste frais.
+ */
+export const SNAPCHAT_FALLBACK_DELAY_MS = 800;
 
 // ── prepareShareFile ─────────────────────────────────────────────────────────
 
@@ -79,11 +95,13 @@ export interface ShareDeps {
   /** Convert the raw result blob to the final File to share. Defaults to prepareShareFile. */
   prepareFile?: (blob: Blob) => Promise<File>;
   /**
-   * Point d'injection d'une redirection. **Délibérément inutilisé** : le flux
-   * Red Snap s'arrête à la feuille de partage depuis le 24/09. Il reste
-   * déclaré pour que le test de non-régression puisse vérifier que personne
-   * n'a réintroduit de redirection automatique — elle arrachait de l'écran
-   * les gens qui venaient de partager vers Snapchat.
+   * Redirection vers Snapchat, appelée après un enregistrement abouti.
+   *
+   * Elle avait été retirée le 24/09 parce qu'elle arrachait de l'écran ceux
+   * qui venaient de partager *vers* Snapchat : ils y étaient déjà, et la
+   * redirection était une interruption. Depuis le 27/09 le bouton enregistre
+   * dans la pellicule au lieu de partager, donc partir vers Snapchat est la
+   * suite du geste et non son interruption.
    */
   redirect?: (url: string) => void;
 }
@@ -153,33 +171,46 @@ export async function shareToSnapchat(
 export interface SendAsRedSnapState {
   sendingRedSnap: boolean;
   error: string;
-  /** Passe à true après un partage abouti : l'UI peut alors proposer le repli. */
-  sharedOnce: boolean;
+  /**
+   * Passe à true dès que la feuille d'enregistrement s'est refermée sans
+   * annulation. L'UI s'en sert pour afficher les gestes restants et le bouton
+   * de repli vers Snapchat.
+   */
+  savedOnce: boolean;
 }
 
 /**
- * "Red Snap" : on ouvre la feuille de partage native, et c'est tout.
+ * « Red Snap » : enregistrer la photo dans la pellicule, puis ouvrir Snapchat.
  *
- * Snapchat y figure comme destination, et son extension de partage ouvre
- * l'application avec la photo déjà chargée, prête à envoyer. Deux gestes en
- * tout : Red Snap, puis Snapchat dans la liste. La photo ne passe jamais par
- * la pellicule, et aucun filtre n'est à retrouver.
+ * La méthode qui donne son nom au produit se déroule *dans* Snapchat, pas
+ * ici : on enregistre la photo, on la met en fond avec l'outil green screen,
+ * on sort la tête du cadre et on déclenche. Le snap envoyé est alors une
+ * vraie capture caméra — c'est ce qui le distingue d'une pièce jointe, et
+ * c'est tout l'intérêt de la fonction.
  *
- * Cette fonction redirigeait auparavant vers le lens « Camera Roll » juste
- * après la feuille. Ça poussait tout le monde vers le chemin long — tout
- * enregistrer, ouvrir le lens, retrouver la photo, quatre gestes — et ça
- * arrachait de l'écran ceux qui venaient justement de partager vers
- * Snapchat. Le lens reste accessible, mais en repli proposé par l'UI
- * (`sharedOnce`), pour qui a enregistré la photo au lieu de la partager.
+ * D'où l'enregistrement plutôt que le partage. Jusqu'au 27/09 ce bouton
+ * ouvrait la feuille et laissait choisir Snapchat, ce qui y déposait la photo
+ * en pièce jointe : le chemin exactement opposé à la méthode, sous le nom de
+ * la méthode.
  *
- * Rien de tout cela ne permet d'écrire dans la pellicule sans geste de
- * l'utilisateur : Apple et Google le bloquent, aucune API web n'y donne
- * accès. La feuille de partage est le plus court chemin qui existe.
+ * Aucune API web n'écrit dans la pellicule sans un geste de l'utilisateur —
+ * Apple et Google le bloquent. La feuille de partage, où « Save Image »
+ * attend à un tap, reste le plus court chemin qui existe.
+ *
+ * La redirection est tentée mais jamais garantie : `await navigator.share()`
+ * consomme le geste d'origine, et Safari peut bloquer la navigation qui suit.
+ * L'appelant affiche donc un bouton de repli au bout de
+ * `SNAPCHAT_FALLBACK_DELAY_MS` (cf. `savedOnce`).
  */
 export async function sendAsRedSnap(
   result: string,
   setState: (patch: Partial<SendAsRedSnapState>) => void,
-  { prepareFile = prepareShareFile }: ShareDeps = {},
+  {
+    prepareFile = prepareShareFile,
+    redirect = (url: string) => {
+      window.location.href = url;
+    },
+  }: ShareDeps = {},
 ): Promise<void> {
   if (!result) return;
   if (!navigator.share) {
@@ -206,17 +237,17 @@ export async function sendAsRedSnap(
 
     await navigator.share({ files: [file] });
 
-    // Pas de redirection : si l'utilisateur a choisi Snapchat, il y est déjà
-    // avec sa photo. On signale seulement que le partage a eu lieu, pour que
-    // l'UI propose le lens à qui aurait plutôt enregistré l'image.
-    setState({ sharedOnce: true });
+    // `savedOnce` avant la redirection : si celle-ci est bloquée, l'UI a déjà
+    // de quoi afficher le repli et les gestes restants.
+    setState({ savedOnce: true });
+    redirect(SNAPCHAT_APP_URL);
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") return;
     setState({
       error:
         err instanceof Error
           ? err.message
-          : "Sending as Red Snap isn't possible right now.",
+          : "Saving the photo isn't possible right now.",
     });
   } finally {
     setState({ sendingRedSnap: false });
