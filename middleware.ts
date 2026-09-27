@@ -45,7 +45,17 @@ import { createServerClient } from "@supabase/ssr";
       // Réécriture et non redirection : l'URL partagée reste bluminoo.com, et
       // les robots — toujours non connectés — indexent la landing sur `/`, ce
       // que le sitemap annonce déjà (`/` en priorité 1, `/landing` absent).
-      if (!user && request.nextUrl.pathname === "/") {
+      // `?screen=` exclu : `/templates` redirige vers `/?screen=templates`
+      // (app/templates/page.tsx — studio et gabarits vivent dans le meme DOM,
+      // glisses par un rail). Reecrire cette URL-la renvoyait le visiteur non
+      // connecte sur la landing, donc les gabarits devenaient inatteignables
+      // deconnecte, Googlebot compris. Un parametre d'ecran est une demande
+      // explicite : elle prime sur la porte d'entree.
+      if (
+        !user &&
+        request.nextUrl.pathname === "/" &&
+        !request.nextUrl.searchParams.has("screen")
+      ) {
         const url = request.nextUrl.clone();
         url.pathname = "/landing";
         const rewritten = NextResponse.rewrite(url);

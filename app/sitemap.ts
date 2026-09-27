@@ -28,7 +28,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/legal", priority: 0.1 },
     { path: "/terms", priority: 0.1 },
     { path: "/privacy", priority: 0.1 },
-    { path: "/templates", priority: 0.7 },
+    // `/templates` n'y figure pas : c'est une redirection vers
+    // `/?screen=templates` (app/templates/page.tsx), pas une destination.
+    // Annoncer une URL qui redirige fait indexer sa cible a sa place ; les
+    // vraies pages indexables sont les fiches et categories ci-dessous.
     ...templateRoutes,
   ];
 
