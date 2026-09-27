@@ -11,10 +11,16 @@ import { TESTIMONIALS, type Testimonial } from "@/lib/testimonials";
  * exactement la largeur d'une copie) avant de repartir. L'œil ne voit
  * jamais le saut. Retirer la duplication casserait l'effet.
  */
-/** Étoile pleine 12×12, dans l'accent — identique aux cinq de chaque carte. */
+/**
+ * Étoile pleine 12×12, au jaune Snapchat — identique aux cinq de chaque carte.
+ *
+ * Elle était au bleu `primary` jusqu'au 27/09. Depuis la refonte, le bleu ne
+ * désigne plus que l'ami qui répond ; l'or est aussi la couleur attendue
+ * d'une notation, donc les deux raisons vont dans le même sens.
+ */
 function Star() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#0285fe" aria-hidden>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFFC00" aria-hidden>
       <path d="M12 2.5l2.9 5.9 6.5.95-4.7 4.58 1.11 6.47L12 17.35l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.5z" />
     </svg>
   );

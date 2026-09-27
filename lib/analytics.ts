@@ -10,7 +10,8 @@ export type LandingCtaId =
   | "hero_primary"
   | "panel_templates"
   | "panel_free_mode"
-  | "panel_snapchat";
+  | "panel_snapchat"
+  | "final_cta";
 
 /**
  * Identifiant de session éphémère (sessionStorage, pas de cookie tiers ni de

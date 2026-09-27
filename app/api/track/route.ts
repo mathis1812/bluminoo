@@ -14,6 +14,7 @@ const ALLOWED_CTA_IDS = [
   "panel_templates",
   "panel_free_mode",
   "panel_snapchat",
+  "final_cta",
 ] as const;
 type CtaId = (typeof ALLOWED_CTA_IDS)[number];
 

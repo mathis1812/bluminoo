@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
 import FaqAccordion from "@/components/FaqAccordion";
-import HeroSlider from "@/components/HeroSlider";
-import SpecularButton from "@/components/SpecularButton";
+import SnapPhone from "@/components/landing/SnapPhone";
 import TemplatesCarousel from "@/components/TemplatesCarousel";
 import TestimonialMarquee from "@/components/TestimonialMarquee";
 import {
@@ -16,11 +14,39 @@ import {
 } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Landing — direction artistique « Fake it. Snap it. » (refonte du 27/09).
+ *
+ * L'ancienne version reprenait la palette du produit de reference (noir +
+ * bleu #0285fe) et ouvrait sur un avant/apres en 16:9. Deux problemes :
+ * la page ressemblait a celle d'un concurrent qu'une partie du trafic
+ * TikTok a deja vue, et le bleu disait « outil SaaS » la ou la cible
+ * (18-24 ans, US) achete un effet entre potes.
+ *
+ * Nouvelle grammaire, appliquee a toute la page :
+ * - noir + jaune Snapchat (`snap`) pour l'action : chaque CTA est jaune ;
+ * - rouge du snap photo (`snapred`) pour signaler le Red Snap, en touches ;
+ * - le bleu `primary` ne sert plus qu'a l'ami qui repond, comme dans les
+ *   conversations Snapchat ou l'autre personne est en bleu.
+ * - le visuel du hero montre le snap RECU et la reaction de l'ami : c'est
+ *   la promesse du titre, pas une fonction.
+ */
+
 const FAQ_ITEMS = [
   {
-    question: "How does the image generation work?",
+    question: "How does it work?",
     answer:
-      "You send your photo, add 1 to 3 photos of the place you want to appear in (or just describe the scene), and the AI blends you in photorealistically while preserving your face, pose, and the original lighting.",
+      "Upload a clear photo of yourself, then pick a template or describe the scene you want. The AI puts you in it photorealistically, keeping your face, pose and lighting. Then you send it as a Red Snap.",
+  },
+  {
+    question: "What is a Red Snap?",
+    answer:
+      "A way of sending your pic through Snapchat's camera instead of attaching it. A regular upload shows up as a camera roll photo. A Red Snap shows up like a snap you just took: no camera roll tag, no border. The in-app tutorial walks you through it once, and it takes seconds after that.",
+  },
+  {
+    question: "Which plans include Red Snap?",
+    answer:
+      "Pro and Max. Lite covers image generation at 1K, without Red Snap or video.",
   },
   {
     question: "How long does it take?",
@@ -28,46 +54,80 @@ const FAQ_ITEMS = [
       "A few seconds for an image, one to two minutes for a video. You can start a render and send it right away.",
   },
   {
-    question: "Do the photos belong to me?",
+    question: "Can I use someone else's photo?",
     answer:
-      "Yes. Your renders are saved in your Gallery, tied to your account, and accessible from any device once you're signed in.",
+      "Only photos of yourself, or of friends who are in on the joke. Using a photo of someone without their permission isn't allowed.",
   },
   {
-    question: "What is the Red Snap system?",
+    question: "Are my photos private?",
     answer:
-      "A sharing method that sends your photo like a real snap taken on the spot, without the \"Media loaded\" watermark that gives away images imported from the gallery.",
+      "Your Gallery is private and tied only to your account. The privacy policy lists the subprocessors used to handle photos.",
   },
   {
-    question: "Can I cancel my subscription?",
+    question: "Can I cancel anytime?",
     answer:
-      "Yes, anytime from your account area, through the secure management portal. Your plan stays active until the end of the period you've already paid for.",
-  },
-  {
-    question: "Are payments secure?",
-    answer:
-      "Payments are processed by Stripe. No banking data ever passes through or is stored on our servers.",
-  },
-  {
-    question: "Are my generated photos private?",
-    answer:
-      "Your Gallery is private and tied only to your account. The privacy policy details the subprocessors used to handle photos.",
+      "Yes, from your account, through the secure Stripe portal. Your plan stays active until the end of the period you've already paid for.",
   },
   {
     question: "What if I don't like the result?",
     answer:
-      "AI output can vary from one generation to the next — just run it again. For best results, use a sharp, well-lit photo with the subject clearly visible.",
+      "AI output varies from one generation to the next, so just run it again. A sharp, well-lit photo with your face clearly visible gives the best results.",
+  },
+  {
+    question: "Is Bluminoo affiliated with Snapchat?",
+    answer:
+      "No. Bluminoo is an independent app and is not affiliated with, endorsed by, or sponsored by Snap Inc.",
   },
 ];
 
-/** Libellé de bloc du panneau clair : crochets bleus, texte gris espacé. */
-function PanelEyebrow({ children }: { children: React.ReactNode }) {
+const STEPS = [
+  {
+    title: "Drop a selfie",
+    body: "One clear photo of you. That's the only thing we need.",
+  },
+  {
+    title: "Pick a scene",
+    body: "Private jet, supercar, rooftop, snow chalet. One tap, no prompt.",
+  },
+  {
+    title: "Send it as a Red Snap",
+    body: "It lands like you just took it. Now wait for the replies.",
+  },
+];
+
+/** Petit carre plein du snap photo : la signature visuelle du Red Snap. */
+function RedSquare({ className = "h-3 w-3" }: { className?: string }) {
   return (
-    <p className="flex items-center gap-2 text-[15px] font-medium tracking-[0.06em] text-[#4f4f4f]">
-      <span aria-hidden className="text-[17px] font-normal text-primary">
+    <span aria-hidden className={`inline-block rounded-[3px] bg-snapred ${className}`} />
+  );
+}
+
+/** Libelle de bloc : crochets rouges, texte espace. */
+function Eyebrow({
+  children,
+  tone = "light",
+}: {
+  children: React.ReactNode;
+  /** `light` sur le panneau clair, `dark` sur le noir, `snap` sur le jaune. */
+  tone?: "light" | "dark" | "snap";
+}) {
+  const label =
+    tone === "dark"
+      ? "text-white/60"
+      : tone === "snap"
+        ? "text-[#121212]"
+        : "text-[#4f4f4f]";
+  // Sur le jaune, le rouge vibre et perd sa lisibilite : crochets a l'encre.
+  const bracket = tone === "snap" ? "text-[#121212]" : "text-snapred";
+  return (
+    <p
+      className={`flex items-center gap-2 text-[15px] font-semibold tracking-[0.08em] ${label}`}
+    >
+      <span aria-hidden className={`text-[17px] font-normal ${bracket}`}>
         [
       </span>
       {children}
-      <span aria-hidden className="text-[17px] font-normal text-primary">
+      <span aria-hidden className={`text-[17px] font-normal ${bracket}`}>
         ]
       </span>
     </p>
@@ -75,44 +135,45 @@ function PanelEyebrow({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Bouton d'appel de la landing, partagé par le hero et les blocs du
- * panneau clair.
+ * Bouton d'appel de la landing, le meme partout : jaune Snapchat, texte
+ * encre. Une seule couleur d'action sur toute la page, pour que l'oeil
+ * sache ou cliquer sans lire.
  *
- * Un visiteur connecté est envoyé au studio par un vrai lien — la
+ * Un visiteur connecte est envoye au studio par un vrai lien — la
  * destination doit rester ouvrable dans un nouvel onglet. Un visiteur
- * déconnecté ouvre la feuille de connexion sans quitter la page : c'est un
+ * deconnecte ouvre la feuille d'inscription sans quitter la page : c'est un
  * bouton, pas un lien, puisqu'il ne navigue nulle part.
  */
 function CtaButton({
   isLoggedIn,
   label,
   ctaId,
-  className,
+  className = "",
 }: {
   isLoggedIn: boolean;
   label: string;
   ctaId: LandingCtaId;
-  className: string;
+  className?: string;
 }) {
-  const shared = `flex h-[52px] shrink-0 items-center justify-center gap-[22px] rounded-3xl bg-primary text-[17px] font-semibold text-white shadow-[0_0_18px_rgba(2,133,254,0.45),0_0_44px_rgba(2,133,254,0.22)] transition active:opacity-90 ${className}`;
+  const shared = `group flex h-[56px] shrink-0 items-center justify-center gap-4 rounded-full bg-snap pl-7 pr-2 text-[17px] font-bold text-[#121212] shadow-[0_0_24px_rgba(255,252,0,0.35),0_0_60px_rgba(255,252,0,0.15)] transition hover:brightness-95 active:scale-[0.98] ${className}`;
 
   const content = (
     <>
       {label}
       <span
         aria-hidden
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[15px] border border-white/25 bg-white/20"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#121212] text-snap transition group-hover:translate-x-0.5"
       >
         <svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2.5"
+          strokeWidth="2.75"
           strokeLinecap="round"
           strokeLinejoin="round"
           className="h-4 w-4"
         >
-          <path d="M9 18l6-6-6-6" />
+          <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
       </span>
     </>
@@ -136,7 +197,7 @@ function CtaButton({
       onClick={() => {
         trackLandingCtaClick(ctaId);
         // Ces boutons proposent de commencer, pas de se reconnecter : la
-        // feuille s'ouvre donc sur la création de compte.
+        // feuille s'ouvre donc sur la creation de compte.
         openAuthSheet("signup");
       }}
       className={shared}
@@ -147,15 +208,14 @@ function CtaButton({
 }
 
 export default function LandingPage() {
-  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     trackLandingPageView();
   }, []);
 
-  // Un visiteur déjà connecté n'a rien à faire sur /sign-up : on le
-  // renvoie vers le studio plutôt que de lui reproposer de créer un compte.
+  // Un visiteur deja connecte ne doit pas se voir reproposer l'inscription :
+  // les CTA l'envoient au studio.
   useEffect(() => {
     if (
       !process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -171,84 +231,195 @@ export default function LandingPage() {
       .catch(() => {});
   }, []);
 
-  const ctaLabel = isLoggedIn ? "Open the studio" : "Get started now";
+  const ctaLabel = isLoggedIn ? "Open the studio" : "Create your first snap";
 
   return (
     <div className="mx-auto max-w-6xl px-4 animate-fade-up">
-      {/* HERO — fond noir plein, sans mosaïque derrière : le contraste vient
-          du seul bloc média, comme sur le modèle. */}
-      <section className="relative flex flex-col items-center gap-5 px-2 pb-16 pt-12 text-center sm:pt-16">
-        <h1 className="mx-auto max-w-[15ch] text-[2.5rem] font-[550] leading-[1.08] tracking-tight text-white">
-          Turn any photo into{" "}
-          <span className="bg-gradient-to-r from-[#0285fe] to-[#5ac8fa] bg-clip-text text-transparent">
-            an unreal scene
-          </span>
-          .
-        </h1>
+      {/* HERO — mobile d'abord : le trafic vient de TikTok et de Reels.
+          Sur grand ecran, le texte passe a gauche et le telephone a droite. */}
+      <section className="relative grid items-center gap-12 px-2 pb-20 pt-10 sm:pt-16 lg:grid-cols-[1.1fr_1fr] lg:gap-8 lg:pb-28">
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <p className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[13px] font-semibold text-white/80">
+            <RedSquare className="h-2.5 w-2.5" />
+            Red Snap · no camera roll tag
+          </p>
 
-        <p className="mx-auto max-w-[38ch] text-[17px] leading-[1.55] text-white/60">
-          Edit your photos with AI and bring them to life as video. Striking
-          results, in seconds.
-        </p>
+          <h1 className="mt-6 text-[3.1rem] font-extrabold leading-[0.98] tracking-[-0.04em] text-white sm:text-[4.2rem] lg:text-[4.8rem]">
+            Fake it.
+            <br />
+            Snap it.
+            <br />
+            <span className="text-snap">Nobody knows.</span>
+          </h1>
 
-        <SpecularButton
-          size="lg"
-          radius={18}
-          tint="#ffffff"
-          tintOpacity={0}
-          blur={0}
-          textColor="#f5f5f5"
-          lineColor="#ffffff"
-          baseColor="#0285fe"
-          intensity={2}
-          shineSize={10}
-          shineFade={40}
-          thickness={2.5}
-          speed={0.35}
-          followMouse
-          proximity={250}
-          autoAnimate={false}
-          className="mt-3 self-center"
-          onClick={() => {
-            trackLandingCtaClick("hero_primary");
-            if (isLoggedIn) {
-              router.push("/");
-            } else {
-              openAuthSheet("signup");
-            }
-          }}
-        >
-          {ctaLabel}
-        </SpecularButton>
+          <p className="mt-6 max-w-[34ch] text-[18px] leading-[1.5] text-white/65">
+            Generate an ultra-realistic photo in one click and send it straight
+            to Snap — it shows up like you just took it.
+          </p>
 
-        <div className="mt-8 flex w-full justify-center">
-          <HeroSlider />
+          <CtaButton
+            isLoggedIn={isLoggedIn}
+            label={ctaLabel}
+            ctaId="hero_primary"
+            className="mt-9 w-full max-w-[340px]"
+          />
+
+          {/* Montant ecrit en dur : lib/stripe.ts construit PLANS avec
+              envValue(), l'importer ici embarquerait la configuration Stripe
+              dans le bundle client. Source de verite : PLANS.pro. */}
+          <p className="mt-5 text-[14px] text-white/45">
+            <span className="font-semibold text-white/80">Red Snap</span>{" "}
+            included from $9.99 a week.{" "}
+            <Link
+              href="/pricing"
+              className="text-white/70 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+            >
+              See plans
+            </Link>
+          </p>
         </div>
+
+        <SnapPhone />
       </section>
 
-      {/* mx-[calc(50%-50vw)] + w-screen : seul le bandeau doit aller bord à
-          bord, indépendamment des paddings cumulés de ce conteneur et de
-          <main> (layout) et du plafond max-w-6xl. */}
+      {/* Avis : juste sous le hero. La preuve sociale arrive avant
+          l'explication — le bandeau defilant se lit d'un coup d'oeil, donc il
+          rassure sans retarder la demo qui suit. */}
       <div className="mx-[calc(50%-50vw)] w-screen">
         <TestimonialMarquee />
       </div>
 
-      {/* PANNEAU CLAIR — le geste visuel fort du modèle : un grand pavé
-          #fbfbfb à coins 28px encastré dans le noir, texte sombre dedans.
-          Trois blocs de structure identique, séparés par un filet.
-          Dimensions relevées : pt-20 / pb-[72px], colonne de texte plafonnée
-          à 440px, filet my-14. */}
-      <section className="mx-[calc(50%-50vw)] mb-14 w-screen rounded-[28px] bg-light pb-[72px] pt-20 text-black">
+      {/* COMMENT CA MARCHE — trois etapes, pas plus : le visiteur doit
+          comprendre qu'il n'a rien a ecrire ni a savoir faire. */}
+      <section className="px-2 pb-20">
+        <div className="mx-auto max-w-[960px]">
+          <Eyebrow tone="dark">HOW IT WORKS</Eyebrow>
+          <h2 className="mt-6 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
+            Three taps. Zero proof.
+          </h2>
+          <ol className="mt-10 grid gap-3 sm:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <li
+                key={step.title}
+                className="rounded-3xl border border-line bg-panel p-6"
+              >
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-full text-[15px] font-extrabold ${
+                    i === STEPS.length - 1
+                      ? "bg-snapred text-white"
+                      : "bg-white/10 text-white"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <h3 className="mt-5 text-[19px] font-bold text-white">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-[1.5] text-white/55">
+                  {step.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* PANNEAU CLAIR — un grand pave clair encastre dans le noir, ouvert
+          par la bande jaune Snapchat. Bornes du degrade en pixels et non en
+          pourcentages : la hauteur du panneau varie avec le contenu, et un
+          pourcentage etirerait le jaune. Fin du degrade sur le meme RVB a
+          alpha nul : `transparent` vire au gris sur WebKit. */}
+      <section
+        className="mx-[calc(50%-50vw)] mb-4 w-screen rounded-[28px] bg-light pb-[72px] pt-20 text-black"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, #FFFC00 0px, #FFFC00 190px, rgba(251, 251, 251, 0) 560px)",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div className="px-6">
           <div className="mx-auto w-full max-w-[440px]">
-            <PanelEyebrow>TEMPLATES</PanelEyebrow>
-            <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
-              Create in one click with templates
+            <Eyebrow tone="snap">RED SNAP</Eyebrow>
+            <h2 className="mt-6 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#0f0f10]">
+              Lands like you just took it.
             </h2>
-            <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
-              Browse a full catalogue of ready-made templates: viral pranks,
-              vehicle swaps, voxel worlds and plenty more. Pick one, add your
-              photo, and it is ready to send.
+            <p className="mt-5 text-[16px] leading-[1.55] text-[#3a3a3a]">
+              No &ldquo;camera roll&rdquo; tag. No border. Nothing to give you
+              away. The Red Snap method sends your pic through Snapchat&apos;s
+              camera, so it looks exactly like a snap taken on the spot.
+            </p>
+
+            {/* Comparaison cote a cote : c'est la preuve de la promesse. Une
+                phrase peut etre mise en doute, deux lignes de conversation
+                l'une sous l'autre, non. */}
+            <div className="mt-9 grid gap-2.5">
+              <div className="flex items-center gap-3 rounded-2xl border border-[rgba(15,15,16,0.08)] bg-white p-3.5 opacity-70">
+                <span
+                  aria-hidden
+                  className="h-9 w-9 shrink-0 rounded-full bg-[rgba(15,15,16,0.12)]"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold text-[#0f0f10]">
+                    Regular upload
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-[13px] text-[rgba(15,15,16,0.5)]">
+                    <RedSquare className="h-2.5 w-2.5" />
+                    Delivered ·{" "}
+                    <span className="rounded bg-[rgba(15,15,16,0.08)] px-1.5 py-px text-[12px] font-semibold text-[rgba(15,15,16,0.7)]">
+                      Camera Roll
+                    </span>
+                  </p>
+                </div>
+                <span className="text-[12px] font-bold uppercase tracking-wide text-[rgba(15,15,16,0.4)]">
+                  Busted
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-2xl border-2 border-[#121212] bg-white p-3.5 shadow-[0_8px_24px_rgba(15,15,16,0.10)]">
+                <span
+                  aria-hidden
+                  className="h-9 w-9 shrink-0 rounded-full border-2 border-snap bg-[rgba(15,15,16,0.12)]"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold text-[#0f0f10]">
+                    Red Snap
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-[13px] text-[rgba(15,15,16,0.6)]">
+                    <RedSquare className="h-2.5 w-2.5" />
+                    Delivered · just now
+                  </p>
+                </div>
+                <span className="rounded-full bg-snap px-2.5 py-1 text-[12px] font-bold uppercase tracking-wide text-[#121212]">
+                  Clean
+                </span>
+              </div>
+
+              {/* La reponse de l'ami : le seul element qui montre un
+                  resultat plutot qu'une fonction. */}
+              <div className="ml-12 rounded-2xl border-l-[3px] border-primary bg-white p-3">
+                <p className="text-[13px] font-bold text-primary">Alex</p>
+                <p className="mt-1 text-[14px] leading-[1.45] text-[#0f0f10]">
+                  wait where are you right now
+                </p>
+              </div>
+            </div>
+
+            <CtaButton
+              isLoggedIn={isLoggedIn}
+              label={ctaLabel}
+              ctaId="panel_snapchat"
+              className="mt-9 w-full"
+            />
+
+            <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
+
+            <Eyebrow>TEMPLATES</Eyebrow>
+            <h2 className="mt-6 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#0f0f10]">
+              One click. Zero prompt.
+            </h2>
+            <p className="mt-5 text-[16px] leading-[1.55] text-[#3a3a3a]">
+              Pranks, supercar swaps, voxel worlds and a lot more. Pick a
+              template, add your photo, and it&apos;s ready to snap.
             </p>
             <CtaButton
               isLoggedIn={isLoggedIn}
@@ -259,183 +430,124 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Hors de la colonne de 440px : les cartes doivent pouvoir dépasser
-            sur les côtés, la suivante restant visible en amorce. */}
+        {/* Hors de la colonne de 440px : les cartes doivent pouvoir depasser
+            sur les cotes, la suivante restant visible en amorce. */}
         <TemplatesCarousel />
 
         <div className="px-6">
           <div className="mx-auto w-full max-w-[440px]">
             <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
 
-            <PanelEyebrow>FREE MODE</PanelEyebrow>
-            <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
-              Generate without limits in free mode
+            <Eyebrow>FREE MODE</Eyebrow>
+            <h2 className="mt-6 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#0f0f10]">
+              Or make it up from scratch.
             </h2>
-            <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
-              Bring your own ideas to life. Describe the scene you have in mind,
-              create images up to 4K, then turn any of them into video.
+            <p className="mt-5 text-[16px] leading-[1.55] text-[#3a3a3a]">
+              Describe any scene you want, generate up to 4K, then turn it
+              into a video.
             </p>
+
+            {/* Apercu de la barre de saisie du studio, reconstruit en CSS. */}
+            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
+              <p className="text-[15px] text-[rgba(15,15,16,0.7)]">
+                me on a yacht in Monaco at sunset
+                <span
+                  aria-hidden
+                  className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[3px] animate-pulse bg-[#0f0f10]"
+                />
+              </p>
+              <div className="mt-6 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded-full bg-[#121212] px-3.5 py-1.5 text-[13px] font-semibold text-white">
+                    Photo
+                  </span>
+                  <span className="rounded-full bg-[rgba(15,15,16,0.08)] px-3.5 py-1.5 text-[13px] font-medium text-[rgba(15,15,16,0.5)]">
+                    Video
+                  </span>
+                  <span className="rounded-full bg-[rgba(15,15,16,0.08)] px-3 py-1.5 text-[13px] font-medium text-[rgba(15,15,16,0.5)]">
+                    4K
+                  </span>
+                </div>
+                <span
+                  aria-hidden
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-snap text-[#121212]"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3.5 w-3.5"
+                  >
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
             <CtaButton
               isLoggedIn={isLoggedIn}
               label={ctaLabel}
               ctaId="panel_free_mode"
               className="mt-9 w-full"
             />
-
-            {/* Aperçu de la barre de saisie du studio, reconstruit en CSS. */}
-            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
-              <div className="flex items-start justify-between gap-3">
-                <p className="text-[15px] text-[rgba(15,15,16,0.45)]">
-                  Describe what you want to change…
-                </p>
-                <span
-                  aria-hidden
-                  className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[rgba(15,15,16,0.35)] text-[10px] font-semibold text-[rgba(15,15,16,0.45)]"
-                >
-                  i
-                </span>
-              </div>
-              <div className="mt-6 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="rounded-full bg-[#3f3f42] px-3.5 py-1.5 text-[13px] font-semibold text-white">
-                    Photo
-                  </span>
-                  <span className="rounded-full bg-[rgba(15,15,16,0.08)] px-3.5 py-1.5 text-[13px] font-medium text-[rgba(15,15,16,0.45)]">
-                    Video
-                  </span>
-                  <span className="rounded-full bg-[rgba(15,15,16,0.08)] px-3 py-1.5 text-[13px] font-medium text-[rgba(15,15,16,0.45)]">
-                    4K
-                  </span>
-                </div>
-                <span className="flex items-center gap-2 rounded-full bg-[#3f3f42] px-3 py-1.5 text-[13px] font-semibold text-white">
-                  250
-                  <span
-                    aria-hidden
-                    className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-3 w-3"
-                    >
-                      <path d="M12 19V5M5 12l7-7 7 7" />
-                    </svg>
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
-
-            <PanelEyebrow>SNAPCHAT</PanelEyebrow>
-            <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
-              Send your creations as a Red Snap
-            </h2>
-            <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
-              Share what you generate straight to a Red Snap, so it lands like a
-              photo taken on the spot, without the &ldquo;Media loaded&rdquo;
-              tag giving it away.
-            </p>
-            <CtaButton
-              isLoggedIn={isLoggedIn}
-              label={ctaLabel}
-              ctaId="panel_snapchat"
-              className="mt-9 w-full"
-            />
-
-            {/* Aperçu d'une conversation, reconstruit en CSS. */}
-            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
-              <div className="flex items-center gap-2.5">
-                <span aria-hidden className="text-[rgba(15,15,16,0.5)]">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                </span>
-                <span
-                  aria-hidden
-                  className="h-7 w-7 shrink-0 rounded-full bg-[rgba(15,15,16,0.18)]"
-                />
-                <span className="text-[15px] font-semibold text-[#0f0f10]">
-                  Alex
-                </span>
-                <span
-                  aria-hidden
-                  className="ml-auto flex items-center gap-3 text-[rgba(15,15,16,0.5)]"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                    <path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.6 3.6a1 1 0 01-.25 1l-2.25 2.2z" />
-                  </svg>
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                    <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
-                  </svg>
-                </span>
-              </div>
-
-              <div className="mt-3 rounded-2xl border-l-[3px] border-[#f23b3b] bg-white p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-bold text-[#f23b3b]">Me</span>
-                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
-                    10:44
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center gap-2 rounded-xl border border-[rgba(15,15,16,0.10)] px-3 py-2">
-                  <span aria-hidden className="text-[#f23b3b]">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="h-3.5 w-3.5"
-                    >
-                      <path d="M6 4l14 8-14 8V4z" />
-                    </svg>
-                  </span>
-                  <span className="text-[14px] font-semibold text-[#0f0f10]">
-                    Sent
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ — même gabarit de bloc que le panneau clair, mais sur fond noir :
-          libellé entre crochets, titre en 2rem, colonne de 440px. Les
-          séparateurs sont en pointillés, et un seul panneau reste ouvert. */}
+      {/* FAQ — meme gabarit de bloc que le panneau clair, sur fond noir. */}
       <section className="px-6 pb-20">
         <div className="mx-auto w-full max-w-[440px]">
-          <p className="flex items-center gap-2 text-[15px] font-medium tracking-[0.06em] text-white/60">
-            <span aria-hidden className="text-[17px] font-normal text-primary">
-              [
-            </span>
-            F.A.Q
-            <span aria-hidden className="text-[17px] font-normal text-primary">
-              ]
-            </span>
-          </p>
-          <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-white">
-            Frequently asked questions
+          <Eyebrow tone="dark">F.A.Q</Eyebrow>
+          <h2 className="mt-6 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
+            Questions? Answers.
           </h2>
           <FaqAccordion items={FAQ_ITEMS} />
         </div>
       </section>
 
-      {/* MARQUE GÉANTE — dernier bloc avant le pied de page. Le mot est
-          dimensionné en unité de conteneur pour remplir toute la largeur.
-          overflow-x-clip contient les débordements de jambages sans créer
-          de conteneur de défilement. La marge négative compense l'approche
-          gauche de la lettre, sinon le mot paraît décalé vers la droite. */}
+      {/* DERNIER APPEL — le visiteur qui a tout lu jusqu'ici doit trouver un
+          bouton sans remonter la page. */}
+      <section className="px-2 pb-8">
+        <div className="relative mx-auto max-w-[960px] overflow-hidden rounded-[28px] bg-snap px-6 py-14 text-center">
+          <h2 className="mx-auto max-w-[16ch] text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-[#121212] sm:text-[3.2rem]">
+            Your friends are about to believe anything.
+          </h2>
+          <p className="mx-auto mt-4 max-w-[36ch] text-[16px] text-[#121212]/70">
+            One photo, one click. Ultra-realistic pics your friends will swear
+            are real.
+          </p>
+          <div className="mt-8 flex justify-center">
+            {/* Sur le jaune, le bouton passe en encre : un CTA jaune sur fond
+                jaune disparaitrait. */}
+            {isLoggedIn ? (
+              <Link
+                href="/"
+                onClick={() => trackLandingCtaClick("final_cta")}
+                className="flex h-[56px] items-center justify-center rounded-full bg-[#121212] px-8 text-[17px] font-bold text-white transition hover:bg-black"
+              >
+                {ctaLabel}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  trackLandingCtaClick("final_cta");
+                  openAuthSheet("signup");
+                }}
+                className="flex h-[56px] items-center justify-center rounded-full bg-[#121212] px-8 text-[17px] font-bold text-white transition hover:bg-black"
+              >
+                {ctaLabel}
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* MARQUE GEANTE — dimensionnee en unite de conteneur pour remplir
+          toute la largeur (cf. .marque-geante dans globals.css). */}
       <div className="marque-geante mx-[calc(50%-50vw)] mt-14 w-screen overflow-x-clip px-4">
         <p className="marque-geante-mot -ml-[0.074em] font-bold leading-none tracking-tight text-white">
           Bluminoo
