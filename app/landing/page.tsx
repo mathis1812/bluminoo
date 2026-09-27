@@ -35,7 +35,7 @@ const FAQ_ITEMS = [
   {
     question: "What is the Red Snap system?",
     answer:
-      "Normally you would save the photo, open Snapchat, then hunt for it in your gallery. Red Snap hands it to Snapchat directly: it arrives already loaded and ready to send, and it never sits in your camera roll. Two taps from the render to the chat.",
+      "A way of sending your render through Snapchat's camera rather than attaching it. Snapchat tags attached photos as loaded media, which tells the other person the shot came from a gallery. Sent as a Red Snap, it carries no such tag. The tutorial in the app shows the whole thing once, and it takes seconds after that.",
   },
   {
     question: "Which plans include Red Snap?",
@@ -192,8 +192,9 @@ export default function LandingPage() {
         </h1>
 
         <p className="mx-auto max-w-[40ch] text-[17px] leading-[1.55] text-white/60">
-          Pick a scene, add your photo, send it as a Red Snap. It goes straight
-          into the chat without ever passing through your camera roll.
+          Pick a scene, add your photo, then send it with the Red Snap method.
+          It lands as a snap taken on the spot, not as a photo picked from a
+          gallery.
         </p>
 
         <SpecularButton
@@ -267,13 +268,13 @@ export default function LandingPage() {
           <div className="mx-auto w-full max-w-[440px]">
             <PanelEyebrow>SNAPCHAT</PanelEyebrow>
             <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
-              Send it as a Red Snap, not as an upload
+              It arrives as a camera snap, not an import
             </h2>
             <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
-              A photo you dig out of your gallery arrives as an import, and
-              Snapchat shows it. Bluminoo hands yours to Snapchat through the
-              share sheet instead: two taps, and it never passes through your
-              camera roll.
+              Attach a photo the usual way and Snapchat marks it as loaded
+              media. The Red Snap method sends yours through the camera
+              instead, so nothing underneath it says where it came from. The
+              tutorial inside the app walks you through it once.
             </p>
             <CtaButton
               isLoggedIn={isLoggedIn}
