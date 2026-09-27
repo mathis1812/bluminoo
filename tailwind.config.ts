@@ -14,6 +14,11 @@ const config: Config = {
         panel: "#0c1111",
         line: "#232828",
         light: "#fbfbfb",
+        // Jaune officiel de Snapchat. Il etait en dur dans
+        // app/red-snap/page.tsx ; la landing le reprend pour que le bloc
+        // Red Snap parle la langue de la plateforme qu'il promet, donc il
+        // devient un token plutot qu'un hexa recopie a deux endroits.
+        snap: "#FFFC00",
         muted: "#a8a8a8",
         faint: "#4f4f4f",
         primary: {

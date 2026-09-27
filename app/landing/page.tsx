@@ -65,14 +65,28 @@ const FAQ_ITEMS = [
 ];
 
 /** Libellé de bloc du panneau clair : crochets bleus, texte gris espacé. */
-function PanelEyebrow({ children }: { children: React.ReactNode }) {
+function PanelEyebrow({
+  children,
+  tone = "default",
+}: {
+  children: React.ReactNode;
+  /** `snap` pour un eyebrow pose sur le jaune Snapchat. */
+  tone?: "default" | "snap";
+}) {
+  // Sur le jaune, le bleu des crochets perd son contraste et se bat avec le
+  // fond : ils passent a l'encre, et le libelle avec eux.
+  const isSnap = tone === "snap";
+  const bracket = isSnap ? "text-[#121212]" : "text-primary";
+  const label = isSnap ? "text-[#121212]" : "text-[#4f4f4f]";
   return (
-    <p className="flex items-center gap-2 text-[15px] font-medium tracking-[0.06em] text-[#4f4f4f]">
-      <span aria-hidden className="text-[17px] font-normal text-primary">
+    <p
+      className={`flex items-center gap-2 text-[15px] font-medium tracking-[0.06em] ${label}`}
+    >
+      <span aria-hidden className={`text-[17px] font-normal ${bracket}`}>
         [
       </span>
       {children}
-      <span aria-hidden className="text-[17px] font-normal text-primary">
+      <span aria-hidden className={`text-[17px] font-normal ${bracket}`}>
         ]
       </span>
     </p>
@@ -237,7 +251,10 @@ export default function LandingPage() {
             envValue(), donc l'importer ici embarquerait la configuration
             Stripe dans le bundle client. Source de verite : PLANS.pro. */}
         <p className="mt-4 text-[14px] text-white/45">
-          Red Snap included from $9.99 a week.{" "}
+          <span className="rounded-full bg-snap px-2 py-[3px] font-semibold text-[#121212]">
+            Red Snap
+          </span>{" "}
+          included from $9.99 a week.{" "}
           <Link
             href="/pricing"
             className="text-white/70 underline decoration-white/25 underline-offset-4 transition hover:text-white"
@@ -263,18 +280,35 @@ export default function LandingPage() {
           Trois blocs de structure identique, séparés par un filet.
           Dimensions relevées : pt-20 / pb-[72px], colonne de texte plafonnée
           à 440px, filet my-14. */}
-      <section className="mx-[calc(50%-50vw)] mb-14 w-screen rounded-[28px] bg-light pb-[72px] pt-20 text-black">
+      {/* La bande jaune reprend le degrade de la page tuto (`app/red-snap`,
+          #FFFC00 vers le fond) : le bloc Red Snap ouvre desormais le panneau,
+          et il annonce Snapchat avant meme d'etre lu. Elle s'eteint dans le
+          `bg-light` du panneau, d'ou une fin de degrade sur le meme RVB a
+          alpha nul — passer par `transparent` vire au gris sur WebKit, qui
+          interpole en couleurs premultipliees.
+
+          Bornes en pixels et non en pourcentages : le panneau porte trois
+          blocs, donc sa hauteur varie avec le contenu, et un pourcentage
+          etirerait le jaune sur toute la page des qu'un bloc s'allonge. */}
+      <section
+        className="mx-[calc(50%-50vw)] mb-14 w-screen rounded-[28px] bg-light pb-[72px] pt-20 text-black"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, #FFFC00 0px, #FFFC00 190px, rgba(251, 251, 251, 0) 560px)",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div className="px-6">
           <div className="mx-auto w-full max-w-[440px]">
-            <PanelEyebrow>SNAPCHAT</PanelEyebrow>
+            <PanelEyebrow tone="snap">SNAPCHAT</PanelEyebrow>
             <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
               It arrives as a camera snap, not an import
             </h2>
             <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
               Attach a photo the usual way and Snapchat marks it as loaded
-              media. The Red Snap method sends yours through the camera
-              instead, so nothing underneath it says where it came from. The
-              tutorial inside the app walks you through it once.
+              media. The Red Snap method sends yours through the camera instead,
+              so nothing underneath it says where it came from. The tutorial
+              inside the app walks you through it once.
             </p>
             <CtaButton
               isLoggedIn={isLoggedIn}
@@ -283,10 +317,13 @@ export default function LandingPage() {
               className="mt-9 w-full"
             />
 
-            {/* Aperçu d'une conversation, reconstruit en CSS. */}
-            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
-              <div className="flex items-center gap-2.5">
-                <span aria-hidden className="text-[rgba(15,15,16,0.5)]">
+            {/* Aperçu d'une conversation, reconstruit en CSS. La barre de
+                contact porte le jaune Snapchat : un bandeau gris ne disait
+                pas dans quelle application la photo atterrit, qui est tout
+                le propos du bloc. */}
+            <div className="mt-9 overflow-hidden rounded-3xl border border-[rgba(15,15,16,0.08)] bg-white">
+              <div className="flex items-center gap-2.5 bg-snap px-4 py-3">
+                <span aria-hidden className="text-[#121212]">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -301,60 +338,74 @@ export default function LandingPage() {
                 </span>
                 <span
                   aria-hidden
-                  className="h-7 w-7 shrink-0 rounded-full bg-[rgba(15,15,16,0.18)]"
+                  className="h-7 w-7 shrink-0 rounded-full bg-[rgba(18,18,18,0.22)]"
                 />
-                <span className="text-[15px] font-semibold text-[#0f0f10]">
+                <span className="text-[15px] font-semibold text-[#121212]">
                   Alex
                 </span>
                 <span
                   aria-hidden
-                  className="ml-auto flex items-center gap-3 text-[rgba(15,15,16,0.5)]"
+                  className="ml-auto flex items-center gap-3 text-[rgba(18,18,18,0.65)]"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
                     <path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.6 3.6a1 1 0 01-.25 1l-2.25 2.2z" />
                   </svg>
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
                     <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
                   </svg>
                 </span>
               </div>
 
-              <div className="mt-3 rounded-2xl border-l-[3px] border-[#f23b3b] bg-white p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-bold text-[#f23b3b]">Me</span>
-                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
-                    10:44
-                  </span>
+              <div className="bg-[rgba(15,15,16,0.04)] p-3">
+                <div className="rounded-2xl border-l-[3px] border-[#f23b3b] bg-white p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-bold text-[#f23b3b]">
+                      Me
+                    </span>
+                    <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
+                      10:44
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 rounded-xl border border-[rgba(15,15,16,0.10)] px-3 py-2">
+                    <span aria-hidden className="text-[#f23b3b]">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="h-3.5 w-3.5"
+                      >
+                        <path d="M6 4l14 8-14 8V4z" />
+                      </svg>
+                    </span>
+                    <span className="text-[14px] font-semibold text-[#0f0f10]">
+                      Delivered
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-2 flex items-center gap-2 rounded-xl border border-[rgba(15,15,16,0.10)] px-3 py-2">
-                  <span aria-hidden className="text-[#f23b3b]">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="h-3.5 w-3.5"
-                    >
-                      <path d="M6 4l14 8-14 8V4z" />
-                    </svg>
-                  </span>
-                  <span className="text-[14px] font-semibold text-[#0f0f10]">
-                    Delivered
-                  </span>
-                </div>
-              </div>
 
-              {/* La reponse recue, et non l'envoi, est la promesse du produit :
+                {/* La reponse recue, et non l'envoi, est la promesse du produit :
                   c'est le seul element de la maquette qui montre un resultat
                   plutot qu'une fonction. */}
-              <div className="mt-2 rounded-2xl border-l-[3px] border-primary bg-white p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-bold text-primary">Alex</span>
-                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
-                    10:45
-                  </span>
+                <div className="mt-2 rounded-2xl border-l-[3px] border-primary bg-white p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-bold text-primary">
+                      Alex
+                    </span>
+                    <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
+                      10:45
+                    </span>
+                  </div>
+                  <p className="mt-2 text-[14px] leading-[1.45] text-[#0f0f10]">
+                    wait where are you right now
+                  </p>
                 </div>
-                <p className="mt-2 text-[14px] leading-[1.45] text-[#0f0f10]">
-                  wait where are you right now
-                </p>
               </div>
             </div>
             <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
@@ -446,7 +497,6 @@ export default function LandingPage() {
                 </span>
               </div>
             </div>
-
           </div>
         </div>
       </section>
