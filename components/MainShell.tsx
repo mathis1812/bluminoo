@@ -34,12 +34,10 @@ export default function MainShell({
     return <main>{children}</main>;
   }
 
-  // Colonne de telephone centree, cf. `maxWidth.app` dans tailwind.config.
-  // Le filet lateral n'apparait qu'a partir de `md` : sur un ecran large, il
-  // dit « ceci est un cadre » plutot que « la page n'a pas charge ».
+  // Cadre de l'app sur ordinateur, cf. `maxWidth.app` dans tailwind.config.
   if (hasOwnHeader(pathname)) {
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-app md:border-x md:border-white/[0.06]">
+      <main className="mx-auto min-h-dvh w-full max-w-app">
         {children}
       </main>
     );

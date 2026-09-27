@@ -50,17 +50,20 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
       },
       maxWidth: {
-        // Largeur de l'app sur ordinateur. Le produit est concu pour le
-        // telephone — le trafic vient de TikTok, le rendu part sur Snapchat —
-        // et aucun ecran de l'app n'avait de point de rupture. Sur 1920 px,
-        // tout s'etirait : une vignette de gabarit a 37,6 % du conteneur
-        // faisait 720 px au lieu de 150, et comme son `sizes` annonce 210 px
-        // au navigateur, il telechargeait une petite image puis l'etirait.
+        // Largeur de l'app sur ordinateur : la meme que la landing
+        // (`max-w-6xl`), pour qu'on ne change pas de cadre en passant de
+        // l'une a l'autre. Contenue sans etre plein ecran.
         //
-        // 480 px : un peu plus large que le plus grand telephone, et la
-        // largeur a laquelle l'etagere montre encore ~2,7 vignettes, ce qui
-        // signale qu'elle defile (cf. TemplateShelf).
-        app: "480px",
+        // Elle ne suffit pas seule : aucun ecran de l'app n'avait de point de
+        // rupture, donc tout ce qui etait dimensionne en pourcentage grandit
+        // avec elle. Chaque ecran se reorganise a partir de `md` (etageres,
+        // grilles, barre de saisie) — elargir sans ca ramenait une vignette
+        // de gabarit a 450 px.
+        app: "1152px",
+        // Les feuilles (menu, connexion, compte, recharge) et la page de
+        // tarifs. Une feuille qui monte du bas se lit mal au-dela : a la
+        // largeur de l'app, elle devenait une dalle.
+        sheet: "560px",
       },
       letterSpacing: {
         // L'interlettrage négatif des titres est la signature typographique

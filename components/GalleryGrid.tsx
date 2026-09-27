@@ -162,7 +162,9 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
 
       {/* Vignette nue, sans libellé ni date en surimpression : elles vivent
           dans la modale de détail au clic, comme sur le modèle. */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Plus de colonnes, pas de plus grandes vignettes : en `grid-cols-3`
+          fixe, une miniature faisait 380 px de cote sur ordinateur. */}
+      <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-6">
         {visible.map((entry) => (
           <button
             key={entry.id}

@@ -35,7 +35,11 @@ export default function TemplateCategoryPage({ params }: Props) {
       <TemplateHeader backHref="/?screen=templates" title={category.title} />
 
       <div className="animate-fade-up mx-auto w-full max-w-[900px] px-4 pb-16 pt-[calc(env(safe-area-inset-top)+76px)]">
-        <div className="grid grid-cols-2 gap-3">
+        {/* Deux colonnes sur telephone ; au-dela, des colonnes en plus
+            plutot que des vignettes plus grandes. En `grid-cols-2` fixe, une
+            vignette faisait 570 px de large sur ordinateur. Le `sizes` de
+            300 px ci-dessous reste vrai a chaque palier. */}
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
           {category.templates.map((template) => (
             <Link
               key={template.slug}

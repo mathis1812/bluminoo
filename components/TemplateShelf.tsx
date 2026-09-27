@@ -33,14 +33,17 @@ export default function TemplateShelf() {
           aria-label={`${featured.title} — see all templates`}
           // aspect-video et non 4/3 : la vedette du modèle est un bandeau
           // 16/9, nettement moins haut que ce qui était posé ici.
-          className="relative mx-2.5 mb-5 block aspect-video overflow-hidden rounded-2xl bg-[#1c1c1c] transition active:opacity-90"
+          // `md:aspect-[21/9]` : a la largeur du cadre sur ordinateur, un
+          // bandeau 16/9 faisait 640 px de haut et mangeait l'ecran avant la
+          // premiere rangee.
+          className="relative mx-2.5 mb-5 block aspect-video overflow-hidden rounded-2xl bg-[#1c1c1c] transition active:opacity-90 md:aspect-[21/9]"
         >
           <Image
             src={featured.featuredImage ?? featured.templates[0]?.cardImage}
             alt=""
             fill
             priority
-            sizes="(max-width: 900px) 96vw, 880px"
+            sizes="(max-width: 1152px) 96vw, 1132px"
             className="object-cover"
           />
           {/* Photo d'origine superposée, révélée en boucle par un fondu CSS :
@@ -53,7 +56,7 @@ export default function TemplateShelf() {
               alt=""
               aria-hidden
               fill
-              sizes="(max-width: 900px) 96vw, 880px"
+              sizes="(max-width: 1152px) 96vw, 1132px"
               className="before-after-fade object-cover opacity-0"
             />
           )}
@@ -108,7 +111,12 @@ export default function TemplateShelf() {
                 // La largeur vit sur l'élément flex, pas sur la boîte
                 // interne : un pourcentage posé sur celle-ci se résoudrait
                 // contre un parent de largeur automatique, donc contre rien.
-                className="w-[calc(37.594%_-_8.2406px)] min-w-[110px] shrink-0 snap-start transition focus:outline-none focus-visible:outline-none active:opacity-80"
+                //
+                // `md:w-[200px]` : en pourcentage, la vignette grandissait
+                // avec l'ecran — 720 px sur 1920. A largeur fixe, le cadre de
+                // l'app en montre ~5 par rangee, assez pour signaler qu'elle
+                // defile, et une rangee courte tient entiere.
+                className="w-[calc(37.594%_-_8.2406px)] min-w-[110px] shrink-0 snap-start transition focus:outline-none focus-visible:outline-none active:opacity-80 md:w-[200px]"
               >
                 {/* Largeur reprise telle quelle du modèle (portée par le
                     lien ci-dessus) : elle laisse entrevoir une troisième
@@ -120,7 +128,7 @@ export default function TemplateShelf() {
                     src={template.cardImage}
                     alt=""
                     fill
-                    sizes="(max-width: 560px) 38vw, 210px"
+                    sizes="(max-width: 767px) 38vw, 200px"
                     className="object-cover"
                   />
                   {/* Dégradé sous le libellé : sans lui, un texte blanc sur
