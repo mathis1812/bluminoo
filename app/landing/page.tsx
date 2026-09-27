@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { openAuthSheet } from "@/components/AuthSheet";
 import FaqAccordion from "@/components/FaqAccordion";
 import SnapPhone from "@/components/landing/SnapPhone";
 import TemplatesCarousel from "@/components/TemplatesCarousel";
@@ -191,19 +190,23 @@ function CtaButton({
     );
   }
 
+  // Non connecte : on entre dans le studio, pas dans un formulaire. Le
+  // visiteur depose sa photo, ecrit sa scene et lance la generation ; rien
+  // n'est envoye ni facture, et c'est le paywall en fin de chargement simule
+  // qui propose les abonnements (`useStudioGeneration`). Ces boutons
+  // ouvraient la creation de compte : il fallait donc un compte pour
+  // seulement essayer, alors que c'est l'essai qui donne envie du compte.
+  //
+  // `?try=1` : sans ce parametre le middleware sert la landing sur `/`, et
+  // le bouton ramenerait a la page qu'on vient de quitter.
   return (
-    <button
-      type="button"
-      onClick={() => {
-        trackLandingCtaClick(ctaId);
-        // Ces boutons proposent de commencer, pas de se reconnecter : la
-        // feuille s'ouvre donc sur la creation de compte.
-        openAuthSheet("signup");
-      }}
+    <Link
+      href="/?try=1"
+      onClick={() => trackLandingCtaClick(ctaId)}
       className={shared}
     >
       {content}
-    </button>
+    </Link>
   );
 }
 
@@ -531,16 +534,13 @@ export default function LandingPage() {
                 {ctaLabel}
               </Link>
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  trackLandingCtaClick("final_cta");
-                  openAuthSheet("signup");
-                }}
+              <Link
+                href="/?try=1"
+                onClick={() => trackLandingCtaClick("final_cta")}
                 className="flex h-[56px] items-center justify-center rounded-full bg-[#121212] px-8 text-[17px] font-bold text-white transition hover:bg-black"
               >
                 {ctaLabel}
-              </button>
+              </Link>
             )}
           </div>
         </div>

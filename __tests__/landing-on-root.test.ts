@@ -64,6 +64,19 @@ describe("middleware — la landing sur la racine", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 
+  /**
+   * Les boutons de la landing mènent à `/?try=1`. Réécrire cette URL les
+   * ramènerait sur la page qu'on vient de quitter, et il faudrait un compte
+   * pour seulement essayer le produit.
+   */
+  it("laisse passer une demande d'essai", async () => {
+    getUser.mockResolvedValue({ data: { user: null } });
+
+    const response = await middleware(requestFor("/?try=1"));
+
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+  });
+
   it("n'intercepte que la racine", async () => {
     getUser.mockResolvedValue({ data: { user: null } });
 
