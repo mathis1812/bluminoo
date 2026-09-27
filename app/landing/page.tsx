@@ -35,7 +35,12 @@ const FAQ_ITEMS = [
   {
     question: "What is the Red Snap system?",
     answer:
-      "A sharing method that sends your photo like a real snap taken on the spot, without the \"Media loaded\" watermark that gives away images imported from the gallery.",
+      "Normally you would save the photo, open Snapchat, then hunt for it in your gallery. Red Snap hands it to Snapchat directly: it arrives already loaded and ready to send, and it never sits in your camera roll. Two taps from the render to the chat.",
+  },
+  {
+    question: "Which plans include Red Snap?",
+    answer:
+      "Pro and Max. Lite covers image generation at 1K, without Red Snap or video.",
   },
   {
     question: "Can I cancel my subscription?",
@@ -178,17 +183,17 @@ export default function LandingPage() {
       {/* HERO — fond noir plein, sans mosaïque derrière : le contraste vient
           du seul bloc média, comme sur le modèle. */}
       <section className="relative flex flex-col items-center gap-5 px-2 pb-16 pt-12 text-center sm:pt-16">
-        <h1 className="mx-auto max-w-[15ch] text-[2.5rem] font-[550] leading-[1.08] tracking-tight text-white">
-          Turn any photo into{" "}
+        <h1 className="mx-auto max-w-[19ch] text-[2.5rem] font-[550] leading-[1.08] tracking-tight text-white">
+          Send a snap from{" "}
           <span className="bg-gradient-to-r from-[#0285fe] to-[#5ac8fa] bg-clip-text text-transparent">
-            an unreal scene
+            somewhere you have never been
           </span>
           .
         </h1>
 
-        <p className="mx-auto max-w-[38ch] text-[17px] leading-[1.55] text-white/60">
-          Edit your photos with AI and bring them to life as video. Striking
-          results, in seconds.
+        <p className="mx-auto max-w-[40ch] text-[17px] leading-[1.55] text-white/60">
+          Pick a scene, add your photo, send it as a Red Snap. It goes straight
+          into the chat without ever passing through your camera roll.
         </p>
 
         <SpecularButton
@@ -221,6 +226,25 @@ export default function LandingPage() {
           {ctaLabel}
         </SpecularButton>
 
+        {/* La landing n'affichait aucun prix et ne menait nulle part vers
+            /pricing : le visiteur devait s'inscrire pour decouvrir ce que ca
+            coute. Le palier est nomme ici parce que le Red Snap, promesse du
+            titre, demande Pro — l'annoncer avant l'inscription vaut mieux que
+            de le faire decouvrir derriere un paywall.
+
+            Le montant est ecrit en dur : lib/stripe.ts construit PLANS avec
+            envValue(), donc l'importer ici embarquerait la configuration
+            Stripe dans le bundle client. Source de verite : PLANS.pro. */}
+        <p className="mt-4 text-[14px] text-white/45">
+          Red Snap included from $9.99 a week.{" "}
+          <Link
+            href="/pricing"
+            className="text-white/70 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+          >
+            See plans
+          </Link>
+        </p>
+
         <div className="mt-8 flex w-full justify-center">
           <HeroSlider />
         </div>
@@ -241,6 +265,99 @@ export default function LandingPage() {
       <section className="mx-[calc(50%-50vw)] mb-14 w-screen rounded-[28px] bg-light pb-[72px] pt-20 text-black">
         <div className="px-6">
           <div className="mx-auto w-full max-w-[440px]">
+            <PanelEyebrow>SNAPCHAT</PanelEyebrow>
+            <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
+              Send it as a Red Snap, not as an upload
+            </h2>
+            <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
+              A photo you dig out of your gallery arrives as an import, and
+              Snapchat shows it. Bluminoo hands yours to Snapchat through the
+              share sheet instead: two taps, and it never passes through your
+              camera roll.
+            </p>
+            <CtaButton
+              isLoggedIn={isLoggedIn}
+              label={ctaLabel}
+              ctaId="panel_snapchat"
+              className="mt-9 w-full"
+            />
+
+            {/* Aperçu d'une conversation, reconstruit en CSS. */}
+            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
+              <div className="flex items-center gap-2.5">
+                <span aria-hidden className="text-[rgba(15,15,16,0.5)]">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                  >
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </span>
+                <span
+                  aria-hidden
+                  className="h-7 w-7 shrink-0 rounded-full bg-[rgba(15,15,16,0.18)]"
+                />
+                <span className="text-[15px] font-semibold text-[#0f0f10]">
+                  Alex
+                </span>
+                <span
+                  aria-hidden
+                  className="ml-auto flex items-center gap-3 text-[rgba(15,15,16,0.5)]"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                    <path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.6 3.6a1 1 0 01-.25 1l-2.25 2.2z" />
+                  </svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                    <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
+                  </svg>
+                </span>
+              </div>
+
+              <div className="mt-3 rounded-2xl border-l-[3px] border-[#f23b3b] bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold text-[#f23b3b]">Me</span>
+                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
+                    10:44
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center gap-2 rounded-xl border border-[rgba(15,15,16,0.10)] px-3 py-2">
+                  <span aria-hidden className="text-[#f23b3b]">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="h-3.5 w-3.5"
+                    >
+                      <path d="M6 4l14 8-14 8V4z" />
+                    </svg>
+                  </span>
+                  <span className="text-[14px] font-semibold text-[#0f0f10]">
+                    Delivered
+                  </span>
+                </div>
+              </div>
+
+              {/* La reponse recue, et non l'envoi, est la promesse du produit :
+                  c'est le seul element de la maquette qui montre un resultat
+                  plutot qu'une fonction. */}
+              <div className="mt-2 rounded-2xl border-l-[3px] border-primary bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold text-primary">Alex</span>
+                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
+                    10:45
+                  </span>
+                </div>
+                <p className="mt-2 text-[14px] leading-[1.45] text-[#0f0f10]">
+                  wait where are you right now
+                </p>
+              </div>
+            </div>
+            <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
+
             <PanelEyebrow>TEMPLATES</PanelEyebrow>
             <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
               Create in one click with templates
@@ -329,83 +446,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <hr className="my-14 h-px border-0 bg-[rgba(15,15,16,0.12)]" />
-
-            <PanelEyebrow>SNAPCHAT</PanelEyebrow>
-            <h2 className="mt-6 text-[2rem] font-[550] leading-[1.12] tracking-tight text-[#0f0f10]">
-              Send your creations as a Red Snap
-            </h2>
-            <p className="mt-5 text-[16px] leading-[1.55] text-[#4f4f4f]">
-              Share what you generate straight to a Red Snap, so it lands like a
-              photo taken on the spot, without the &ldquo;Media loaded&rdquo;
-              tag giving it away.
-            </p>
-            <CtaButton
-              isLoggedIn={isLoggedIn}
-              label={ctaLabel}
-              ctaId="panel_snapchat"
-              className="mt-9 w-full"
-            />
-
-            {/* Aperçu d'une conversation, reconstruit en CSS. */}
-            <div className="mt-9 rounded-3xl bg-[rgba(15,15,16,0.05)] p-4">
-              <div className="flex items-center gap-2.5">
-                <span aria-hidden className="text-[rgba(15,15,16,0.5)]">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                </span>
-                <span
-                  aria-hidden
-                  className="h-7 w-7 shrink-0 rounded-full bg-[rgba(15,15,16,0.18)]"
-                />
-                <span className="text-[15px] font-semibold text-[#0f0f10]">
-                  Alex
-                </span>
-                <span
-                  aria-hidden
-                  className="ml-auto flex items-center gap-3 text-[rgba(15,15,16,0.5)]"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                    <path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.6 3.6a1 1 0 01-.25 1l-2.25 2.2z" />
-                  </svg>
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                    <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
-                  </svg>
-                </span>
-              </div>
-
-              <div className="mt-3 rounded-2xl border-l-[3px] border-[#f23b3b] bg-white p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-bold text-[#f23b3b]">Me</span>
-                  <span className="text-[12px] text-[rgba(15,15,16,0.4)]">
-                    10:44
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center gap-2 rounded-xl border border-[rgba(15,15,16,0.10)] px-3 py-2">
-                  <span aria-hidden className="text-[#f23b3b]">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="h-3.5 w-3.5"
-                    >
-                      <path d="M6 4l14 8-14 8V4z" />
-                    </svg>
-                  </span>
-                  <span className="text-[14px] font-semibold text-[#0f0f10]">
-                    Sent
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
