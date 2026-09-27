@@ -19,6 +19,10 @@ const config: Config = {
         // Red Snap parle la langue de la plateforme qu'il promet, donc il
         // devient un token plutot qu'un hexa recopie a deux endroits.
         snap: "#FFFC00",
+        // Rouge du snap photo (le carre plein « Delivered »). C'est la
+        // couleur qui donne son nom au Red Snap : la landing l'utilise comme
+        // signal du produit, en petites touches, jamais en aplat.
+        snapred: "#F23B3B",
         muted: "#a8a8a8",
         faint: "#4f4f4f",
         primary: {
@@ -65,8 +69,15 @@ const config: Config = {
         // glissement plein écran (-100vh), pas un petit décalage de
         // quelques pixels qui se lisait comme un simple fondu.
         "page-in": "page-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both",
+        // Barre de progression du snap ouvert dans le hero. Sa duree doit
+        // rester egale a SLIDE_DURATION_MS (components/landing/SnapPhone).
+        "snap-timer": "snap-timer 3.6s linear both",
       },
       keyframes: {
+        "snap-timer": {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
         "tools-in": {
           from: { opacity: "0" },
           to: { opacity: "1" },

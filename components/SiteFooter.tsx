@@ -38,6 +38,11 @@ export default function SiteFooter() {
   return (
     <footer className="px-6 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-2 text-center text-[13px] text-white/35">
       <p>© {new Date().getFullYear()} Bluminoo Studio. All rights reserved.</p>
+      {/* La landing parle de Snapchat et en reprend le jaune : cette ligne
+          evite qu'on prenne Bluminoo pour un produit officiel de Snap. */}
+      <p className="mt-1">
+        Bluminoo is not affiliated with, endorsed by, or sponsored by Snap Inc.
+      </p>
       <nav className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
         {links.map((link, index) => (
           <Fragment key={link.href}>
