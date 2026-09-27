@@ -132,9 +132,14 @@ export default function ResultActions({
         </button>
       )}
 
-      {/* Red Snap aux couleurs de Snapchat — le même jaune que la carte du
-          menu (#FFFC00), pour que la destination se reconnaisse avant même
-          qu'on lise le libellé. */}
+      {/* Red Snap au rouge du snap photo (`snapred`), le carré plein que
+          Snapchat affiche dans une conversation — et la couleur qui lui donne
+          son nom.
+
+          Il portait le jaune Snapchat jusqu'au 27/09, pour que la destination
+          se reconnaisse avant le libellé. Le jaune désigne désormais l'action
+          dans toute l'app, comme sur la landing : le garder ici aurait noyé le
+          bouton parmi les autres. Le rouge le distingue, et il le décrit. */}
       {hasRedSnap ? (
         <button
           type="button"
@@ -195,7 +200,7 @@ const LIGHT_BUTTON =
   "flex h-12 items-center justify-center rounded-3xl bg-white px-6 text-[16px] font-semibold text-black transition active:opacity-90";
 
 const SNAP_BUTTON =
-  "flex h-12 items-center justify-center gap-2 rounded-3xl bg-[#FFFC00] px-5 text-[16px] font-semibold text-black transition active:opacity-90 disabled:opacity-60";
+  "flex h-12 items-center justify-center gap-2 rounded-3xl bg-snapred px-5 text-[16px] font-semibold text-white transition active:opacity-90 disabled:opacity-60";
 
 /**
  * Fantôme dessiné à la main plutôt que le logo Snapchat : une silhouette

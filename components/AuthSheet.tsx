@@ -245,7 +245,7 @@ export default function AuthSheet() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 flex h-14 w-full items-center justify-center rounded-3xl bg-white text-[17px] font-semibold text-black transition active:opacity-90 disabled:opacity-60"
+            className="mt-1 flex h-14 w-full items-center justify-center rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] transition active:opacity-90 disabled:opacity-60"
           >
             {loading ? copy.pending : copy.action}
           </button>

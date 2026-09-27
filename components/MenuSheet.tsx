@@ -230,7 +230,7 @@ export default function MenuSheet({
                 <Link
                   href="/pricing"
                   onClick={onClose}
-                  className="shrink-0 rounded-full bg-primary px-3.5 py-2 text-[14px] font-semibold text-white transition active:opacity-80"
+                  className="shrink-0 rounded-full bg-snap px-3.5 py-2 text-[14px] font-semibold text-[#121212] transition active:opacity-80"
                 >
                   Top up
                 </Link>
@@ -246,7 +246,7 @@ export default function MenuSheet({
                     onClose();
                     openAuthSheet("signin");
                   }}
-                  className="shrink-0 rounded-full bg-primary px-3.5 py-2 text-[14px] font-semibold text-white transition active:opacity-80"
+                  className="shrink-0 rounded-full bg-snap px-3.5 py-2 text-[14px] font-semibold text-[#121212] transition active:opacity-80"
                 >
                   Sign in
                 </button>
@@ -321,14 +321,17 @@ export default function MenuSheet({
           <Link
             href={hasRedSnap ? "/red-snap" : "/pricing"}
             onClick={onClose}
-            className="mt-2 flex h-[96px] items-center justify-between gap-3 rounded-3xl bg-[#FFFC00] px-5 transition active:opacity-90"
+            className="mt-2 flex h-[96px] items-center justify-between gap-3 rounded-3xl bg-snapred px-5 transition active:opacity-90"
           >
-            <span className="text-[18px] font-semibold leading-tight text-black">
+            <span className="text-[18px] font-semibold leading-tight text-white">
               Send your AI generations
               <br />
               as a Red Snap
             </span>
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary py-2 pl-5 pr-4 text-[15px] font-semibold text-white">
+            {/* Pastille blanche sur le rouge : le bleu y perdait son contraste
+                et ramenait une troisieme couleur sur une carte qui n'en
+                demande pas. */}
+            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white py-2 pl-5 pr-4 text-[15px] font-semibold text-snapred">
               See
               <svg
                 width="16"

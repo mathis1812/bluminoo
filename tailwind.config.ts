@@ -14,17 +14,27 @@ const config: Config = {
         panel: "#0c1111",
         line: "#232828",
         light: "#fbfbfb",
-        // Jaune officiel de Snapchat. Il etait en dur dans
-        // app/red-snap/page.tsx ; la landing le reprend pour que le bloc
-        // Red Snap parle la langue de la plateforme qu'il promet, donc il
-        // devient un token plutot qu'un hexa recopie a deux endroits.
+        // Jaune officiel de Snapchat, et couleur de L'ACTION dans tout le
+        // produit : chaque bouton qui fait avancer — Generate, Continue,
+        // Top up, See the plans — le porte, landing comprise.
+        //
+        // Il est tres clair : tout element qui le prend passe son texte a
+        // l'encre (#121212). Du blanc dessus tombe sous 1,1:1 de contraste,
+        // donc illisible.
         snap: "#FFFC00",
-        // Rouge du snap photo (le carre plein « Delivered »). C'est la
-        // couleur qui donne son nom au Red Snap : la landing l'utilise comme
-        // signal du produit, en petites touches, jamais en aplat.
+        // Rouge du snap photo (le carre plein « Delivered »), la couleur qui
+        // donne son nom au Red Snap. Elle le signale partout : le bouton du
+        // rendu, la carte du menu, les touches de la landing.
+        //
+        // Le bouton Red Snap portait le jaune jusqu'au 27/09. Depuis que le
+        // jaune designe l'action, le garder l'aurait noye parmi les autres
+        // boutons — et le rouge, lui, decrit ce qu'il envoie.
         snapred: "#F23B3B",
         muted: "#a8a8a8",
         faint: "#4f4f4f",
+        // Le bleu n'est plus la couleur de l'action depuis le 27/09. Il lui
+        // reste l'information et l'etat : barre de progression, pastilles de
+        // selection, badges. Sur la landing, c'est l'ami qui repond.
         primary: {
           DEFAULT: "#0285fe",
           soft: "#4da8ff",

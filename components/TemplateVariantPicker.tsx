@@ -104,7 +104,7 @@ export default function TemplateVariantPicker({
 
         <Link
           href={`/templates/${template.slug}/${selected}`}
-          className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-3xl bg-primary text-[17px] font-semibold text-white transition active:opacity-90"
+          className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] transition active:opacity-90"
         >
           Continue
           <svg

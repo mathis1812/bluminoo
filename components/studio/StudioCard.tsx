@@ -227,7 +227,7 @@ export default function StudioCard({
                 </p>
                 <Link
                   href="/pricing"
-                  className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-primary px-6 text-[16px] font-semibold text-white transition active:opacity-90"
+                  className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
                 >
                   See the plans
                 </Link>
