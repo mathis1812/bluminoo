@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 import { useCallback, useState } from "react";
+import GeneratingCard from "@/components/studio/GeneratingCard";
+import {
+  IMAGE_EXPECTED_SECONDS,
+  useElapsedProgress,
+} from "@/components/studio/useElapsedProgress";
 import { EDIT_COST } from "@/lib/generation-cost";
 
 /**
@@ -34,6 +39,14 @@ export default function EditPanel({
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Une retouche est une génération complète : même attente, donc même
+  // calibrage que le studio. Sans ça, le seul signe de vie était le libellé
+  // du bouton, et l'on ne distinguait pas une attente normale d'une panne.
+  const { progressPercent, loadingMessage } = useElapsedProgress(
+    loading,
+    IMAGE_EXPECTED_SECONDS,
+  );
 
   const trimmed = description.trim();
   const canSubmit = trimmed.length > 0 && !loading;
@@ -78,6 +91,10 @@ export default function EditPanel({
 
   return (
     <div className="flex w-full flex-col gap-3">
+      {/* Le cadre est en `relative` : `GeneratingCard` s'y pose en overlay
+          pendant la retouche, exactement comme sur la carte du studio — même
+          mot-symbole, même barre, mêmes messages. L'écran ne se vide donc
+          jamais, et la photo travaillée reste sous les yeux du client. */}
       <div className="relative w-full overflow-hidden rounded-2xl bg-black/40">
         <Image
           src={sourceUrl}
@@ -87,6 +104,14 @@ export default function EditPanel({
           unoptimized
           className="h-auto w-full object-contain"
         />
+
+        {loading && (
+          <GeneratingCard
+            message={loadingMessage}
+            progressPercent={progressPercent}
+            previewUrl={sourceUrl}
+          />
+        )}
       </div>
 
       <textarea
