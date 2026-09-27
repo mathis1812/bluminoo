@@ -286,7 +286,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                 <button
                   type="button"
                   onClick={() => void downloadEntry(selected)}
-                  className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-ink transition hover:bg-primary-soft"
+                  className="rounded-xl bg-snap px-3.5 py-2 text-xs font-bold text-[#121212] transition hover:opacity-90"
                 >
                   Download
                 </button>

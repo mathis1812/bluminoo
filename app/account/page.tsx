@@ -140,7 +140,7 @@ export default async function AccountPage() {
             </p>
             <Link
               href="/pricing"
-              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-ink transition hover:bg-primary-soft"
+              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-snap px-4 py-3 text-sm font-semibold text-[#121212] transition hover:opacity-90"
             >
               See plans
             </Link>

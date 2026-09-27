@@ -214,7 +214,7 @@ export default function PromptBar({
           tabIndex={showTools ? -1 : undefined}
           onClick={onOpenTemplates}
           disabled={!hasTemplates || showTools}
-          className="mr-2 flex h-16 w-max shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-primary px-5 text-[15px] font-semibold text-white transition active:opacity-70 disabled:pointer-events-none disabled:opacity-40"
+          className="mr-2 flex h-16 w-max shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-snap px-5 text-[15px] font-semibold text-[#121212] transition active:opacity-70 disabled:pointer-events-none disabled:opacity-40"
         >
           Templates
         </button>

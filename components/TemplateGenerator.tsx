@@ -349,7 +349,7 @@ export default function TemplateGenerator({
               </p>
               <Link
                 href="/pricing"
-                className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-primary px-6 text-[16px] font-semibold text-white transition active:opacity-90"
+                className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
               >
                 See the plans
               </Link>
@@ -545,7 +545,7 @@ export default function TemplateGenerator({
               type="button"
               onClick={generate}
               disabled={!prepared || loading}
-              className="mt-3 flex h-14 w-full items-center justify-center gap-2.5 rounded-3xl bg-primary text-[17px] font-semibold text-white transition active:opacity-90 disabled:opacity-60"
+              className="mt-3 flex h-14 w-full items-center justify-center gap-2.5 rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] transition active:opacity-90 disabled:opacity-60"
             >
               Generate
               <span className="flex items-center gap-1 text-[17px] font-bold tabular-nums">

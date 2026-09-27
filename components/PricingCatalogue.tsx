@@ -347,7 +347,7 @@ export default function PricingCatalogue() {
           type="button"
           onClick={handleContinue}
           disabled={loading}
-          className="flex h-14 w-full items-center justify-center rounded-3xl bg-primary text-[17px] font-semibold text-white shadow-[0_0_18px_rgba(2,133,254,0.45),0_0_44px_rgba(2,133,254,0.22)] transition active:opacity-80 disabled:opacity-50"
+          className="flex h-14 w-full items-center justify-center rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] shadow-[0_0_18px_rgba(255,252,0,0.45),0_0_44px_rgba(255,252,0,0.22)] transition active:opacity-80 disabled:opacity-50"
         >
           {loading ? "Loading…" : "Continue"}
         </button>
