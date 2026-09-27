@@ -56,7 +56,12 @@ export default function Home() {
     // `viewportRef` : c'est CET élément qui porte `h-dvh`, donc la hauteur
     // qu'un panneau occupe réellement. On la mesure ici plutôt que de la
     // déduire de `window.innerHeight` — cf. `panelHeight` dans useRailScreens.
-    <div ref={viewportRef} className="h-dvh overflow-hidden">
+    <div
+      ref={viewportRef}
+      // `mx-auto max-w-app` : le cadre de l'app sur ordinateur, pose ici
+      // plutot que dans MainShell — cf. le commentaire de `/` la-bas.
+      className="mx-auto h-dvh w-full max-w-app overflow-hidden"
+    >
       <StudioTopBar
         credits={account.credits}
         planId={account.planId}
@@ -136,6 +141,12 @@ export default function Home() {
             )}
           </StudioCard>
 
+          {/* Plafonnee a partir de `md` : sans ca, sur ordinateur, le champ
+              de description s'etirait sur toute la largeur du cadre. 680 px
+              laissent la barre un peu plus large que la carte au-dessus,
+              elle-meme bornee par la hauteur de l'ecran — la barre s'y lit
+              comme un socle. */}
+          <div className="w-full md:mx-auto md:max-w-[680px]">
           <PromptBar
             userNote={studio.userNote}
             setUserNote={studio.setUserNote}
@@ -152,6 +163,7 @@ export default function Home() {
             onOpenTemplates={() => setScreen("templates")}
             hasTemplates={hasTemplates}
           />
+          </div>
         </div>
 
         {/* Panneau des gabarits : sa propre section h-dvh, défilable en

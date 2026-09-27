@@ -53,7 +53,7 @@ export default function RechargeSheet({
         // pt sur la racine, et non sur la bannière : la poignée et le bouton
         // de fermeture sont positionnés en absolu par rapport à celle-ci, donc
         // la rembourrer les décollerait de l'image qu'ils doivent survoler.
-        className="animate-sheet-up absolute inset-x-0 bottom-0 top-0 flex flex-col overflow-hidden rounded-t-[47px] bg-black pb-[max(8px,calc(env(safe-area-inset-bottom)-14px))] pt-[env(safe-area-inset-top)]"
+        className="animate-sheet-up absolute inset-x-0 bottom-0 top-0 mx-auto flex w-full max-w-sheet flex-col overflow-hidden rounded-t-[47px] bg-black pb-[max(8px,calc(env(safe-area-inset-bottom)-14px))] pt-[env(safe-area-inset-top)]"
       >
         {/* Bannière : elle sert aussi de zone de sécurité, la poignée et la
             croix se posant dessus plutôt que sur le contenu. */}

@@ -27,7 +27,7 @@ export default function TemplateHeader({
   titleClassName?: string;
 }) {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+12px)]">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex max-w-app items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+12px)]">
       <Link
         href={backHref}
         aria-label="Back"

@@ -49,6 +49,22 @@ const config: Config = {
         body: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
       },
+      maxWidth: {
+        // Largeur de l'app sur ordinateur : la meme que la landing
+        // (`max-w-6xl`), pour qu'on ne change pas de cadre en passant de
+        // l'une a l'autre. Contenue sans etre plein ecran.
+        //
+        // Elle ne suffit pas seule : aucun ecran de l'app n'avait de point de
+        // rupture, donc tout ce qui etait dimensionne en pourcentage grandit
+        // avec elle. Chaque ecran se reorganise a partir de `md` (etageres,
+        // grilles, barre de saisie) — elargir sans ca ramenait une vignette
+        // de gabarit a 450 px.
+        app: "1152px",
+        // Les feuilles (menu, connexion, compte, recharge) et la page de
+        // tarifs. Une feuille qui monte du bas se lit mal au-dela : a la
+        // largeur de l'app, elle devenait une dalle.
+        sheet: "560px",
+      },
       letterSpacing: {
         // L'interlettrage négatif des titres est la signature typographique
         // du modèle : -1px à 40px, -0.8px à 32px.

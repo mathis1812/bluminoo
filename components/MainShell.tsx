@@ -25,8 +25,22 @@ export default function MainShell({
 }) {
   const pathname = usePathname();
 
-  if (hasOwnHeader(pathname)) {
+  // `/` reste nu, et c'est le studio qui s'y contraint lui-meme
+  // (app/page.tsx). Le middleware sert la landing a cette meme adresse aux
+  // visiteurs non connectes : poser la colonne ici l'aurait ecrasee dans
+  // une bande de telephone, hero en deux colonnes compris. La landing ne
+  // rend jamais le composant du studio, donc elle reste intacte.
+  if (pathname === "/") {
     return <main>{children}</main>;
+  }
+
+  // Cadre de l'app sur ordinateur, cf. `maxWidth.app` dans tailwind.config.
+  if (hasOwnHeader(pathname)) {
+    return (
+      <main className="mx-auto min-h-dvh w-full max-w-app">
+        {children}
+      </main>
+    );
   }
 
   return (
