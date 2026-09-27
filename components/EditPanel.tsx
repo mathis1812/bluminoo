@@ -1,7 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useState } from "react";
+import GeneratingCard from "@/components/studio/GeneratingCard";
+import {
+  IMAGE_EXPECTED_SECONDS,
+  useElapsedProgress,
+} from "@/components/studio/useElapsedProgress";
 import { EDIT_COST } from "@/lib/generation-cost";
 
 /**
@@ -34,6 +38,14 @@ export default function EditPanel({
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Une retouche est une génération complète : même attente, donc même
+  // calibrage que le studio. Sans ça, le seul signe de vie était le libellé
+  // du bouton, et l'on ne distinguait pas une attente normale d'une panne.
+  const { progressPercent, loadingMessage } = useElapsedProgress(
+    loading,
+    IMAGE_EXPECTED_SECONDS,
+  );
 
   const trimmed = description.trim();
   const canSubmit = trimmed.length > 0 && !loading;
@@ -78,15 +90,34 @@ export default function EditPanel({
 
   return (
     <div className="flex w-full flex-col gap-3">
+      {/* Le cadre est en `relative` : `GeneratingCard` s'y pose en overlay
+          pendant la retouche, exactement comme sur la carte du studio — même
+          mot-symbole, même barre, mêmes messages. L'écran ne se vide donc
+          jamais, et la photo travaillée reste sous les yeux du client. */}
       <div className="relative w-full overflow-hidden rounded-2xl bg-black/40">
-        <Image
+        {/* `<img>` et non `next/image` : le rendu était déclaré en 1200×900,
+            soit du 4:3, alors qu'il sort le plus souvent en 9:16. Le
+            navigateur réservait donc la mauvaise hauteur puis se corrigeait à
+            l'arrivée de l'image, et le champ et les boutons sautaient. On ne
+            connaît pas le format avant de charger, donc on ne le déclare pas.
+
+            `unoptimized` était déjà posé — l'URL vient de notre bucket, signée
+            et déjà dimensionnée — donc `next/image` n'apportait rien ici.
+            Même choix, et pour la même raison, que `ResultViewer`. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={sourceUrl}
           alt="Image being edited"
-          width={1200}
-          height={900}
-          unoptimized
           className="h-auto w-full object-contain"
         />
+
+        {loading && (
+          <GeneratingCard
+            message={loadingMessage}
+            progressPercent={progressPercent}
+            previewUrl={sourceUrl}
+          />
+        )}
       </div>
 
       <textarea

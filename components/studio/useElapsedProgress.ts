@@ -5,6 +5,14 @@ import { useEffect, useState } from "react";
 /** Durée typique observée d'une génération, pour calibrer la progression. */
 export const IMAGE_EXPECTED_SECONDS = 30;
 
+/**
+ * Intervalle entre deux messages d'attente, en secondes.
+ *
+ * 2,6 s : la cadence d'une seconde, héritée de l'ancien compteur, faisait
+ * défiler les messages trop vite pour être lus.
+ */
+const LOADING_MESSAGE_SECONDS = 2.6;
+
 export const GENERATION_LOADING_MESSAGES = [
   "Analyzing the light…",
   "Adjusting the reflections…",
@@ -41,5 +49,14 @@ export function useElapsedProgress(active: boolean, expectedSeconds: number) {
     Math.round(100 * (1 - Math.exp((-2 * elapsedSeconds) / expectedSeconds))),
   );
 
-  return { elapsedSeconds, progressPercent };
+  // Dérivé du temps écoulé plutôt que porté par un intervalle propre : le
+  // studio et les gabarits en ont chacun un, et un troisième exemplaire de la
+  // même boucle aurait dérivé des deux autres au premier ajustement.
+  const loadingMessage =
+    GENERATION_LOADING_MESSAGES[
+      Math.floor(elapsedSeconds / LOADING_MESSAGE_SECONDS) %
+        GENERATION_LOADING_MESSAGES.length
+    ];
+
+  return { elapsedSeconds, progressPercent, loadingMessage };
 }

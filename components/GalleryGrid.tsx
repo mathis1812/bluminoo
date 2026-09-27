@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import EditPanel from "@/components/EditPanel";
 
@@ -78,6 +79,10 @@ const TABS: { value: Filter; label: string }[] = [
 ];
 
 export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
+  // `entries` vient du Server Component parent (app/gallery/page.tsx) : une
+  // retouche crée une entrée en base que seul un nouveau rendu serveur fait
+  // apparaître. `router.refresh()` le déclenche sans recharger la page.
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<GalleryEntry | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
@@ -209,12 +214,17 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                   onCancel={() => setEditing(false)}
                   onEdited={(imageUrl) => {
                     setEditing(false);
-                    // La retouche remplace l'image AFFICHEE, pas l'entree en
-                    // base : l'originale reste dans la galerie, et la
-                    // nouvelle y apparait au prochain chargement. On garde
-                    // l'id et la date de l'entree ouverte, qui ne servent
-                    // ici qu'a l'affichage.
+                    // La retouche ne remplace pas l'entree ouverte : c'est
+                    // une generation a part, facturee, et l'originale reste
+                    // dans la galerie. On montre la nouvelle image dans la
+                    // modale en gardant l'id et la date de l'entree ouverte,
+                    // qui ne servent ici qu'a l'affichage.
                     setSelected({ ...selected, result_url: imageUrl });
+                    // Et on recharge la liste : sans ca, la nouvelle entree
+                    // n'apparaissait qu'au prochain chargement de la page.
+                    // Quelqu'un qui retouchait puis fermait la modale ne
+                    // retrouvait pas son rendu et le croyait perdu.
+                    router.refresh();
                   }}
                 />
               </div>
