@@ -94,157 +94,56 @@ export async function POST(req: NextRequest) {
 
   let dbWriteFailed = false;
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const userId = session.metadata?.supabase_user_id;
+  // Toute exception (Stripe injoignable, base en panne) doit libérer la
+  // réservation comme un échec d'écriture : sinon l'événement resterait
+  // marqué traité et le rejeu de Stripe serait ignoré — paiement perdu.
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.supabase_user_id;
 
-    // Pack de crédits à l'unité : un ajout, jamais un remplacement — ne
-    // touche ni plan ni current_period_end, indépendants d'un achat ponctuel.
-    const topupId = session.metadata?.topup as keyof typeof TOPUPS | undefined;
-    if (topupId && TOPUPS[topupId] && userId) {
-      await addCredits(userId, TOPUPS[topupId].credits);
-    } else if (topupId) {
-      console.error(
-        `[stripe-webhook] checkout.session.completed missing/invalid topup metadata for event ${event.id}: userId=${userId}, topupId=${topupId}`,
-      );
-    }
-
-    const planId = session.metadata?.plan as keyof typeof PLANS | undefined;
-
-    if (userId && planId && PLANS[planId]) {
-      const subscriptionId =
-        typeof session.subscription === "string"
-          ? session.subscription
-          : session.subscription?.id;
-      const customerId =
-        typeof session.customer === "string"
-          ? session.customer
-          : session.customer?.id;
-
-      let currentPeriodEnd: string | null = null;
-      if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const periodEnd = currentPeriodEndOf(subscription);
-        currentPeriodEnd = periodEnd
-          ? new Date(periodEnd * 1000).toISOString()
-          : null;
-      }
-
-      const { data: updateData, error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          stripe_customer_id: customerId ?? null,
-          stripe_subscription_id: subscriptionId ?? null,
-          plan: planId,
-          credits: creditsFor(planId),
-          current_period_end: currentPeriodEnd,
-        })
-        .eq("id", userId)
-        .select("id");
-
-      if (updateError) {
+      // Pack de crédits à l'unité : un ajout, jamais un remplacement — ne
+      // touche ni plan ni current_period_end, indépendants d'un achat ponctuel.
+      const topupId = session.metadata?.topup as keyof typeof TOPUPS | undefined;
+      if (topupId && TOPUPS[topupId] && userId) {
+        await addCredits(userId, TOPUPS[topupId].credits);
+      } else if (topupId) {
         console.error(
-          `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
-          updateError,
-        );
-        dbWriteFailed = true;
-      } else if (!updateData || updateData.length === 0) {
-        console.error(
-          `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (userId=${userId} may be stale)`,
+          `[stripe-webhook] checkout.session.completed missing/invalid topup metadata for event ${event.id}: userId=${userId}, topupId=${topupId}`,
         );
       }
-    } else if (!topupId) {
-      console.error(
-        `[stripe-webhook] checkout.session.completed missing/invalid metadata for event ${event.id}: userId=${userId}, planId=${planId}`,
-      );
-    }
-  }
 
-  if (event.type === "invoice.paid") {
-    const invoice = event.data.object as Stripe.Invoice;
+      const planId = session.metadata?.plan as keyof typeof PLANS | undefined;
 
-    if (invoice.billing_reason === "subscription_cycle") {
-      // `Stripe.Invoice.subscription` was removed from the installed SDK's
-      // typings in favor of `invoice.parent.subscription_details.subscription`
-      // (invoices can now have non-subscription parents too). Same value,
-      // new path.
-      const subscriptionRef =
-        invoice.parent?.subscription_details?.subscription ??
-        (invoice as unknown as { subscription?: string | Stripe.Subscription })
-          .subscription;
-      const subscriptionId =
-        typeof subscriptionRef === "string"
-          ? subscriptionRef
-          : subscriptionRef?.id;
+      if (userId && planId && PLANS[planId]) {
+        const subscriptionId =
+          typeof session.subscription === "string"
+            ? session.subscription
+            : session.subscription?.id;
+        const customerId =
+          typeof session.customer === "string"
+            ? session.customer
+            : session.customer?.id;
 
-      if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const priceId = subscription.items.data[0]?.price.id;
-        const planId = resolveSubscriptionPriceId(priceId);
-        const periodEnd = currentPeriodEndOf(subscription);
-
-        if (planId) {
-          const { data: updateData, error: updateError } = await supabase
-            .from("profiles")
-            .update({
-              plan: planId,
-              credits: creditsFor(planId),
-              current_period_end: periodEnd
-                ? new Date(periodEnd * 1000).toISOString()
-                : null,
-            })
-            .eq("stripe_subscription_id", subscriptionId)
-            .select("id");
-
-          if (updateError) {
-            console.error(
-              `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
-              updateError,
-            );
-            dbWriteFailed = true;
-          } else if (!updateData || updateData.length === 0) {
-            console.error(
-              `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscriptionId} may be stale)`,
-            );
-          }
-        } else {
-          console.error(
-            `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscriptionId}, event ${event.id})`,
-          );
+        let currentPeriodEnd: string | null = null;
+        if (subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const periodEnd = currentPeriodEndOf(subscription);
+          currentPeriodEnd = periodEnd
+            ? new Date(periodEnd * 1000).toISOString()
+            : null;
         }
-      }
-    }
-  }
 
-  if (event.type === "customer.subscription.updated") {
-    const subscription = event.data.object as Stripe.Subscription;
-    const previousAttributes = (
-      event.data as { previous_attributes?: Record<string, unknown> }
-    ).previous_attributes;
-
-    if (previousAttributes && "items" in previousAttributes) {
-      const priceId = subscription.items.data[0]?.price.id;
-      const planId = resolveSubscriptionPriceId(priceId);
-      const periodEnd = currentPeriodEndOf(subscription);
-
-      if (planId) {
-        // Un changement de palier ne touche JAMAIS la colonne `credits`.
-        // Stripe ne facture qu'un prorata sur un changement d'items : si on
-        // recréditait le forfait du palier cible ici, un aller-retour
-        // Max → Lite → Max rechargerait 5000 crédits pour quelques
-        // centimes, autant de fois que voulu. L'utilisateur obtient
-        // immédiatement la résolution d'image de son nouveau palier (lue
-        // depuis `plan`), et le forfait du nouveau palier lui arrive au
-        // renouvellement suivant via `invoice.paid`.
         const { data: updateData, error: updateError } = await supabase
           .from("profiles")
           .update({
+            stripe_customer_id: customerId ?? null,
+            stripe_subscription_id: subscriptionId ?? null,
             plan: planId,
-            current_period_end: periodEnd
-              ? new Date(periodEnd * 1000).toISOString()
-              : null,
+            credits: creditsFor(planId),
+            current_period_end: currentPeriodEnd,
           })
-          .eq("stripe_subscription_id", subscription.id)
+          .eq("id", userId)
           .select("id");
 
         if (updateError) {
@@ -255,37 +154,146 @@ export async function POST(req: NextRequest) {
           dbWriteFailed = true;
         } else if (!updateData || updateData.length === 0) {
           console.error(
-            `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscription.id} may be stale)`,
+            `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (userId=${userId} may be stale)`,
           );
         }
-      } else {
+      } else if (!topupId) {
         console.error(
-          `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscription.id}, event ${event.id})`,
+          `[stripe-webhook] checkout.session.completed missing/invalid metadata for event ${event.id}: userId=${userId}, planId=${planId}`,
         );
       }
     }
-  }
 
-  if (event.type === "customer.subscription.deleted") {
-    const subscription = event.data.object as Stripe.Subscription;
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object as Stripe.Invoice;
 
-    const { data: updateData, error: updateError } = await supabase
-      .from("profiles")
-      .update({ plan: null, stripe_subscription_id: null })
-      .eq("stripe_subscription_id", subscription.id)
-      .select("id");
+      if (invoice.billing_reason === "subscription_cycle") {
+        // `Stripe.Invoice.subscription` was removed from the installed SDK's
+        // typings in favor of `invoice.parent.subscription_details.subscription`
+        // (invoices can now have non-subscription parents too). Same value,
+        // new path.
+        const subscriptionRef =
+          invoice.parent?.subscription_details?.subscription ??
+          (invoice as unknown as { subscription?: string | Stripe.Subscription })
+            .subscription;
+        const subscriptionId =
+          typeof subscriptionRef === "string"
+            ? subscriptionRef
+            : subscriptionRef?.id;
 
-    if (updateError) {
-      console.error(
-        `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
-        updateError,
-      );
-      dbWriteFailed = true;
-    } else if (!updateData || updateData.length === 0) {
-      console.error(
-        `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscription.id} may be stale)`,
-      );
+        if (subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const priceId = subscription.items.data[0]?.price.id;
+          const planId = resolveSubscriptionPriceId(priceId);
+          const periodEnd = currentPeriodEndOf(subscription);
+
+          if (planId) {
+            const { data: updateData, error: updateError } = await supabase
+              .from("profiles")
+              .update({
+                plan: planId,
+                credits: creditsFor(planId),
+                current_period_end: periodEnd
+                  ? new Date(periodEnd * 1000).toISOString()
+                  : null,
+              })
+              .eq("stripe_subscription_id", subscriptionId)
+              .select("id");
+
+            if (updateError) {
+              console.error(
+                `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
+                updateError,
+              );
+              dbWriteFailed = true;
+            } else if (!updateData || updateData.length === 0) {
+              console.error(
+                `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscriptionId} may be stale)`,
+              );
+            }
+          } else {
+            console.error(
+              `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscriptionId}, event ${event.id})`,
+            );
+          }
+        }
+      }
     }
+
+    if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as Stripe.Subscription;
+      const previousAttributes = (
+        event.data as { previous_attributes?: Record<string, unknown> }
+      ).previous_attributes;
+
+      if (previousAttributes && "items" in previousAttributes) {
+        const priceId = subscription.items.data[0]?.price.id;
+        const planId = resolveSubscriptionPriceId(priceId);
+        const periodEnd = currentPeriodEndOf(subscription);
+
+        if (planId) {
+          // Un changement de palier ne touche JAMAIS la colonne `credits`.
+          // Stripe ne facture qu'un prorata sur un changement d'items : si on
+          // recréditait le forfait du palier cible ici, un aller-retour
+          // Max → Lite → Max rechargerait 5000 crédits pour quelques
+          // centimes, autant de fois que voulu. L'utilisateur obtient
+          // immédiatement la résolution d'image de son nouveau palier (lue
+          // depuis `plan`), et le forfait du nouveau palier lui arrive au
+          // renouvellement suivant via `invoice.paid`.
+          const { data: updateData, error: updateError } = await supabase
+            .from("profiles")
+            .update({
+              plan: planId,
+              current_period_end: periodEnd
+                ? new Date(periodEnd * 1000).toISOString()
+                : null,
+            })
+            .eq("stripe_subscription_id", subscription.id)
+            .select("id");
+
+          if (updateError) {
+            console.error(
+              `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
+              updateError,
+            );
+            dbWriteFailed = true;
+          } else if (!updateData || updateData.length === 0) {
+            console.error(
+              `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscription.id} may be stale)`,
+            );
+          }
+        } else {
+          console.error(
+            `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscription.id}, event ${event.id})`,
+          );
+        }
+      }
+    }
+
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object as Stripe.Subscription;
+
+      const { data: updateData, error: updateError } = await supabase
+        .from("profiles")
+        .update({ plan: null, stripe_subscription_id: null })
+        .eq("stripe_subscription_id", subscription.id)
+        .select("id");
+
+      if (updateError) {
+        console.error(
+          `[stripe-webhook] failed to update profiles for ${event.type} (event ${event.id}):`,
+          updateError,
+        );
+        dbWriteFailed = true;
+      } else if (!updateData || updateData.length === 0) {
+        console.error(
+          `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscription.id} may be stale)`,
+        );
+      }
+    }
+  } catch (err) {
+    console.error(`[stripe-webhook] failed to process event ${event.id}:`, err);
+    dbWriteFailed = true;
   }
 
   if (dbWriteFailed) {

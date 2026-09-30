@@ -45,6 +45,15 @@ export const maxDuration = 300;
 const MAX_PLACE_IMAGES = 3;
 
 /**
+ * Marge gardée en fin de budget pour la conversion JPEG et l'upload. Une
+ * fonction coupée par Vercel ne rembourse pas : le client serait débité sans
+ * image.
+ */
+const PERSIST_MARGIN_MS = 30_000;
+/** En dessous, une régénération n'aurait pas le temps d'aboutir : on garde le premier rendu. */
+const MIN_RETRY_BUDGET_MS = 60_000;
+
+/**
  * Charge l'exemple de rendu d'un gabarit depuis `public/` et le renvoie en
  * data URL, prêt à être joint comme seconde image (référence de style).
  * Lecture disque locale : pas de réseau, donc hors allowlist SSRF (ce n'est
@@ -109,6 +118,10 @@ type GenerateBody = {
 const MAX_EDIT_PROMPT_LENGTH = 500;
 
 export async function POST(req: NextRequest) {
+  const startedAt = Date.now();
+  const budgetLeftMs = () =>
+    startedAt + maxDuration * 1000 - PERSIST_MARGIN_MS - Date.now();
+
   // Un seul fournisseur sur le chemin de génération depuis le 25/08 :
   // Gemini analyse les photos du lieu et génère l'image en une passe. Et un
   // seul hébergeur depuis le 03/09 : les photos sources vont directement du
@@ -422,27 +435,37 @@ export async function POST(req: NextRequest) {
     mimeType = generated.mimeType;
 
     // Contrôle qualité + une seule régénération, pour les gabarits qui en
-    // déclarent un (univers). Best-effort : le juge ne peut que déclencher un
-    // retry, jamais faire échouer une génération déjà obtenue. Le retry ne
-    // re-débite pas de crédits — c'est le même acte de génération, réessayé.
+    // déclarent un (univers). Best-effort : ni le juge ni le retry ne peuvent
+    // faire échouer une génération déjà obtenue — un retry qui échoue garde
+    // le premier rendu. Le retry ne re-débite pas de crédits.
+    //
+    // Borné par le budget restant : génération (240 s max) + juge (30 s) +
+    // retry (240 s) dépassaient les 300 s de Vercel, qui coupait la fonction
+    // sans remboursement.
     const qualityCheck = templateSlug ? getQualityCheck(templateSlug) : null;
-    if (qualityCheck) {
+    if (qualityCheck && budgetLeftMs() >= MIN_RETRY_BUDGET_MS) {
       const passed = await assessTemplateResult(geminiApiKey, {
         imageBytes: bytes,
         mimeType,
         criteria: qualityCheck.criteria,
       });
-      if (!passed) {
-        const retried = await generateGeminiImage(geminiApiKey, {
-          prompt: `${finalPrompt}\n\n${qualityCheck.retrySuffix}`,
-          imageUrls: imageInput,
-          model,
-          temperature,
-          resolution,
-          matchFirstImageAspect: lockAspectRatio,
-        });
-        bytes = retried.bytes;
-        mimeType = retried.mimeType;
+      const retryBudgetMs = budgetLeftMs();
+      if (!passed && retryBudgetMs >= MIN_RETRY_BUDGET_MS) {
+        try {
+          const retried = await generateGeminiImage(geminiApiKey, {
+            prompt: `${finalPrompt}\n\n${qualityCheck.retrySuffix}`,
+            imageUrls: imageInput,
+            model,
+            temperature,
+            resolution,
+            matchFirstImageAspect: lockAspectRatio,
+            timeoutMs: retryBudgetMs,
+          });
+          bytes = retried.bytes;
+          mimeType = retried.mimeType;
+        } catch (err) {
+          console.error("Quality retry failed, keeping the first render:", err);
+        }
       }
     }
   } catch (err) {

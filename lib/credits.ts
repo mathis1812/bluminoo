@@ -40,8 +40,21 @@ export async function refundCredits(
 }
 
 /**
- * Crédite un pack de crédits acheté à l'unité. Repose sur `refund_credits` :
- * l'opération SQL est la même incrémentation atomique qu'un remboursement,
- * inutile de dupliquer la fonction pour une différence de nom seulement.
+ * Crédite un pack de crédits acheté à l'unité. Même incrémentation SQL que
+ * `refund_credits`, mais l'erreur est LEVÉE au lieu d'être journalisée : un
+ * pack payé dont le crédit échoue doit faire rejouer le webhook par Stripe,
+ * pas disparaître en silence.
  */
-export const addCredits = refundCredits;
+export async function addCredits(
+  userId: string,
+  amount: number,
+): Promise<void> {
+  const service = createServiceClient();
+  const { error } = await service.rpc("refund_credits", {
+    p_user_id: userId,
+    p_amount: amount,
+  });
+  if (error) {
+    throw new Error(`Failed to add ${amount} credits: ${error.message}`);
+  }
+}

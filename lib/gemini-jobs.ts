@@ -125,6 +125,11 @@ export async function generateGeminiImage(
      * Ignoré si les dimensions sont illisibles.
      */
     matchFirstImageAspect?: boolean;
+    /**
+     * Plafond de l'appel, en ms. Par défaut `GEMINI_TIMEOUT_MS`. Une
+     * régénération le réduit au budget qui reste à la fonction Vercel.
+     */
+    timeoutMs?: number;
   },
 ): Promise<{ bytes: Buffer; mimeType: string }> {
   const images = await Promise.all(input.imageUrls.map(downloadImage));
@@ -146,7 +151,8 @@ export async function generateGeminiImage(
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+  const timeoutMs = input.timeoutMs ?? GEMINI_TIMEOUT_MS;
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res: Response;
   try {
     res = await fetch(
@@ -195,7 +201,7 @@ export async function generateGeminiImage(
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       throw new Error(
-        `Gemini generation timed out after ${GEMINI_TIMEOUT_MS / 1000}s. Please try again.`,
+        `Gemini generation timed out after ${Math.round(timeoutMs / 1000)}s. Please try again.`,
       );
     }
     throw err;

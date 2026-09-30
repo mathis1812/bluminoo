@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { refundCredits, spendCredits } from "@/lib/credits";
 import { persistVideoFromUrl } from "@/lib/gallery-server";
-import { createFalTask, pollFalTask } from "@/lib/fal-jobs";
+import { createFalTask, pollFalTask, type FalTask } from "@/lib/fal-jobs";
 import { buildKlingVideoInput, KLING_VIDEO_MODEL_ID } from "@/lib/kling-video";
 import {
   asPlanId,
@@ -167,8 +167,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let task: FalTask | null = null;
   try {
-    const task = await createFalTask(
+    task = await createFalTask(
       apiKey,
       KLING_VIDEO_MODEL_ID,
       buildKlingVideoInput({
@@ -190,6 +191,12 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     await refundCredits(user.id, cost);
     if (err instanceof Error && err.message === "TIMEOUT") {
+      // fal.ai continue la génération, et la facture, après notre abandon.
+      // L'URL porte l'identifiant de la tâche : de quoi la retrouver et
+      // la réclamer au support fal.
+      console.error(
+        `Video generation timed out for user ${user.id}; fal task still running: ${task?.statusUrl}`,
+      );
       return NextResponse.json(
         { error: "Generation took too long. Try again in a few moments." },
         { status: 504 },
