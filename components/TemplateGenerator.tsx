@@ -20,7 +20,7 @@ import { IMAGE_GENERATION_COST } from "@/lib/generation-cost";
 import { playRevealChime, unlockAudioContext } from "@/lib/reveal-chime";
 import { createClient } from "@/lib/supabase/client";
 import {
-  prepareAndUpload,
+  createUploadCache,
   prepareImage,
   validateImageFile,
   type PreparedImage,
@@ -176,16 +176,7 @@ export default function TemplateGenerator({
    * consignes : autant de secondes retirées de l'attente perçue. Un échec est
    * retiré du cache pour qu'un réessai reparte de zéro.
    */
-  const uploadCacheRef = useRef(new Map<string, Promise<string>>());
-
-  const ensureUploaded = useCallback((image: PreparedImage) => {
-    const cached = uploadCacheRef.current.get(image.previewUrl);
-    if (cached) return cached;
-    const pending = prepareAndUpload(image);
-    pending.catch(() => uploadCacheRef.current.delete(image.previewUrl));
-    uploadCacheRef.current.set(image.previewUrl, pending);
-    return pending;
-  }, []);
+  const [ensureUploaded] = useState(createUploadCache);
 
   const handleFile = useCallback(
     async (file: File) => {

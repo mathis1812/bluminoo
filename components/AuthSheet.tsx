@@ -94,6 +94,35 @@ export default function AuthSheet() {
     };
   }, [isOpen, close]);
 
+  const [resetNotice, setResetNotice] = useState<string | null>(null);
+
+  /**
+   * Mot de passe oublié : Supabase envoie un lien qui revient sur
+   * `/auth/confirm`, lequel ouvre la session puis mène à `/reset-password`.
+   * Le message est le même que l'adresse existe ou non, pour ne pas révéler
+   * qui a un compte.
+   */
+  async function sendPasswordReset() {
+    setError(null);
+    setResetNotice(null);
+    if (!email.trim()) {
+      setError("Enter your email first, then tap Forgot password.");
+      emailRef.current?.focus();
+      return;
+    }
+    setLoading(true);
+    const { error: resetError } = await createClient().auth.resetPasswordForEmail(
+      email.trim(),
+      { redirectTo: `${window.location.origin}/auth/confirm?next=/reset-password` },
+    );
+    setLoading(false);
+    if (resetError) {
+      setError("Something went wrong, please try again in a moment.");
+      return;
+    }
+    setResetNotice("If an account exists for this email, a reset link is on its way.");
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -241,6 +270,21 @@ export default function AuthSheet() {
               {error}
             </p>
           )}
+          {resetNotice && (
+            <p role="status" className="text-[14px] text-white/70">
+              {resetNotice}
+            </p>
+          )}
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={sendPasswordReset}
+              disabled={loading}
+              className="self-end text-[14px] text-white/60 underline underline-offset-2 disabled:opacity-60"
+            >
+              Forgot password?
+            </button>
+          )}
 
           <button
             type="submit"
@@ -256,6 +300,7 @@ export default function AuthSheet() {
           onClick={() => {
             setMode(mode === "signin" ? "signup" : "signin");
             setError(null);
+            setResetNotice(null);
           }}
           className="mt-3 flex h-14 w-full items-center justify-center rounded-3xl border-[1.5px] border-white/20 bg-transparent text-[17px] font-medium text-white transition active:opacity-90"
         >

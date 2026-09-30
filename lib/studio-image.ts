@@ -174,7 +174,7 @@ async function compressImage(file: File): Promise<PreparedImage> {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("Unreadable image."));
+      image.onerror = () => reject(new Error("Unreadable image. Try a JPG or PNG photo."));
       image.src = objectUrl;
     });
 
@@ -202,9 +202,19 @@ async function compressImage(file: File): Promise<PreparedImage> {
  * reçoit la photo dans le sens où l'utilisateur la voit, qu'il honore ou non
  * l'EXIF. Cf. `readExifOrientation`.
  */
+/** Formats acceptés par le bucket `photo-uploads` (migration 0008). */
+const UPLOADABLE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
 export async function prepareImage(file: File): Promise<PreparedImage> {
   const orientation = await readFileOrientation(file);
-  if (file.size > MAX_UPLOAD_BYTES || orientation !== 1) {
+  // Un format que le bucket refuse (HEIC, AVIF, GIF…) est ré-encodé en JPEG
+  // plutôt qu'envoyé tel quel : l'upload échouait sinon avec un message
+  // Supabase illisible pour le client.
+  if (
+    file.size > MAX_UPLOAD_BYTES ||
+    orientation !== 1 ||
+    !UPLOADABLE_TYPES.has(file.type)
+  ) {
     return compressImage(file);
   }
   const dataUrl = await readFileAsDataUrl(file);
@@ -311,4 +321,25 @@ export async function prepareAndUpload(image: PreparedImage): Promise<string> {
     );
   }
   return uploadImage(new File([blob], "photo.jpg", { type: image.mimeType }));
+}
+
+/**
+ * Un upload par photo, réutilisé tant que son URL signée reste valable.
+ * L'upload part dès la sélection et resservait indéfiniment : une seconde
+ * génération sur la même photo, plus de 15 min après, envoyait une URL
+ * expirée au serveur. Au-delà de la fenêtre, on ré-uploade. Un échec est
+ * retiré du cache pour qu'un réessai reparte de zéro.
+ */
+const UPLOAD_REUSE_MS = (SIGNED_URL_TTL_SECONDS - 120) * 1000;
+
+export function createUploadCache() {
+  const cache = new Map<string, { url: Promise<string>; at: number }>();
+  return (image: PreparedImage): Promise<string> => {
+    const hit = cache.get(image.previewUrl);
+    if (hit && Date.now() - hit.at < UPLOAD_REUSE_MS) return hit.url;
+    const url = prepareAndUpload(image);
+    url.catch(() => cache.delete(image.previewUrl));
+    cache.set(image.previewUrl, { url, at: Date.now() });
+    return url;
+  };
 }
