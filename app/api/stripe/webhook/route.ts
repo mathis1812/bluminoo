@@ -9,7 +9,7 @@ import {
   envValue,
   isStripeConfigured,
 } from "@/lib/stripe";
-import { addCredits } from "@/lib/credits";
+import { addCredits, grantPlanCredits } from "@/lib/credits";
 import { createServiceClient } from "@/lib/supabase/service";
 
 export const runtime = "nodejs";
@@ -140,7 +140,6 @@ export async function POST(req: NextRequest) {
             stripe_customer_id: customerId ?? null,
             stripe_subscription_id: subscriptionId ?? null,
             plan: planId,
-            credits: creditsFor(planId),
             current_period_end: currentPeriodEnd,
           })
           .eq("id", userId)
@@ -156,6 +155,9 @@ export async function POST(req: NextRequest) {
           console.error(
             `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (userId=${userId} may be stale)`,
           );
+        } else {
+          // Hors de l'update : la part pack du solde doit survivre (0014).
+          await grantPlanCredits(userId, creditsFor(planId));
         }
       } else if (!topupId) {
         console.error(
@@ -192,7 +194,6 @@ export async function POST(req: NextRequest) {
               .from("profiles")
               .update({
                 plan: planId,
-                credits: creditsFor(planId),
                 current_period_end: periodEnd
                   ? new Date(periodEnd * 1000).toISOString()
                   : null,
@@ -210,6 +211,10 @@ export async function POST(req: NextRequest) {
               console.error(
                 `[stripe-webhook] ${event.type} update matched no rows for event ${event.id} (subscriptionId=${subscriptionId} may be stale)`,
               );
+            } else {
+              for (const row of updateData) {
+                await grantPlanCredits(row.id as string, creditsFor(planId));
+              }
             }
           } else {
             console.error(
