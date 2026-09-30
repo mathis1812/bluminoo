@@ -17,6 +17,13 @@ import {
  * comme tel sur /pricing. Un abonné Starter voit à la place une invitation
  * à le débloquer : si cette distinction saute, la grille tarifaire ment.
  */
+/**
+ * TEMPORAIRE : rappel des trois gestes Snapchat masqué pendant le tournage
+ * des vidéos TikTok, pour que la méthode n'apparaisse pas à l'écran. Repasser
+ * à `true` pour le réafficher.
+ */
+const SHOW_SNAP_STEPS = false;
+
 export default function ResultActions({
   resultUrl,
   hasRedSnap,
@@ -167,11 +174,13 @@ export default function ResultActions({
           elle passe, la page est déjà quittée et personne ne le voit. */}
       {savedOnce && (
         <div className="mt-2 w-full">
-          <ol className="mx-auto flex max-w-[22rem] list-decimal flex-col gap-1 pl-5 text-left text-[14px] leading-5 text-white/45">
-            <li>Green screen, then pick the photo you just saved</li>
-            <li>Step out of the frame</li>
-            <li>Take the shot, then send it</li>
-          </ol>
+          {SHOW_SNAP_STEPS && (
+            <ol className="mx-auto flex max-w-[22rem] list-decimal flex-col gap-1 pl-5 text-left text-[14px] leading-5 text-white/45">
+              <li>Green screen, then pick the photo you just saved</li>
+              <li>Step out of the frame</li>
+              <li>Take the shot, then send it</li>
+            </ol>
+          )}
 
           {snapchatBlocked && (
             <a href={SNAPCHAT_APP_URL} className={`${SNAP_BUTTON} mt-3 w-full`}>
