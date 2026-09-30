@@ -65,19 +65,27 @@ export async function POST() {
   // plus par l'hébergeur tiers kie.ai (migration 0008), c'est nous qui les
   // détenons, donc c'est à nous de les effacer. Les oublier ici laisserait
   // des photos de personnes identifiables après la suppression du compte.
+  // `list` renvoie 100 fichiers par défaut : on vide le dossier par lots
+  // jusqu'à ce qu'il soit vide, sinon un client actif gardait ses photos.
   for (const bucket of ["gallery", "photo-uploads"]) {
-    const { data: files } = await service.storage.from(bucket).list(user.id);
-    if (!files || files.length === 0) continue;
+    for (;;) {
+      const { data: files } = await service.storage
+        .from(bucket)
+        .list(user.id, { limit: 1000 });
+      if (!files || files.length === 0) break;
 
-    const paths = files.map((file) => `${user.id}/${file.name}`);
-    const { error: removeError } = await service.storage
-      .from(bucket)
-      .remove(paths);
-    if (removeError) {
-      console.error(
-        `Failed to remove ${bucket} files for user ${user.id}:`,
-        removeError.message,
-      );
+      const paths = files.map((file) => `${user.id}/${file.name}`);
+      const { error: removeError } = await service.storage
+        .from(bucket)
+        .remove(paths);
+      if (removeError) {
+        // Sans cette sortie, un lot qui échoue serait relisté à l'infini.
+        console.error(
+          `Failed to remove ${bucket} files for user ${user.id}:`,
+          removeError.message,
+        );
+        break;
+      }
     }
   }
 

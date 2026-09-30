@@ -97,11 +97,15 @@ export default function TemplateGenerator({
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [planId, setPlanId] = useState<string | null>(null);
+  const [credits, setCredits] = useState(0);
   const [paywalled, setPaywalled] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /** Seul un compte connecté ET porteur d'un palier peut générer. */
-  const isSubscribed = isLoggedIn && !!planId;
+  /**
+   * Un palier OU un solde suffit : même règle que `useStudioAccount`, un pack
+   * de crédits s'achète sans abonnement.
+   */
+  const isSubscribed = isLoggedIn && (!!planId || credits > 0);
   /** Red Snap réservé aux paliers Pro et Max — voir lib/generation-tiers.ts. */
   const hasRedSnap = planHasRedSnap(asPlanId(planId));
 
@@ -119,14 +123,16 @@ export default function TemplateGenerator({
     setIsLoggedIn(!!user);
     if (!user) {
       setPlanId(null);
+      setCredits(0);
       return;
     }
     const { data } = await supabase
       .from("profiles")
-      .select("plan")
+      .select("plan, credits")
       .eq("id", user.id)
       .single();
     setPlanId((data?.plan as string | null) ?? null);
+    setCredits((data?.credits as number | null) ?? 0);
   }, []);
 
   useEffect(() => {

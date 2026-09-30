@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import {
   stripe,
   PLANS,
@@ -62,6 +63,19 @@ export async function POST(req: NextRequest) {
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
+      // Enregistré tout de suite, pas seulement par le webhook : un paiement
+      // abandonné puis relancé recréait sinon un client Stripe à chaque fois.
+      // Best-effort, un échec ne bloque pas le paiement.
+      const { error: saveError } = await createServiceClient()
+        .from("profiles")
+        .update({ stripe_customer_id: customerId })
+        .eq("id", user.id);
+      if (saveError) {
+        console.error(
+          `Failed to save Stripe customer for user ${user.id}:`,
+          saveError.message,
+        );
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Stripe error.";
       return NextResponse.json(

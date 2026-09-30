@@ -57,7 +57,11 @@ export function useStudioAccount() {
   }, [refreshCredits]);
 
   /**
-   * Seul un compte connecté ET porteur d'un palier peut générer — sauf
+   * Peut générer : un compte connecté qui a un palier OU un solde. Le solde
+   * compte parce qu'un pack de crédits s'achète sans abonnement, et qu'un
+   * abonné résilié garde ses crédits : exiger un palier les rendait payés et
+   * inutilisables. Aucune fuite gratuite, un compte neuf démarre à 0 et le
+   * serveur revérifie le solde avant chaque génération. Sauf
    * pendant la période de test (voir TESTING_UNLOCK_ALL_TIERS dans
    * lib/generation-tiers.ts), où seule la connexion suffit : tant qu'aucun
    * produit Stripe réel n'est configuré, exiger un palier bloquerait tout
@@ -65,7 +69,7 @@ export function useStudioAccount() {
    */
   const isSubscribed = TESTING_UNLOCK_ALL_TIERS
     ? isLoggedIn
-    : isLoggedIn && !!planId;
+    : isLoggedIn && (!!planId || (credits ?? 0) > 0);
   const plan = asPlanId(planId);
   /**
    * Red Snap réservé aux paliers Pro et Max — voir lib/generation-tiers.ts.
