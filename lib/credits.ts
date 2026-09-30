@@ -40,21 +40,29 @@ export async function refundCredits(
 }
 
 /**
- * Crédite un pack de crédits acheté à l'unité. Même incrémentation SQL que
- * `refund_credits`, mais l'erreur est LEVÉE au lieu d'être journalisée : un
- * pack payé dont le crédit échoue doit faire rejouer le webhook par Stripe,
- * pas disparaître en silence.
+ * Appelle une fonction de crédit du webhook. L'erreur est LEVÉE, pas
+ * journalisée : un paiement dont le crédit échoue doit faire rejouer le
+ * webhook par Stripe, pas disparaître en silence.
  */
-export async function addCredits(
+async function creditRpc(
+  fn: "add_topup_credits" | "grant_plan_credits",
   userId: string,
   amount: number,
 ): Promise<void> {
   const service = createServiceClient();
-  const { error } = await service.rpc("refund_credits", {
+  const { error } = await service.rpc(fn, {
     p_user_id: userId,
     p_amount: amount,
   });
   if (error) {
-    throw new Error(`Failed to add ${amount} credits: ${error.message}`);
+    throw new Error(`${fn}(${amount}) failed: ${error.message}`);
   }
 }
+
+/** Pack acheté : ajouté au solde et à la part pack, qui survit aux renouvellements (migration 0014). */
+export const addCredits = (userId: string, amount: number) =>
+  creditRpc("add_topup_credits", userId, amount);
+
+/** Abonnement ou renouvellement : le forfait remplace l'ancien, la part pack est gardée. */
+export const grantPlanCredits = (userId: string, amount: number) =>
+  creditRpc("grant_plan_credits", userId, amount);
