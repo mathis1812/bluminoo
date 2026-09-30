@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import EditPanel from "@/components/EditPanel";
@@ -55,11 +56,9 @@ async function shareEntry(entry: GalleryEntry): Promise<void> {
     );
   }
 
-  await navigator.share({
-    files: [file],
-    title: "Photo created with Bluminoo",
-    text: "Photo created with Bluminoo",
-  });
+  // Fichier seul : un titre ou un texte joint donne un écran noir dans
+  // Snapchat sur iOS (même règle que `lib/share-utils.ts`).
+  await navigator.share({ files: [file] });
 }
 
 function formatDate(iso: string): string {
@@ -78,7 +77,13 @@ const TABS: { value: Filter; label: string }[] = [
   { value: "video", label: "Videos" },
 ];
 
-export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
+export default function GalleryGrid({
+  entries,
+  nextHref,
+}: {
+  entries: GalleryEntry[];
+  nextHref: string | null;
+}) {
   // `entries` vient du Server Component parent (app/gallery/page.tsx) : une
   // retouche crée une entrée en base que seul un nouveau rendu serveur fait
   // apparaître. `router.refresh()` le déclenche sans recharger la page.
@@ -90,6 +95,29 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
   // Retouche en cours sur l'entree ouverte. Remise a false a chaque
   // ouverture : rouvrir une image doit repartir de la vue de detail.
   const [editing, setEditing] = useState(false);
+  /** Suppression en deux clics, comme la suppression de compte. */
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(entry: GalleryEntry) {
+    setDeleting(true);
+    setShareError("");
+    try {
+      const res = await fetch(`/api/gallery/${entry.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setShareError(data?.error || "Unable to delete right now.");
+        return;
+      }
+      setSelected(null);
+      router.refresh();
+    } catch {
+      setShareError("Network error. Check your connection.");
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
 
   const visible =
     filter === "all" ? entries : entries.filter((e) => e.mode === filter);
@@ -171,6 +199,8 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
             type="button"
             onClick={() => {
               setEditing(false);
+              setConfirmDelete(false);
+              setShareError("");
               setSelected(entry);
             }}
             aria-label={`View full size: ${entry.label}`}
@@ -179,6 +209,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
             {entry.mode === "video" ? (
               <video
                 src={entry.result_url}
+                preload="metadata"
                 muted
                 loop
                 playsInline
@@ -196,6 +227,16 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
           </button>
         ))}
       </div>
+
+      {nextHref && (
+        <Link
+          href={nextHref}
+          scroll={false}
+          className="mx-auto mt-6 rounded-full border border-white/15 px-5 py-2.5 text-[14px] font-semibold text-white active:opacity-70"
+        >
+          Load more
+        </Link>
+      )}
 
       {selected && (
         <div
@@ -291,6 +332,22 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                   className="rounded-xl bg-snap px-3.5 py-2 text-xs font-bold text-[#121212] transition hover:opacity-90"
                 >
                   Download
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    confirmDelete
+                      ? void handleDelete(selected)
+                      : setConfirmDelete(true)
+                  }
+                  disabled={deleting}
+                  className={`rounded-xl px-3.5 py-2 text-xs font-bold transition disabled:opacity-50 ${
+                    confirmDelete
+                      ? "bg-red-500 text-white"
+                      : "border border-white/10 text-red-300 hover:border-red-400/40"
+                  }`}
+                >
+                  {deleting ? "Deleting…" : confirmDelete ? "Delete for good" : "Delete"}
                 </button>
                 <button
                   type="button"

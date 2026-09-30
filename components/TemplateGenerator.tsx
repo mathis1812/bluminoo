@@ -258,6 +258,7 @@ export default function TemplateGenerator({
       }
       if (data?.imageUrl) {
         setResult(data.imageUrl);
+        void refreshSession();
       } else {
         setError("Unexpected response from the server. Please try again.");
       }
@@ -270,7 +271,7 @@ export default function TemplateGenerator({
     } finally {
       setLoading(false);
     }
-  }, [prepared, isSubscribed, ensureUploaded, template.slug, template.label, variant]);
+  }, [prepared, isSubscribed, ensureUploaded, template.slug, template.label, variant, refreshSession]);
 
   return (
     // min-h plutôt que h-fixe avec overflow masqué : sur un petit écran ou un

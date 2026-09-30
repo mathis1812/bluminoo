@@ -17,7 +17,19 @@ type GalleryEntry = {
  * `PlaceholderSection` (fond glassy violet, pré-refonte) n'y a plus sa
  * place — laissé intact ailleurs, faute d'autre appelant à corriger.
  */
-export default async function GalleryPage() {
+/** Taille d'une page de galerie ; « Load more » en ajoute autant. */
+const PAGE_SIZE = 60;
+const MAX_LIMIT = 1000;
+
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams: { limit?: string };
+}) {
+  const requested = Number.parseInt(searchParams.limit ?? "", 10);
+  const limit = Number.isFinite(requested)
+    ? Math.min(Math.max(requested, PAGE_SIZE), MAX_LIMIT)
+    : PAGE_SIZE;
   const supabase = createClient();
   const {
     data: { user },
@@ -32,6 +44,7 @@ export default async function GalleryPage() {
     .select("id, mode, result_url, label, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
+    .limit(limit)
     .returns<GalleryEntry[]>();
 
   return (
@@ -40,7 +53,14 @@ export default async function GalleryPage() {
 
       <div className="animate-fade-up flex min-h-dvh flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
         {entries && entries.length > 0 ? (
-          <GalleryGrid entries={entries} />
+          <GalleryGrid
+            entries={entries}
+            nextHref={
+              entries.length === limit && limit < MAX_LIMIT
+                ? `/gallery?limit=${limit + PAGE_SIZE}`
+                : null
+            }
+          />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
             <p className="text-[17px] font-semibold text-white">
