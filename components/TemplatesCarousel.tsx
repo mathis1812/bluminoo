@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { LandingCopy } from "@/app/landing/copy";
 
 /**
  * Carrousel de gabarits du panneau clair.
@@ -24,7 +25,6 @@ type Template = {
   id: string;
   before: string;
   after: string;
-  alt: string;
 };
 
 const TEMPLATES: Template[] = [
@@ -32,29 +32,30 @@ const TEMPLATES: Template[] = [
     id: "maison",
     before: "/landing/templates/maison-before.jpg",
     after: "/landing/templates/maison-after.jpg",
-    alt: "A living room, then the same room with a collapsed ceiling.",
   },
   {
     id: "swap",
     before: "/landing/templates/swap-before.jpg",
     after: "/landing/templates/swap-after.jpg",
-    alt: "A parked saloon car, then the same shot with a sports car.",
   },
   {
     id: "minecraft",
     before: "/landing/templates/minecraft-before.jpg",
     after: "/landing/templates/minecraft-after.jpg",
-    alt: "A hiker on a mountain path, then the same scene as a voxel world.",
   },
   {
     id: "rase",
     before: "/landing/templates/rase-before.jpg",
     after: "/landing/templates/rase-after.jpg",
-    alt: "A fluffy kitten, then the same kitten with its coat shaved.",
   },
 ];
 
-export default function TemplatesCarousel() {
+/** Textes par langue dans app/landing/copy.ts, `alts` dans l'ordre de TEMPLATES. */
+export default function TemplatesCarousel({
+  copy,
+}: {
+  copy: LandingCopy["carousel"];
+}) {
   const [index, setIndex] = useState(0);
   const [showAfter, setShowAfter] = useState(false);
 
@@ -95,7 +96,7 @@ export default function TemplatesCarousel() {
             transform: `translateX(calc(${-index} * (var(--carte) + var(--ecart))))`,
           }}
         >
-          {TEMPLATES.map((template) => (
+          {TEMPLATES.map((template, i) => (
             <figure
               key={template.id}
               className="carte-templates mr-[var(--ecart)] w-[var(--carte)] shrink-0 rounded-[32px] border border-white/70 bg-[rgba(15,15,16,0.06)] p-2 shadow-[0_10px_30px_rgba(15,15,16,0.10),inset_0_1px_0_rgba(255,255,255,0.65)]"
@@ -103,13 +104,13 @@ export default function TemplatesCarousel() {
               <div className="relative aspect-[3/4] w-full overflow-hidden rounded-3xl border border-[rgba(15,15,16,0.12)]">
                 <Image
                   src={showAfter ? template.after : template.before}
-                  alt={template.alt}
+                  alt={copy.alts[i]}
                   fill
                   sizes="(max-width: 520px) calc(100vw - 80px), 440px"
                   className="select-none object-cover"
                 />
                 <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1.5 text-[13px] font-semibold text-white backdrop-blur-sm">
-                  {showAfter ? "After" : "Before"}
+                  {showAfter ? copy.after : copy.before}
                 </span>
               </div>
             </figure>
@@ -123,7 +124,7 @@ export default function TemplatesCarousel() {
             key={template.id}
             type="button"
             onClick={() => setIndex(i)}
-            aria-label={`Show template ${i + 1}`}
+            aria-label={copy.showTemplate(i + 1)}
             aria-current={i === index ? "true" : undefined}
             className={`h-2 rounded-full transition-all ${
               i === index ? "w-6 bg-[#0f0f10]" : "w-2 bg-[rgba(15,15,16,0.22)]"
