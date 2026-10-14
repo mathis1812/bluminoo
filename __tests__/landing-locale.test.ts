@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { localeFromAcceptLanguage } from "@/app/landing/copy";
+import { localeFromAcceptLanguage, resolveLocale } from "@/app/landing/copy";
+
+describe("resolveLocale", () => {
+  it("le bouton FR/EN l'emporte sur la langue du telephone", () => {
+    expect(resolveLocale("en", "fr-FR,fr;q=0.9")).toBe("en");
+    expect(resolveLocale("fr", "en-US")).toBe("fr");
+  });
+
+  it("ignore un cookie absent ou invalide", () => {
+    expect(resolveLocale(undefined, "fr-FR")).toBe("fr");
+    expect(resolveLocale("de", "en-US")).toBe("en");
+  });
+});
 
 describe("localeFromAcceptLanguage", () => {
   it("sert le francais quand le navigateur prefere le francais", () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FaqAccordion from "@/components/FaqAccordion";
 import SnapPhone from "@/components/landing/SnapPhone";
@@ -12,7 +13,7 @@ import {
   type LandingCtaId,
 } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
-import { LANDING_COPY, type Locale } from "./copy";
+import { LANDING_COPY, LOCALE_COOKIE, type Locale } from "./copy";
 
 /**
  * Landing — direction artistique « Fake it. Snap it. » (refonte du 27/09).
@@ -148,6 +149,41 @@ function CtaButton({
   );
 }
 
+/**
+ * Bouton FR/EN. Le choix part dans un cookie d'un an, lu par la page serveur
+ * avant `Accept-Language` ; `refresh()` re-rend la page dans la langue
+ * choisie sans recharger le JS.
+ */
+function LangSwitch({ locale, label }: { locale: Locale; label: string }) {
+  const router = useRouter();
+  const choose = (next: Locale) => {
+    if (next === locale) return;
+    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh();
+  };
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className="flex rounded-full border border-white/10 bg-white/[0.04] p-1 text-[13px] font-semibold"
+    >
+      {(["fr", "en"] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          onClick={() => choose(l)}
+          aria-pressed={l === locale}
+          className={`rounded-full px-3 py-1 uppercase transition ${
+            l === locale ? "bg-white text-[#121212]" : "text-white/60 hover:text-white"
+          }`}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function LandingView({ locale }: { locale: Locale }) {
   const t = LANDING_COPY[locale];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -177,6 +213,10 @@ export default function LandingView({ locale }: { locale: Locale }) {
 
   return (
     <div lang={locale} className="mx-auto max-w-6xl px-4 animate-fade-up">
+      <div className="flex justify-end px-2 pt-4">
+        <LangSwitch locale={locale} label={t.langSwitch} />
+      </div>
+
       {/* HERO — mobile d'abord : le trafic vient de TikTok et de Reels.
           Sur grand ecran, le texte passe a gauche et le telephone a droite. */}
       <section className="relative grid items-center gap-12 px-2 pb-20 pt-10 sm:pt-16 lg:grid-cols-[1.1fr_1fr] lg:gap-8 lg:pb-28">

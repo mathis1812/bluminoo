@@ -11,16 +11,29 @@ import type { FaqItem } from "@/components/FaqAccordion";
 
 export type Locale = "en" | "fr";
 
+/** Cookie pose par le bouton FR/EN : le choix explicite du visiteur. */
+export const LOCALE_COOKIE = "lang";
+
 /** Premiere langue du header (celle que le navigateur prefere) : fr* → fr. */
 export function localeFromAcceptLanguage(header: string | null): Locale {
   const first = header?.split(",")[0]?.trim().toLowerCase() ?? "";
   return first.startsWith("fr") ? "fr" : "en";
 }
 
+/** Le bouton FR/EN l'emporte sur la langue du telephone ; valeur inconnue ignoree. */
+export function resolveLocale(
+  cookie: string | undefined,
+  acceptLanguage: string | null,
+): Locale {
+  if (cookie === "fr" || cookie === "en") return cookie;
+  return localeFromAcceptLanguage(acceptLanguage);
+}
+
 export type SnapCopy = { alt: string; from: string; reply: string };
 
 export type LandingCopy = {
   meta: { description: string; ogLocale: string };
+  langSwitch: string;
   heroBadge: string;
   heroTitle: [string, string, string];
   heroBody: string;
@@ -72,6 +85,7 @@ const EN: LandingCopy = {
       "Create a hyper-realistic photo or video of the life you dream about — a place, a scene, a moment — and post it to your story to stun everyone you know.",
     ogLocale: "en_US",
   },
+  langSwitch: "Language",
   heroBadge: "Red Snap · no camera roll tag",
   heroTitle: ["Fake it.", "Snap it.", "Nobody knows."],
   heroBody:
@@ -215,8 +229,9 @@ const FR: LandingCopy = {
       "Crée une photo ou une vidéo hyper-réaliste de la vie dont tu rêves — un lieu, une scène, un moment — et poste-la en story pour bluffer tout le monde.",
     ogLocale: "fr_FR",
   },
+  langSwitch: "Langue",
   heroBadge: "Red Snap · sans mention Pellicule",
-  heroTitle: ["Fake-le.", "Snappe-le.", "Personne ne capte."],
+  heroTitle: ["Fake-le.", "Snappe-le.", "Personne ne saura."],
   heroBody:
     "Génère une photo ultra-réaliste en un clic et envoie-la direct sur Snap : elle arrive comme si tu venais de la prendre.",
   ctaLoggedIn: "Ouvrir le studio",
