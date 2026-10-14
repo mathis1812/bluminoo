@@ -1,6 +1,13 @@
 "use client";
 
+import type { Locale } from "@/app/landing/copy";
 import { TESTIMONIALS, type Testimonial } from "@/lib/testimonials";
+
+/** Libelles du bandeau ; les citations, elles, viennent de lib/testimonials. */
+const LABELS = {
+  en: { title: "What our users say", stars: "5 out of 5 stars" },
+  fr: { title: "Ce qu'ils en disent", stars: "5 étoiles sur 5" },
+} as const;
 
 /**
  * Bandeau de témoignages défilant en boucle continue, deux rangées de sens
@@ -26,7 +33,13 @@ function Star() {
   );
 }
 
-function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+function TestimonialCard({
+  testimonial,
+  locale,
+}: {
+  testimonial: Testimonial;
+  locale: Locale;
+}) {
   const initial = testimonial.name.trim().charAt(0).toUpperCase();
   return (
     <figure className="carte-avis mr-3 flex w-[280px] shrink-0 flex-col gap-2 rounded-2xl border border-line px-3.5 py-3 text-left">
@@ -43,11 +56,11 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
               <Star key={i} />
             ))}
           </div>
-          <span className="sr-only">5 out of 5 stars</span>
+          <span className="sr-only">{LABELS[locale].stars}</span>
         </span>
       </figcaption>
       <blockquote className="text-[14px] leading-[1.45] text-white/85">
-        {testimonial.quote}
+        {locale === "fr" ? testimonial.quoteFr : testimonial.quote}
       </blockquote>
     </figure>
   );
@@ -56,9 +69,11 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 function MarqueeRow({
   items,
   direction,
+  locale,
 }: {
   items: Testimonial[];
   direction: "left" | "right";
+  locale: Locale;
 }) {
   const animation =
     direction === "left" ? "animate-marquee-left" : "animate-marquee-right";
@@ -69,7 +84,7 @@ function MarqueeRow({
         className={`flex shrink-0 ${animation} group-hover:[animation-play-state:paused] motion-reduce:animate-none`}
       >
         {items.map((t) => (
-          <TestimonialCard key={`a-${t.name}`} testimonial={t} />
+          <TestimonialCard key={`a-${t.name}`} testimonial={t} locale={locale} />
         ))}
       </div>
       <div
@@ -77,14 +92,14 @@ function MarqueeRow({
         className={`flex shrink-0 ${animation} group-hover:[animation-play-state:paused] motion-reduce:animate-none motion-reduce:hidden`}
       >
         {items.map((t) => (
-          <TestimonialCard key={`b-${t.name}`} testimonial={t} />
+          <TestimonialCard key={`b-${t.name}`} testimonial={t} locale={locale} />
         ))}
       </div>
     </div>
   );
 }
 
-export default function TestimonialMarquee() {
+export default function TestimonialMarquee({ locale }: { locale: Locale }) {
   if (TESTIMONIALS.length === 0) return null;
 
   const half = Math.ceil(TESTIMONIALS.length / 2);
@@ -93,10 +108,10 @@ export default function TestimonialMarquee() {
 
   return (
     <section className="relative overflow-hidden py-16">
-      <h2 className="sr-only">What our users say</h2>
+      <h2 className="sr-only">{LABELS[locale].title}</h2>
       <div className="flex flex-col gap-3">
-        <MarqueeRow items={topRow} direction="left" />
-        <MarqueeRow items={bottomRow} direction="right" />
+        <MarqueeRow items={topRow} direction="left" locale={locale} />
+        <MarqueeRow items={bottomRow} direction="right" locale={locale} />
       </div>
     </section>
   );

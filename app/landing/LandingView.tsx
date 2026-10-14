@@ -253,7 +253,7 @@ export default function LandingView({ locale }: { locale: Locale }) {
           l'explication — le bandeau defilant se lit d'un coup d'oeil, donc il
           rassure sans retarder la demo qui suit. */}
       <div className="mx-[calc(50%-50vw)] w-screen">
-        <TestimonialMarquee />
+        <TestimonialMarquee locale={locale} />
       </div>
 
       {/* COMMENT CA MARCHE — trois etapes, pas plus : le visiteur doit
