@@ -266,20 +266,6 @@ export default function LandingPage() {
             ctaId="hero_primary"
             className="mt-9 w-full max-w-[340px]"
           />
-
-          {/* Montant ecrit en dur : lib/stripe.ts construit PLANS avec
-              envValue(), l'importer ici embarquerait la configuration Stripe
-              dans le bundle client. Source de verite : PLANS.pro. */}
-          <p className="mt-5 text-[14px] text-white/45">
-            <span className="font-semibold text-white/80">Red Snap</span>{" "}
-            included from $9.99 a week.{" "}
-            <Link
-              href="/pricing"
-              className="text-white/70 underline decoration-white/25 underline-offset-4 transition hover:text-white"
-            >
-              See plans
-            </Link>
-          </p>
         </div>
 
         <SnapPhone />
