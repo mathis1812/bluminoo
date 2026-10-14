@@ -5,8 +5,8 @@ import { TESTIMONIALS, type Testimonial } from "@/lib/testimonials";
 
 /** Libelles du bandeau ; les citations, elles, viennent de lib/testimonials. */
 const LABELS = {
-  en: { title: "What our users say", stars: "5 out of 5 stars" },
-  fr: { title: "Ce qu'ils en disent", stars: "5 étoiles sur 5" },
+  en: { title: "What our users say", stars: (r: string) => `${r} out of 5 stars` },
+  fr: { title: "Ce qu'ils en disent", stars: (r: string) => `${r} étoiles sur 5` },
 } as const;
 
 /**
@@ -25,11 +25,32 @@ const LABELS = {
  * désigne plus que l'ami qui répond ; l'or est aussi la couleur attendue
  * d'une notation, donc les deux raisons vont dans le même sens.
  */
-function Star() {
+function Star({ fill }: { fill: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFFC00" aria-hidden>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill={fill} aria-hidden className="shrink-0">
       <path d="M12 2.5l2.9 5.9 6.5.95-4.7 4.58 1.11 6.47L12 17.35l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.5z" />
     </svg>
+  );
+}
+
+/**
+ * Note reelle de l'avis (5 par defaut) : une rangee d'etoiles grises, et par
+ * dessus la meme rangee en jaune, coupee a rating/5 de sa largeur — 4,5
+ * affiche donc quatre etoiles et demie.
+ */
+function Stars({ rating }: { rating: number }) {
+  const row = (fill: string) =>
+    Array.from({ length: 5 }, (_, i) => <Star key={i} fill={fill} />);
+  return (
+    <div className="relative flex shrink-0 gap-0.5">
+      {row("rgba(255,255,255,0.2)")}
+      <div
+        className="absolute inset-y-0 left-0 flex gap-0.5 overflow-hidden"
+        style={{ width: `${(rating / 5) * 100}%` }}
+      >
+        {row("#FFFC00")}
+      </div>
+    </div>
   );
 }
 
@@ -41,6 +62,7 @@ function TestimonialCard({
   locale: Locale;
 }) {
   const initial = testimonial.name.trim().charAt(0).toUpperCase();
+  const rating = testimonial.rating ?? 5;
   return (
     <figure className="carte-avis mr-3 flex w-[280px] shrink-0 flex-col gap-2 rounded-2xl border border-line px-3.5 py-3 text-left">
       <figcaption className="flex items-center gap-2">
@@ -51,12 +73,10 @@ function TestimonialCard({
           {testimonial.name}
         </span>
         <span className="ml-auto flex items-center">
-          <div className="flex shrink-0 gap-0.5">
-            {Array.from({ length: 5 }, (_, i) => (
-              <Star key={i} />
-            ))}
-          </div>
-          <span className="sr-only">{LABELS[locale].stars}</span>
+          <Stars rating={rating} />
+          <span className="sr-only">
+            {LABELS[locale].stars(rating.toLocaleString(locale))}
+          </span>
         </span>
       </figcaption>
       <blockquote className="text-[14px] leading-[1.45] text-white/85">

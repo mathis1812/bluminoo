@@ -7,6 +7,9 @@
 // affichée sur la landing FR. `quote` est sa traduction anglaise ; la traduction doit rester fidèle au sens et au ton exprimés
 // par la personne, sans jamais en inventer ni en édulcorer le contenu.
 //
+// Les crochets signalent une correction editoriale : « [Pro] » remplace
+// l'ancien nom du plan (Essentiel/Essential, renomme Pro le 29/08).
+//
 // Tant que ce tableau est vide, la section témoignages ne s'affiche pas sur la
 // landing page : celle-ci retombe sur les sections stats / différenciateurs
 // existantes. Dès qu'un vrai témoignage a été recueilli (et son consentement
@@ -21,7 +24,7 @@ export type Testimonial = {
   quote: string;
   /** Citation d'origine, en français, mot pour mot (landing FR). */
   quoteFr: string;
-  /** Note optionnelle sur 5, si l'utilisateur en a laissé une. */
+  /** Note sur 5 laissée par la personne ; 5 si absente (affichée en étoiles). */
   rating?: number;
 };
 
@@ -51,8 +54,8 @@ export const TESTIMONIALS: Testimonial[] = [
   { name: "ZEN_USER_99", quote: "Keep doing what you're doing, you're doing an extraordinary job. Plus you're responsive when there's an issue. Thanks!", quoteFr: "Continuer ce que vous faites, vous faites un travail extraordinaire. En plus vous êtes réactif quand il y a un problème. Merci!" },
   { name: "TOM_RIDER", quote: "you guys are the best, keep going on this path, I hope for you, you could go far", quoteFr: "vous êtes top les mec continuez sur ce chemin je l'espère pour vous, vous pourriez allez loin" },
   { name: "GIRAFE93FANTE", quote: "if only I'd had this sooner, my buddy believes anything thanks to the Red Snap thing 🤣", quoteFr: "si seulement j'avais eu ça plus tôt mon pote croit à tout grâce au truc snap rouge 🤣" },
-  { name: "ENTIFACHO", quote: "thanks for including Red Snap tech in the Essential plan, you guys rock 🙏", quoteFr: "merci d'avoir mis la tech snap rouge intégrée dans l'abonnement essentiel vous gérer 🙏" },
+  { name: "ENTIFACHO", quote: "thanks for including Red Snap tech in the [Pro] plan, you guys rock 🙏", quoteFr: "merci d'avoir mis la tech snap rouge intégrée dans l'abonnement [Pro] vous gérer 🙏" },
   { name: "PEPITRDOR999", quote: "I don't regret my purchase one bit, I skipped a kebab and ended up with this banger instead 😭🙏", quoteFr: "je regrette tellement pas mon achat j'ai évité de manger un kebab et je me retrouve avce ce banger 😭🙏" },
-  { name: "MASKEYTV", quote: "for a start I'll give it a 4.5 rating because nothing and nobody is perfect, but it's extremely high quality", quoteFr: "pour un début je vous donne la note de 4.5 car rien n'y personne n'est parfait mais c'est extrêmement quali" },
+  { name: "MASKEYTV", quote: "for a start I'll give it a 4.5 rating because nothing and nobody is perfect, but it's extremely high quality", quoteFr: "pour un début je vous donne la note de 4.5 car rien n'y personne n'est parfait mais c'est extrêmement quali", rating: 4.5 },
   { name: "PAYXLANPY", quote: "Well done for your work, a lot of people love the site, it's really good work!", quoteFr: "Bravo pour votre travail de nombreuse personne adore le site, c'est du très bon boulot !" },
 ];
