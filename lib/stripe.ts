@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import type { Currency } from "@/lib/locale";
 
 // Toute valeur lue depuis l'environnement est nettoyée : un caractère invisible
 // collé par erreur (BOM, espace, retour ligne) rend la clé invalide, et Stripe
@@ -50,8 +51,12 @@ export const PLANS: Record<
   {
     name: string;
     priceId: string;
-    /** Par semaine — ces abonnements se renouvellent chaque semaine, pas chaque mois. */
-    priceUsd: number;
+    /**
+     * Par semaine — ces abonnements se renouvellent chaque semaine, pas
+     * chaque mois. Meme montant en dollars et en euros (TTC) : la devise
+     * EUR est une `currency_options` du meme prix Stripe, cf. formatPrice.
+     */
+    price: number;
     creditsPerWeek: number;
     imageResolution: ImageResolution;
   }
@@ -59,21 +64,21 @@ export const PLANS: Record<
   lite: {
     name: "Lite",
     priceId: envValue("STRIPE_PRICE_LITE"),
-    priceUsd: 4.99,
+    price: 4.99,
     creditsPerWeek: 1000,
     imageResolution: "1K",
   },
   pro: {
     name: "Pro",
     priceId: envValue("STRIPE_PRICE_PRO"),
-    priceUsd: 9.99,
+    price: 9.99,
     creditsPerWeek: 2250,
     imageResolution: "2K",
   },
   max: {
     name: "Max",
     priceId: envValue("STRIPE_PRICE_MAX"),
-    priceUsd: 19.99,
+    price: 19.99,
     creditsPerWeek: 5000,
     imageResolution: "4K",
   },
@@ -89,27 +94,30 @@ export type TopupId = "small" | "medium" | "large";
 
 export const TOPUPS: Record<
   TopupId,
-  { priceId: string; priceUsd: number; credits: number }
+  { priceId: string; price: number; credits: number }
 > = {
   small: {
     priceId: envValue("STRIPE_PRICE_TOPUP_SMALL"),
-    priceUsd: 7.99,
+    price: 7.99,
     credits: 1000,
   },
   medium: {
     priceId: envValue("STRIPE_PRICE_TOPUP_MEDIUM"),
-    priceUsd: 14.99,
+    price: 14.99,
     credits: 2000,
   },
   large: {
     priceId: envValue("STRIPE_PRICE_TOPUP_LARGE"),
-    priceUsd: 29.99,
+    price: 29.99,
     credits: 4500,
   },
 };
 
-export function formatPrice(amount: number): string {
-  return `$${amount.toFixed(2)}`;
+/** « $9.99 » pour les visiteurs US, « 9,99 € » (TTC) pour les visiteurs FR. */
+export function formatPrice(amount: number, currency: Currency = "usd"): string {
+  return currency === "eur"
+    ? `${amount.toFixed(2).replace(".", ",")} €`
+    : `$${amount.toFixed(2)}`;
 }
 
 export function priceIdFor(planId: PlanId): string {

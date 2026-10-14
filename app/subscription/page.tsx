@@ -13,6 +13,7 @@ import {
   type PlanId,
   type TopupId,
 } from "@/lib/stripe";
+import { useCurrency } from "@/lib/use-currency";
 
 /**
  * Écran de gestion de l'abonnement — l'équivalent de `/abonnement` sur le
@@ -52,6 +53,9 @@ const ACTION_BUTTON =
   "flex h-12 w-full items-center justify-center rounded-2xl border-[1.5px] border-white/15 bg-black/30 text-[16px] font-medium text-white transition active:opacity-70 disabled:opacity-40";
 
 export default function SubscriptionPage() {
+  // ponytail: devise du visiteur, pas celle de l'abonnement Stripe ; a lire
+  // sur la subscription si un abonne US consulte depuis un navigateur FR.
+  const currency = useCurrency();
   const [credits, setCredits] = useState<number | null>(null);
   const [planId, setPlanId] = useState<PlanId | null>(null);
   const [renewal, setRenewal] = useState<string | null>(null);
@@ -186,7 +190,7 @@ export default function SubscriptionPage() {
             </span>
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-[17px] font-medium text-white">
-                {formatPrice(plan.priceUsd)}
+                {formatPrice(plan.price, currency)}
                 <span className="text-[13px] text-white/50"> / week</span>
               </span>
               <span className="text-[13px] leading-5 text-white/50">
@@ -225,10 +229,10 @@ export default function SubscriptionPage() {
                 "en-US",
               )}{" "}
               credits <span className="text-[13px] text-white/50">/ week</span>{" "}
-              for {formatPrice(nextPlan.priceUsd - plan.priceUsd)} more
+              for {formatPrice(nextPlan.price - plan.price, currency)} more
             </span>
             <span className="text-[13px] leading-5 text-white/50">
-              {formatPrice(nextPlan.priceUsd)} / week ·{" "}
+              {formatPrice(nextPlan.price, currency)} / week ·{" "}
               {nextPlan.creditsPerWeek.toLocaleString("en-US")} credits · ≈{" "}
               {photosFor(nextPlan.creditsPerWeek)} photos
             </span>
@@ -260,7 +264,7 @@ export default function SubscriptionPage() {
                   {pack.credits.toLocaleString("en-US")} credits
                   <span className="text-[13px] text-white/50">
                     {" "}
-                    — {formatPrice(pack.priceUsd)}
+                    — {formatPrice(pack.price, currency)}
                   </span>
                 </span>
                 <span className="text-[13px] leading-5 text-white/50">

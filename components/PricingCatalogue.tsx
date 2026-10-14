@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
 import { PLANS, TOPUPS, formatPrice, type PlanId, type TopupId } from "@/lib/stripe";
+import { useCurrency } from "@/lib/use-currency";
 import {
   hasRedSnap as planHasRedSnap,
   isVideoOpen,
@@ -104,6 +105,7 @@ const TOPUP_FEATURES: Feature[] = [
 ];
 
 export default function PricingCatalogue() {
+  const currency = useCurrency();
   const [tab, setTab] = useState<"subscription" | "topup">("subscription");
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("pro");
   const [selectedTopup, setSelectedTopup] = useState<TopupId>("medium");
@@ -243,7 +245,7 @@ export default function PricingCatalogue() {
                       style={{ background: tint }}
                     >
                       <PriceCardNotches tint={tint} />
-                      {formatPrice(plan.priceUsd)}
+                      {formatPrice(plan.price, currency)}
                       <span className="ml-1 text-[12px] font-medium">/ wk</span>
                     </span>
                   </span>
@@ -283,7 +285,7 @@ export default function PricingCatalogue() {
                       style={{ background: tint }}
                     >
                       <PriceCardNotches tint={tint} />
-                      {formatPrice(pack.priceUsd)}
+                      {formatPrice(pack.price, currency)}
                     </span>
                   </span>
                 </button>

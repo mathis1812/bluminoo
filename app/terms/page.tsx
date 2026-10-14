@@ -61,7 +61,8 @@ export default function CgvPage() {
               video) and are reset and reloaded at each renewal of the
               subscription period. Credits not used by the end of a period
               are neither carried over nor refunded. Prices are shown in US
-              dollars, all taxes included.
+              dollars, or in euros for visitors in France, all taxes
+              included.
             </p>
           </section>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { LOCALE_COOKIE, currencyForLocale, resolveLocale } from "@/lib/locale";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -87,6 +88,16 @@ export async function POST(req: NextRequest) {
 
   const origin = req.headers.get("origin") ?? new URL(req.url).origin;
 
+  // Meme regle que l'affichage des prix (lib/use-currency.ts) : un visiteur
+  // FR paie en euros. Les prix Stripe portent une `currency_options` EUR ;
+  // sans elle, Stripe refuse la session — l'ajouter AVANT de deployer.
+  const currency = currencyForLocale(
+    resolveLocale(
+      req.cookies.get(LOCALE_COOKIE)?.value,
+      req.headers.get("accept-language"),
+    ),
+  );
+
   // Pack de crédits à l'unité : paiement unique, indépendant d'un
   // abonnement — un client sans abonnement, ou déjà abonné, peut en
   // acheter un, donc pas de garde sur profile.plan ici.
@@ -100,6 +111,7 @@ export async function POST(req: NextRequest) {
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         customer: customerId,
+        currency,
         line_items: [{ price: TOPUPS[packId].priceId, quantity: 1 }],
         // Le studio est la destination après paiement, pas l'ancienne
         // /account (page morte depuis la refonte — voir la correction du
@@ -138,6 +150,7 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
+      currency,
       line_items: [{ price: priceIdFor(planId), quantity: 1 }],
       // Même correction que le pack de crédits ci-dessus : studio, pas
       // l'ancienne /account.
