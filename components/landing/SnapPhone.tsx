@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { LandingCopy } from "@/app/landing/copy";
 
 /**
  * Visuel du hero : un snap vu COTE DESTINATAIRE.
@@ -24,47 +25,22 @@ const SLIDE_DURATION_MS = 3_600;
 /** Delai avant que la reponse de l'ami n'apparaisse sur chaque photo. */
 const REPLY_DELAY_MS = 1_100;
 
-type Snap = {
-  src: string;
-  alt: string;
-  from: string;
-  reply: string;
-};
-
-const SNAPS: Snap[] = [
-  {
-    src: "/landing/showcase/3.webp",
-    alt: "A woman walking toward a private jet at night.",
-    from: "Jordan",
-    reply: "since when do you fly private??",
-  },
-  {
-    src: "/landing/showcase/12.webp",
-    alt: "A hand on the steering wheel of a Lamborghini.",
-    from: "Maya",
-    reply: "no way you're driving that rn",
-  },
-  {
-    src: "/landing/showcase/8.webp",
-    alt: "A woman standing in front of a black Rolls-Royce at night.",
-    from: "Chris",
-    reply: "wait whose car is that 😭",
-  },
-  {
-    src: "/landing/showcase/13.webp",
-    alt: "Legs stretched out in the back seat of a Maybach.",
-    from: "Alex",
-    reply: "ok where are you actually",
-  },
+/** Images dans l'ordre de `copy.snaps` (textes par langue dans app/landing/copy.ts). */
+const SNAP_SOURCES = [
+  "/landing/showcase/3.webp",
+  "/landing/showcase/12.webp",
+  "/landing/showcase/8.webp",
+  "/landing/showcase/13.webp",
 ];
 
-export default function SnapPhone() {
+export default function SnapPhone({ copy }: { copy: LandingCopy["phone"] }) {
+  const snaps = SNAP_SOURCES.map((src, i) => ({ src, ...copy.snaps[i] }));
   const [index, setIndex] = useState(0);
   const [showReply, setShowReply] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((current) => (current + 1) % SNAPS.length);
+      setIndex((current) => (current + 1) % SNAP_SOURCES.length);
     }, SLIDE_DURATION_MS);
     return () => clearInterval(timer);
   }, []);
@@ -77,7 +53,7 @@ export default function SnapPhone() {
     return () => clearTimeout(timer);
   }, [index]);
 
-  const snap = SNAPS[index];
+  const snap = snaps[index];
 
   return (
     <div className="relative mx-auto w-full max-w-[300px]">
@@ -93,7 +69,7 @@ export default function SnapPhone() {
           {/* Toutes les images restent montees et se relaient en fondu :
               demonter/remonter une <Image> ferait clignoter le noir entre
               deux snaps. */}
-          {SNAPS.map((item, i) => (
+          {snaps.map((item, i) => (
             <Image
               key={item.src}
               src={item.src}
@@ -121,8 +97,8 @@ export default function SnapPhone() {
                 aria-hidden
                 className="h-7 w-7 shrink-0 rounded-full border-2 border-snap bg-white/25"
               />
-              <span className="text-[14px] font-semibold text-white">You</span>
-              <span className="text-[12px] text-white/70">just now</span>
+              <span className="text-[14px] font-semibold text-white">{copy.you}</span>
+              <span className="text-[12px] text-white/70">{copy.justNow}</span>
             </div>
           </div>
 
@@ -148,10 +124,10 @@ export default function SnapPhone() {
           est parti par la camera, sans mention pellicule. */}
       <div className="absolute -right-3 top-24 flex items-center gap-2 rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#0f0f10] shadow-xl sm:-right-10">
         <span aria-hidden className="h-3 w-3 rounded-[3px] bg-snapred" />
-        Delivered
+        {copy.delivered}
       </div>
       <div className="absolute -left-3 bottom-28 rounded-full bg-[#121212] px-3 py-2 text-[13px] font-semibold text-white shadow-xl ring-1 ring-white/10 sm:-left-10">
-        No camera roll tag
+        {copy.noCameraRoll}
       </div>
     </div>
   );
