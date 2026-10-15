@@ -9,6 +9,7 @@ import { asPlanId, PLAN_ORDER, QUALITY_COST } from "@/lib/generation-tiers";
 import {
   PLANS,
   TOPUPS,
+  billingFor,
   formatPrice,
   type PlanId,
   type TopupId,
@@ -53,9 +54,11 @@ const ACTION_BUTTON =
   "flex h-12 w-full items-center justify-center rounded-2xl border-[1.5px] border-white/15 bg-black/30 text-[16px] font-medium text-white transition active:opacity-70 disabled:opacity-40";
 
 export default function SubscriptionPage() {
-  // ponytail: devise du visiteur, pas celle de l'abonnement Stripe ; a lire
-  // sur la subscription si un abonne US consulte depuis un navigateur FR.
+  // ponytail: devise et rythme du visiteur, pas ceux de l'abonnement Stripe ;
+  // a lire sur la subscription si un abonne US consulte depuis un navigateur FR.
   const currency = useCurrency();
+  const billing = billingFor(currency);
+  const unit = billing === "month" ? "month" : "week";
   const [credits, setCredits] = useState<number | null>(null);
   const [planId, setPlanId] = useState<PlanId | null>(null);
   const [renewal, setRenewal] = useState<string | null>(null);
@@ -127,18 +130,18 @@ export default function SubscriptionPage() {
     [],
   );
 
-  const plan = planId ? PLANS[planId] : null;
+  const plan = planId ? PLANS[planId][billing] : null;
   const nextPlanId: PlanId | null = planId
     ? (PLAN_ORDER[PLAN_ORDER.indexOf(planId) + 1] ?? null)
     : null;
-  const nextPlan = nextPlanId ? PLANS[nextPlanId] : null;
+  const nextPlan = nextPlanId ? PLANS[nextPlanId][billing] : null;
 
-  // Barre de progression : part du forfait hebdomadaire encore disponible.
+  // Barre de progression : part du forfait encore disponible.
   // Plafonnée à 100% — un pack de crédits peut faire dépasser le forfait,
   // et une barre à 140% déborderait de son rail.
   const progress =
     plan && credits !== null
-      ? Math.min(100, Math.round((credits / plan.creditsPerWeek) * 100))
+      ? Math.min(100, Math.round((credits / plan.credits) * 100))
       : 0;
 
   return (
@@ -146,7 +149,7 @@ export default function SubscriptionPage() {
       <TemplateHeader backHref="/" title="Subscription" />
 
       <main className="flex min-h-dvh flex-col gap-3 bg-black px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
-        {/* Solde, avec la jauge du forfait hebdomadaire. */}
+        {/* Solde, avec la jauge du forfait. */}
         <section className={`${CARD} gap-2`}>
           <span className="flex items-center gap-2 text-[22px] font-semibold leading-tight text-white">
             <svg
@@ -191,11 +194,11 @@ export default function SubscriptionPage() {
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-[17px] font-medium text-white">
                 {formatPrice(plan.price, currency)}
-                <span className="text-[13px] text-white/50"> / week</span>
+                <span className="text-[13px] text-white/50"> / {unit}</span>
               </span>
               <span className="text-[13px] leading-5 text-white/50">
-                {plan.creditsPerWeek.toLocaleString("en-US")} credits · ≈{" "}
-                {photosFor(plan.creditsPerWeek)} photos
+                {plan.credits.toLocaleString("en-US")} credits · ≈{" "}
+                {photosFor(plan.credits)} photos
               </span>
             </span>
             {renewal && (
@@ -225,16 +228,16 @@ export default function SubscriptionPage() {
           <section className={`${CARD} gap-3`}>
             <span className="text-[17px] font-medium text-white">
               +
-              {(nextPlan.creditsPerWeek - plan.creditsPerWeek).toLocaleString(
+              {(nextPlan.credits - plan.credits).toLocaleString(
                 "en-US",
               )}{" "}
-              credits <span className="text-[13px] text-white/50">/ week</span>{" "}
+              credits <span className="text-[13px] text-white/50">/ {unit}</span>{" "}
               for {formatPrice(nextPlan.price - plan.price, currency)} more
             </span>
             <span className="text-[13px] leading-5 text-white/50">
-              {formatPrice(nextPlan.price, currency)} / week ·{" "}
-              {nextPlan.creditsPerWeek.toLocaleString("en-US")} credits · ≈{" "}
-              {photosFor(nextPlan.creditsPerWeek)} photos
+              {formatPrice(nextPlan.price, currency)} / {unit} ·{" "}
+              {nextPlan.credits.toLocaleString("en-US")} credits · ≈{" "}
+              {photosFor(nextPlan.credits)} photos
             </span>
             <button
               type="button"
@@ -249,7 +252,7 @@ export default function SubscriptionPage() {
               {pending === "upgrade" ? "Opening…" : "Change plan"}
             </button>
             <span className="text-[13px] leading-5 text-white/50">
-              Takes effect immediately, prorated for the current week.
+              Takes effect immediately, prorated for the current {unit}.
             </span>
           </section>
         )}

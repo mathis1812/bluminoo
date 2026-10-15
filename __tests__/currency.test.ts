@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { currencyForLocale, resolveLocale } from "@/lib/locale";
-import { formatPrice } from "@/lib/stripe";
+import { PLANS, billingFor, formatPrice } from "@/lib/stripe";
 
 describe("devise du visiteur", () => {
   it("un visiteur FR paie en euros, les autres en dollars", () => {
@@ -16,5 +16,19 @@ describe("formatPrice", () => {
     expect(formatPrice(9.99, "usd")).toBe("$9.99");
     expect(formatPrice(9.99, "eur")).toBe("9,99 €");
     expect(formatPrice(19.99 - 9.99, "eur")).toBe("10,00 €");
+  });
+});
+
+describe("rythme de facturation", () => {
+  it("les euros passent au mensuel, les dollars restent en hebdo", () => {
+    expect(billingFor("eur")).toBe("month");
+    expect(billingFor("usd")).toBe("week");
+  });
+
+  it("le mensuel garde le prix par credit de l'hebdo", () => {
+    for (const plan of Object.values(PLANS)) {
+      const perCredit = (o: { price: number; credits: number }) => o.price / o.credits;
+      expect(perCredit(plan.month)).toBeCloseTo(perCredit(plan.week), 3);
+    }
   });
 });

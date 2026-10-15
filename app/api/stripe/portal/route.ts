@@ -5,7 +5,7 @@ import {
   isStripeConfigured,
   PLANS,
   priceIdFor,
-  resolveSubscriptionPriceId,
+  resolveSubscriptionPrice,
   type PlanId,
 } from "@/lib/stripe";
 
@@ -100,8 +100,8 @@ export async function POST(req: NextRequest) {
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const currentItem = subscription.items.data[0];
-    const currentPlanId = resolveSubscriptionPriceId(currentItem?.price.id);
-    if (!currentPlanId) {
+    const current = resolveSubscriptionPrice(currentItem?.price.id);
+    if (!current) {
       console.error(
         `Unrecognized Stripe price (${currentItem?.price.id}) for subscription ${subscriptionId} of user ${user.id}.`,
       );
@@ -114,7 +114,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const targetPriceId = priceIdFor(targetPlan);
+    // Meme rythme que l'abonnement en cours : un abonne mensuel reste mensuel.
+    const targetPriceId = priceIdFor(targetPlan, current.billing);
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,

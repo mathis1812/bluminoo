@@ -4,10 +4,11 @@ import {
   stripe,
   PLANS,
   TOPUPS,
-  resolveSubscriptionPriceId,
+  resolveSubscriptionPrice,
   creditsFor,
   envValue,
   isStripeConfigured,
+  type Billing,
 } from "@/lib/stripe";
 import { addCredits, grantPlanCredits } from "@/lib/credits";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -157,7 +158,10 @@ export async function POST(req: NextRequest) {
           );
         } else {
           // Hors de l'update : la part pack du solde doit survivre (0014).
-          await grantPlanCredits(userId, creditsFor(planId));
+          // Session creee avant le mensuel : pas de `billing`, donc hebdo.
+          const billing: Billing =
+            session.metadata?.billing === "month" ? "month" : "week";
+          await grantPlanCredits(userId, creditsFor(planId, billing));
         }
       } else if (!topupId) {
         console.error(
@@ -186,10 +190,11 @@ export async function POST(req: NextRequest) {
         if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const priceId = subscription.items.data[0]?.price.id;
-          const planId = resolveSubscriptionPriceId(priceId);
+          const resolved = resolveSubscriptionPrice(priceId);
           const periodEnd = currentPeriodEndOf(subscription);
 
-          if (planId) {
+          if (resolved) {
+            const { planId, billing } = resolved;
             const { data: updateData, error: updateError } = await supabase
               .from("profiles")
               .update({
@@ -213,12 +218,15 @@ export async function POST(req: NextRequest) {
               );
             } else {
               for (const row of updateData) {
-                await grantPlanCredits(row.id as string, creditsFor(planId));
+                await grantPlanCredits(
+                  row.id as string,
+                  creditsFor(planId, billing),
+                );
               }
             }
           } else {
             console.error(
-              `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscriptionId}, event ${event.id})`,
+              `[stripe-webhook] resolveSubscriptionPrice not found for priceId=${priceId} (subscriptionId=${subscriptionId}, event ${event.id})`,
             );
           }
         }
@@ -233,7 +241,7 @@ export async function POST(req: NextRequest) {
 
       if (previousAttributes && "items" in previousAttributes) {
         const priceId = subscription.items.data[0]?.price.id;
-        const planId = resolveSubscriptionPriceId(priceId);
+        const planId = resolveSubscriptionPrice(priceId)?.planId;
         const periodEnd = currentPeriodEndOf(subscription);
 
         if (planId) {
@@ -269,7 +277,7 @@ export async function POST(req: NextRequest) {
           }
         } else {
           console.error(
-            `[stripe-webhook] resolveSubscriptionPriceId not found for priceId=${priceId} (subscriptionId=${subscription.id}, event ${event.id})`,
+            `[stripe-webhook] resolveSubscriptionPrice not found for priceId=${priceId} (subscriptionId=${subscription.id}, event ${event.id})`,
           );
         }
       }

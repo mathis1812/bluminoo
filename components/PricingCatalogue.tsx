@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
-import { PLANS, TOPUPS, formatPrice, type PlanId, type TopupId } from "@/lib/stripe";
+import {
+  PLANS,
+  TOPUPS,
+  billingFor,
+  formatPrice,
+  type Billing,
+  type PlanId,
+  type TopupId,
+} from "@/lib/stripe";
 import { useCurrency } from "@/lib/use-currency";
 import {
   hasRedSnap as planHasRedSnap,
@@ -80,7 +88,7 @@ type Feature = {
  * incluses restent visibles mais barrées, comme sur le modèle — les cacher
  * ferait disparaître la raison de monter d'un palier.
  */
-function subscriptionFeatures(planId: PlanId): Feature[] {
+function subscriptionFeatures(planId: PlanId, billing: Billing): Feature[] {
   return [
     {
       label: "Red Snap access",
@@ -94,7 +102,10 @@ function subscriptionFeatures(planId: PlanId): Feature[] {
       strong: true,
     },
     { label: "Videos with sound, 4 to 8s", included: isVideoOpen(planId) },
-    { label: "Credits renewed weekly", included: true },
+    {
+      label: `Credits renewed ${billing === "month" ? "monthly" : "weekly"}`,
+      included: true,
+    },
   ];
 }
 
@@ -106,6 +117,7 @@ const TOPUP_FEATURES: Feature[] = [
 
 export default function PricingCatalogue() {
   const currency = useCurrency();
+  const billing = billingFor(currency);
   const [tab, setTab] = useState<"subscription" | "topup">("subscription");
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("pro");
   const [selectedTopup, setSelectedTopup] = useState<TopupId>("medium");
@@ -206,6 +218,7 @@ export default function PricingCatalogue() {
         {tab === "subscription"
           ? SUBSCRIPTION_TIERS.map(({ id, badge }) => {
               const plan = PLANS[id];
+              const offer = plan[billing];
               const isSelected = selectedPlan === id;
               const tint = isSelected ? "#0285fe" : "rgba(255,255,255,0.15)";
               return (
@@ -237,7 +250,7 @@ export default function PricingCatalogue() {
                         <path d={LIGHTNING_PATH} />
                       </svg>
                       <span className="text-[20px] font-bold leading-none tabular-nums text-white">
-                        {plan.creditsPerWeek}
+                        {offer.credits}
                       </span>
                     </span>
                     <span
@@ -245,8 +258,10 @@ export default function PricingCatalogue() {
                       style={{ background: tint }}
                     >
                       <PriceCardNotches tint={tint} />
-                      {formatPrice(plan.price, currency)}
-                      <span className="ml-1 text-[12px] font-medium">/ wk</span>
+                      {formatPrice(offer.price, currency)}
+                      <span className="ml-1 text-[12px] font-medium">
+                        {billing === "month" ? "/ mo" : "/ wk"}
+                      </span>
                     </span>
                   </span>
                 </button>
@@ -295,7 +310,7 @@ export default function PricingCatalogue() {
 
       <ul className="flex flex-col gap-3.5">
         {(tab === "subscription"
-          ? subscriptionFeatures(selectedPlan)
+          ? subscriptionFeatures(selectedPlan, billing)
           : TOPUP_FEATURES
         ).map((feature) => (
           <li
@@ -355,7 +370,7 @@ export default function PricingCatalogue() {
         </button>
         <p className="text-center text-[13px] leading-5 text-white/40">
           {tab === "subscription"
-            ? "Billed weekly · Cancel anytime"
+            ? `Billed ${billing === "month" ? "monthly" : "weekly"} · Cancel anytime`
             : "One-time payment · No expiration"}
         </p>
       </div>

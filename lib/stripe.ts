@@ -46,41 +46,45 @@ export function isStripeConfigured(): boolean {
 export type PlanId = "lite" | "pro" | "max";
 export type ImageResolution = "1K" | "2K" | "4K";
 
+/**
+ * Rythme de facturation : la France teste le mensuel (9,99 / 19,99 / 39,99 €)
+ * pendant que les US restent en hebdo. Meme prix par credit dans les deux
+ * cas : le mensuel donne 2x les credits hebdo pour 2x le prix.
+ */
+export type Billing = "week" | "month";
+
+export function billingFor(currency: Currency): Billing {
+  return currency === "eur" ? "month" : "week";
+}
+
+type Offer = { priceId: string; price: number; credits: number };
+
+/**
+ * `week` : prix hebdo en dollars, avec une `currency_options` EUR (cf.
+ * formatPrice). `month` : prix mensuels distincts dans Stripe — l'intervalle
+ * d'un prix ne se change pas, il faut un prix par rythme.
+ */
 export const PLANS: Record<
   PlanId,
-  {
-    name: string;
-    priceId: string;
-    /**
-     * Par semaine — ces abonnements se renouvellent chaque semaine, pas
-     * chaque mois. Meme montant en dollars et en euros (TTC) : la devise
-     * EUR est une `currency_options` du meme prix Stripe, cf. formatPrice.
-     */
-    price: number;
-    creditsPerWeek: number;
-    imageResolution: ImageResolution;
-  }
+  { name: string; imageResolution: ImageResolution } & Record<Billing, Offer>
 > = {
   lite: {
     name: "Lite",
-    priceId: envValue("STRIPE_PRICE_LITE"),
-    price: 4.99,
-    creditsPerWeek: 1000,
     imageResolution: "1K",
+    week: { priceId: envValue("STRIPE_PRICE_LITE"), price: 4.99, credits: 1000 },
+    month: { priceId: envValue("STRIPE_PRICE_LITE_MONTHLY"), price: 9.99, credits: 2000 },
   },
   pro: {
     name: "Pro",
-    priceId: envValue("STRIPE_PRICE_PRO"),
-    price: 9.99,
-    creditsPerWeek: 2250,
     imageResolution: "2K",
+    week: { priceId: envValue("STRIPE_PRICE_PRO"), price: 9.99, credits: 2250 },
+    month: { priceId: envValue("STRIPE_PRICE_PRO_MONTHLY"), price: 19.99, credits: 4500 },
   },
   max: {
     name: "Max",
-    priceId: envValue("STRIPE_PRICE_MAX"),
-    price: 19.99,
-    creditsPerWeek: 5000,
     imageResolution: "4K",
+    week: { priceId: envValue("STRIPE_PRICE_MAX"), price: 19.99, credits: 5000 },
+    month: { priceId: envValue("STRIPE_PRICE_MAX_MONTHLY"), price: 39.99, credits: 10000 },
   },
 };
 
@@ -120,20 +124,23 @@ export function formatPrice(amount: number, currency: Currency = "usd"): string 
     : `$${amount.toFixed(2)}`;
 }
 
-export function priceIdFor(planId: PlanId): string {
-  return PLANS[planId].priceId;
+export function priceIdFor(planId: PlanId, billing: Billing): string {
+  return PLANS[planId][billing].priceId;
 }
 
-export function creditsFor(planId: PlanId): number {
-  return PLANS[planId].creditsPerWeek;
+export function creditsFor(planId: PlanId, billing: Billing): number {
+  return PLANS[planId][billing].credits;
 }
 
-export function resolveSubscriptionPriceId(
+/** Formule et rythme d'un prix Stripe d'abonnement, hebdo ou mensuel. */
+export function resolveSubscriptionPrice(
   priceId: string | undefined,
-): PlanId | null {
+): { planId: PlanId; billing: Billing } | null {
   if (!priceId) return null;
-  for (const [id, plan] of Object.entries(PLANS) as [PlanId, (typeof PLANS)[PlanId]][]) {
-    if (plan.priceId === priceId) return id;
+  for (const planId of Object.keys(PLANS) as PlanId[]) {
+    for (const billing of ["week", "month"] as const) {
+      if (PLANS[planId][billing].priceId === priceId) return { planId, billing };
+    }
   }
   return null;
 }

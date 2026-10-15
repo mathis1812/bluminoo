@@ -6,6 +6,7 @@ import {
   stripe,
   PLANS,
   TOPUPS,
+  billingFor,
   priceIdFor,
   isStripeConfigured,
   type PlanId,
@@ -146,17 +147,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Euros → mensuel (test FR), dollars → hebdo. Lu par le webhook pour
+  // crediter le forfait du bon rythme.
+  const billing = billingFor(currency);
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       currency,
-      line_items: [{ price: priceIdFor(planId), quantity: 1 }],
+      line_items: [{ price: priceIdFor(planId, billing), quantity: 1 }],
       // Même correction que le pack de crédits ci-dessus : studio, pas
       // l'ancienne /account.
       success_url: `${origin}/?checkout=success`,
       cancel_url: `${origin}/pricing`,
-      metadata: { supabase_user_id: user.id, plan: planId },
+      metadata: { supabase_user_id: user.id, plan: planId, billing },
     });
 
     return NextResponse.json({ url: session.url });
