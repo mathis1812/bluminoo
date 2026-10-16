@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 /** Durée typique observée d'une génération, pour calibrer la progression. */
 export const IMAGE_EXPECTED_SECONDS = 30;
+/** Kling via fal.ai : une à trois minutes selon la durée demandée. */
+export const VIDEO_EXPECTED_SECONDS = 120;
 
 /**
  * Intervalle entre deux messages d'attente, en secondes.

@@ -11,7 +11,7 @@ import {
 } from "@/lib/generation-tiers";
 import type { PlanId } from "@/lib/stripe";
 import {
-  prepareAndUpload,
+  createUploadCache,
   prepareImage,
   validateImageFile,
   type PreparedImage,
@@ -20,6 +20,7 @@ import {
   GENERATION_LOADING_MESSAGES,
   IMAGE_EXPECTED_SECONDS,
   useElapsedProgress,
+  VIDEO_EXPECTED_SECONDS,
 } from "./useElapsedProgress";
 
 /**
@@ -95,7 +96,7 @@ export function useStudioGeneration({
 
   const { elapsedSeconds, progressPercent } = useElapsedProgress(
     loading,
-    IMAGE_EXPECTED_SECONDS,
+    mode === "video" ? VIDEO_EXPECTED_SECONDS : IMAGE_EXPECTED_SECONDS,
   );
 
   // Au chargement du palier, cale la qualité sur son maximum — le client
@@ -125,16 +126,7 @@ export function useStudioGeneration({
    * description : autant de secondes retirées de l'attente perçue. Un échec
    * est retiré du cache pour qu'un réessai reparte de zéro.
    */
-  const uploadCacheRef = useRef(new Map<string, Promise<string>>());
-
-  const ensureUploaded = useCallback((image: PreparedImage) => {
-    const cached = uploadCacheRef.current.get(image.previewUrl);
-    if (cached) return cached;
-    const pending = prepareAndUpload(image);
-    pending.catch(() => uploadCacheRef.current.delete(image.previewUrl));
-    uploadCacheRef.current.set(image.previewUrl, pending);
-    return pending;
-  }, []);
+  const [ensureUploaded] = useState(createUploadCache);
 
   const handleFile = useCallback(
     async (file: File) => {
