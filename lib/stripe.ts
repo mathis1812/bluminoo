@@ -78,13 +78,13 @@ export const PLANS: Record<
     name: "Pro",
     imageResolution: "2K",
     week: { priceId: envValue("STRIPE_PRICE_PRO"), price: 9.99, credits: 2250 },
-    month: { priceId: envValue("STRIPE_PRICE_PRO_MONTHLY"), price: 19.99, credits: 4500 },
+    month: { priceId: envValue("STRIPE_PRICE_Pro_MONTHLY"), price: 19.99, credits: 4500 },
   },
   max: {
     name: "Max",
     imageResolution: "4K",
     week: { priceId: envValue("STRIPE_PRICE_MAX"), price: 19.99, credits: 5000 },
-    month: { priceId: envValue("STRIPE_PRICE_MAX_MONTHLY"), price: 39.99, credits: 10000 },
+    month: { priceId: envValue("STRIPE_PRICE_Max_MONTHLY"), price: 39.99, credits: 10000 },
   },
 };
 
