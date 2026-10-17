@@ -178,7 +178,7 @@ export const VEHICLE_MODELS: { slug: string; label: string; target: string }[] =
 export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
   {
     slug: "swap-vehicule",
-    title: "Swap vehicle",
+    title: "Swap de véhicule",
     featured: true,
     // Deux recadrages 16:9 du même plan de rue, pour que le fondu se
     // superpose : la 208 d'origine, puis l'Aventador qui l'a remplacée.
@@ -190,12 +190,12 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
       cardImage: `/templates/${slug}-card.jpg`,
       exampleImage: `/templates/${slug}.jpg`,
       beforeImage: `/templates/${slug}-before.jpg`,
-      tips: ["Whole car", "Good angle"],
+      tips: ["Voiture entière", "Bon angle"],
     })),
   },
   {
     slug: "pranks",
-    title: "Popular pranks",
+    title: "Pranks du moment",
     templates: [
       {
         slug: "voiture-accidentee",
@@ -206,8 +206,8 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         // « Bon angle » sur le modèle, pas « Clear space » : le second
         // conseil portait sur le dégagement autour du véhicule alors qu'il
         // parle du point de vue, comme sur la catégorie Swap vehicle.
-        tips: ["Whole car", "Good angle"],
-        variantQuestion: "How much damage?",
+        tips: ["Voiture entière", "Bon angle"],
+        variantQuestion: "Quels dégâts ?",
         // Le cran du milieu, relevé sur le modèle (son écran de choix
         // s'ouvre sur « L'assurance en sueur » et son bouton Continuer
         // pointe vers /fort). Bluminoo ouvrait sur le cran le plus extrême,
@@ -217,19 +217,19 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         variants: [
           {
             slug: "modere",
-            label: "It buffs out",
+            label: "Ça part au polish",
             choiceImage: "/templates/voiture-accidentee-modere-choice.jpg",
             exampleImage: "/templates/voiture-accidentee-modere.jpg",
           },
           {
             slug: "fort",
-            label: "Insurance is sweating",
+            label: "L'assurance transpire",
             choiceImage: "/templates/voiture-accidentee-fort-choice.jpg",
             exampleImage: "/templates/voiture-accidentee-fort.jpg",
           },
           {
             slug: "extreme",
-            label: "Straight to the scrapyard",
+            label: "Direction la casse",
             choiceImage: "/templates/voiture-accidentee-extreme-choice.jpg",
             exampleImage: "/templates/voiture-accidentee-extreme.jpg",
           },
@@ -237,53 +237,53 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
       },
       {
         slug: "animal-rase",
-        label: "Shaved Pet",
+        label: "Animal rasé",
         cardImage: "/templates/animal-rase-card.jpg",
         exampleImage: "/templates/animal-rase.jpg",
         beforeImage: "/templates/animal-rase-before.jpg",
-        tips: ["Whole animal", "Body visible"],
+        tips: ["Animal entier", "Corps visible"],
       },
       {
         slug: "lendemain-de-soiree",
-        label: "Morning After",
+        label: "Lendemain de soirée",
         cardImage: "/templates/lendemain-de-soiree-card.jpg",
         exampleImage: "/templates/lendemain-de-soiree.jpg",
         beforeImage: "/templates/lendemain-de-soiree-before.jpg",
-        tips: ["Whole room", "Good light"],
+        tips: ["Pièce entière", "Bonne lumière"],
       },
       {
         slug: "inondation",
-        label: "Flood",
+        label: "Inondation",
         cardImage: "/templates/inondation-card.jpg",
         exampleImage: "/templates/inondation.jpg",
         beforeImage: "/templates/inondation-before.jpg",
-        tips: ["Whole room", "Good light"],
+        tips: ["Pièce entière", "Bonne lumière"],
       },
       {
         slug: "degats-maison",
-        label: "House Damage",
+        label: "Dégâts à la maison",
         cardImage: "/templates/degats-maison-card.jpg",
         exampleImage: "/templates/degats-maison-plafond.jpg",
         beforeImage: "/templates/degats-maison-plafond-before.jpg",
-        tips: ["Whole room", "Ceiling visible"],
-        variantQuestion: "What kind of damage?",
+        tips: ["Pièce entière", "Plafond visible"],
+        variantQuestion: "Quel genre de dégâts ?",
         defaultVariantSlug: "plafond",
         variants: [
           {
             slug: "plafond",
-            label: "Ceiling collapsed",
+            label: "Plafond effondré",
             choiceImage: "/templates/degats-maison-plafond-choice.jpg",
             exampleImage: "/templates/degats-maison-plafond.jpg",
             beforeImage: "/templates/degats-maison-plafond-before.jpg",
-            tips: ["Whole room", "Ceiling visible"],
+            tips: ["Pièce entière", "Plafond visible"],
           },
           {
             slug: "sol",
-            label: "Floor collapsed",
+            label: "Sol effondré",
             choiceImage: "/templates/degats-maison-sol-choice.jpg",
             exampleImage: "/templates/degats-maison-sol.jpg",
             beforeImage: "/templates/degats-maison-sol-before.jpg",
-            tips: ["Whole room", "Floor visible"],
+            tips: ["Pièce entière", "Sol visible"],
           },
         ],
       },
@@ -293,8 +293,8 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         cardImage: "/templates/rat-card.jpg",
         exampleImage: "/templates/rat-invasion.jpg",
         beforeImage: "/templates/rat-before.jpg",
-        tips: ["Floor visible", "Good angle"],
-        variantQuestion: "How many rats?",
+        tips: ["Sol visible", "Bon angle"],
+        variantQuestion: "Combien de rats ?",
         defaultVariantSlug: "invasion",
         variants: [
           {
@@ -305,7 +305,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
           },
           {
             slug: "invasion",
-            label: "RATPOCALYPSE!",
+            label: "RATPOCALYPSE !",
             choiceImage: "/templates/rat-invasion-choice.jpg",
             exampleImage: "/templates/rat-invasion.jpg",
           },
@@ -315,7 +315,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
   },
   {
     slug: "worlds",
-    title: "Worlds",
+    title: "Univers",
     templates: [
       {
         slug: "minecraft",
@@ -323,7 +323,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         cardImage: "/templates/minecraft-card.jpg",
         exampleImage: "/templates/minecraft.jpg",
         beforeImage: "/templates/minecraft-before.jpg",
-        tips: ["Sharp subject", "Visible background"],
+        tips: ["Sujet net", "Fond visible"],
       },
       {
         slug: "gta-5",
@@ -331,7 +331,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         cardImage: "/templates/gta-5-card.jpg",
         exampleImage: "/templates/gta-5.jpg",
         beforeImage: "/templates/gta-5-before.jpg",
-        tips: ["Sharp subject", "Face visible"],
+        tips: ["Sujet net", "Visage visible"],
       },
       {
         slug: "lego",
@@ -339,7 +339,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         cardImage: "/templates/lego-card.jpg",
         exampleImage: "/templates/lego.jpg",
         beforeImage: "/templates/lego-before.jpg",
-        tips: ["Whole subject", "Visible background"],
+        tips: ["Sujet entier", "Fond visible"],
       },
     ],
   },

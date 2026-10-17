@@ -53,7 +53,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/account/delete", { method: "POST" });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Unable to delete your account. Please try again.");
+        setError(data?.error || "Impossible de supprimer ton compte. Réessaie.");
         return;
       }
       const supabase = createClient();
@@ -61,7 +61,7 @@ export default function SettingsPage() {
       router.push("/sign-in");
       router.refresh();
     } catch {
-      setError("Network error. Please try again.");
+      setError("Erreur réseau. Réessaie.");
     } finally {
       setDeleting(false);
     }
@@ -69,7 +69,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <TemplateHeader backHref="/" title="Settings" />
+      <TemplateHeader backHref="/" title="Réglages" />
 
       {!ready ? (
         // Session encore inconnue : l'en-tête suffit, le corps attend.
@@ -78,7 +78,7 @@ export default function SettingsPage() {
       <div className="animate-fade-up flex min-h-dvh flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
         <section className="flex flex-col gap-1 rounded-3xl border-[1.5px] border-white/15 bg-black/30 p-4">
           <span className="text-[13px] font-semibold uppercase tracking-wide text-white/40">
-            Account
+            Compte
           </span>
           <span className="text-[17px] font-medium text-white">{email}</span>
         </section>
@@ -87,10 +87,11 @@ export default function SettingsPage() {
           {confirming ? (
             <>
               <p className="text-base leading-6 text-white/70">
-                All your creations — uploaded photos, generated images and
-                videos — will be deleted from our servers, permanently. Any
-                subscription is cancelled immediately, and your account
-                disappears. Nothing is kept, nothing can be recovered.
+                Toutes tes créations (photos importées, images et vidéos
+                générées) seront supprimées définitivement de nos serveurs.
+                Ton abonnement éventuel est résilié immédiatement et ton
+                compte disparaît. Rien n’est conservé, rien ne peut être
+                récupéré.
               </p>
               {error && (
                 <p role="alert" className="text-[14px] text-red-400">
@@ -103,7 +104,7 @@ export default function SettingsPage() {
                 disabled={deleting}
                 className="flex h-14 w-full items-center justify-center rounded-3xl border-[1.5px] border-[#3a3a3a] bg-[#212121] text-[17px] font-semibold text-[#ff453a] transition active:opacity-90 disabled:opacity-60"
               >
-                {deleting ? "Deleting…" : "Permanently delete my account"}
+                {deleting ? "Suppression…" : "Supprimer définitivement mon compte"}
               </button>
               <button
                 type="button"
@@ -111,22 +112,21 @@ export default function SettingsPage() {
                 disabled={deleting}
                 className="self-center py-2 text-base text-white/45 transition active:opacity-70 disabled:opacity-40"
               >
-                Cancel
+                Annuler
               </button>
             </>
           ) : (
             <>
               <p className="text-base leading-6 text-white/70">
-                Deleting your account erases everything it holds — creations,
-                credits, subscription. It&apos;s immediate and can&apos;t be
-                undone.
+                Supprimer ton compte efface tout ce qu’il contient : créations,
+                crédits, abonnement. C’est immédiat et irréversible.
               </p>
               <button
                 type="button"
                 onClick={() => setConfirming(true)}
                 className="flex h-14 w-full items-center justify-center rounded-3xl border-[1.5px] border-white/15 bg-black/30 text-[17px] font-medium text-white transition active:opacity-70"
               >
-                Delete account
+                Supprimer mon compte
               </button>
             </>
           )}

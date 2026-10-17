@@ -5,7 +5,7 @@ import {
   isStripeConfigured,
   PLANS,
   priceIdFor,
-  resolveSubscriptionPriceId,
+  resolveSubscriptionPrice,
   type PlanId,
 } from "@/lib/stripe";
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sign in to manage your subscription." },
+      { error: "Connecte-toi pour gérer ton abonnement." },
       { status: 401 },
     );
   }
@@ -44,14 +44,14 @@ export async function POST(req: NextRequest) {
     }
   } catch {
     return NextResponse.json(
-      { error: "Invalid request: unreadable JSON body." },
+      { error: "Requête invalide : corps JSON illisible." },
       { status: 400 },
     );
   }
 
   const targetPlan = body.targetPlan as PlanId | undefined;
   if (targetPlan && !(targetPlan in PLANS)) {
-    return NextResponse.json({ error: "Unknown plan." }, { status: 400 });
+    return NextResponse.json({ error: "Offre inconnue." }, { status: 400 });
   }
 
   const { data: profile } = await supabase
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
   if (!profile?.stripe_customer_id) {
     return NextResponse.json(
-      { error: "No active subscription." },
+      { error: "Aucun abonnement actif." },
       { status: 400 },
     );
   }
@@ -81,9 +81,9 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ url: session.url });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Stripe error.";
+      const message = err instanceof Error ? err.message : "Erreur Stripe.";
       return NextResponse.json(
-        { error: `Unable to open the billing portal. ${message}` },
+        { error: `Impossible d'ouvrir le portail de facturation. ${message}` },
         { status: 502 },
       );
     }
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   const subscriptionId = profile.stripe_subscription_id as string | null;
   if (!subscriptionId) {
     return NextResponse.json(
-      { error: "No active subscription to change." },
+      { error: "Aucun abonnement actif à modifier." },
       { status: 400 },
     );
   }
@@ -100,8 +100,8 @@ export async function POST(req: NextRequest) {
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const currentItem = subscription.items.data[0];
-    const currentPlanId = resolveSubscriptionPriceId(currentItem?.price.id);
-    if (!currentPlanId) {
+    const current = resolveSubscriptionPrice(currentItem?.price.id);
+    if (!current) {
       console.error(
         `Unrecognized Stripe price (${currentItem?.price.id}) for subscription ${subscriptionId} of user ${user.id}.`,
       );
@@ -114,7 +114,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const targetPriceId = priceIdFor(targetPlan);
+    // Meme rythme que l'abonnement en cours : un abonne mensuel reste mensuel.
+    const targetPriceId = priceIdFor(targetPlan, current.billing);
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
@@ -132,9 +133,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Stripe error.";
+    const message = err instanceof Error ? err.message : "Erreur Stripe.";
     return NextResponse.json(
-      { error: `Unable to open the plan change. ${message}` },
+      { error: `Impossible d'ouvrir le changement d'offre. ${message}` },
       { status: 502 },
     );
   }

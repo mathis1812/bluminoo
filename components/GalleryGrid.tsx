@@ -36,13 +36,13 @@ async function shareEntry(entry: GalleryEntry): Promise<void> {
   if (entry.mode !== "image") return;
   if (!navigator.share) {
     throw new Error(
-      "Direct sharing is available from a compatible phone.",
+      "Le partage direct est disponible depuis un téléphone compatible.",
     );
   }
 
   const response = await fetch(entry.result_url);
   if (!response.ok) {
-    throw new Error("The photo can't be prepared for sharing.");
+    throw new Error("La photo ne peut pas être préparée pour le partage.");
   }
   const blob = await response.blob();
   const file = new File([blob], `bluminoo-${entry.id}.${extensionFor(entry)}`, {
@@ -51,19 +51,19 @@ async function shareEntry(entry: GalleryEntry): Promise<void> {
 
   if (navigator.canShare && !navigator.canShare({ files: [file] })) {
     throw new Error(
-      "File sharing isn't supported by this browser.",
+      "Le partage de fichiers n'est pas pris en charge par ce navigateur.",
     );
   }
 
   await navigator.share({
     files: [file],
-    title: "Photo created with Bluminoo",
-    text: "Photo created with Bluminoo",
+    title: "Photo créée avec Bluminoo",
+    text: "Photo créée avec Bluminoo",
   });
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString("fr-FR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -73,9 +73,9 @@ function formatDate(iso: string): string {
 type Filter = "all" | "image" | "video";
 
 const TABS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
+  { value: "all", label: "Tout" },
   { value: "image", label: "Photos" },
-  { value: "video", label: "Videos" },
+  { value: "video", label: "Vidéos" },
 ];
 
 export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
@@ -110,7 +110,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
       setShareError(
         err instanceof Error
           ? err.message
-          : "Sharing the photo isn't possible right now.",
+          : "Le partage de la photo est impossible pour le moment.",
       );
     } finally {
       setSharingId(null);
@@ -173,7 +173,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
               setEditing(false);
               setSelected(entry);
             }}
-            aria-label={`View full size: ${entry.label}`}
+            aria-label={`Voir en taille réelle : ${entry.label}`}
             className="relative aspect-square overflow-hidden rounded-2xl bg-[#161616] active:opacity-80"
           >
             {entry.mode === "video" ? (
@@ -273,7 +273,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                     disabled={sharingId === selected.id}
                     className="rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-bold text-primary transition hover:border-primary/50 hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {sharingId === selected.id ? "Preparing…" : "Share to Snapchat"}
+                    {sharingId === selected.id ? "Préparation…" : "Partager sur Snapchat"}
                   </button>
                 )}
                 {selected.mode === "image" && (
@@ -282,7 +282,7 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                     onClick={() => setEditing(true)}
                     className="rounded-xl border border-white/10 px-3.5 py-2 text-xs font-bold text-neutral-100 transition hover:border-white/20"
                   >
-                    Edit
+                    Retoucher
                   </button>
                 )}
                 <button
@@ -290,14 +290,14 @@ export default function GalleryGrid({ entries }: { entries: GalleryEntry[] }) {
                   onClick={() => void downloadEntry(selected)}
                   className="rounded-xl bg-snap px-3.5 py-2 text-xs font-bold text-[#121212] transition hover:opacity-90"
                 >
-                  Download
+                  Télécharger
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelected(null)}
                   className="rounded-xl border border-white/10 px-3.5 py-2 text-xs font-medium text-neutral-300 transition hover:border-white/20"
                 >
-                  Close
+                  Fermer
                 </button>
               </div>
             </div>

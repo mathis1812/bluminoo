@@ -27,9 +27,9 @@ export default function SignUpPage() {
 
       if (signUpError) {
         if (signUpError.message.toLowerCase().includes("password")) {
-          setError("Password must be at least 6 characters long.");
+          setError("Le mot de passe doit faire au moins 6 caractères.");
         } else {
-          setError("Something went wrong, please try again in a moment.");
+          setError("Quelque chose a planté, réessaie dans un instant.");
         }
         return;
       }
@@ -38,7 +38,7 @@ export default function SignUpPage() {
       // user (identities === []) if the email is already in use, rather
       // than an explicit error.
       if (data.user && data.user.identities && data.user.identities.length === 0) {
-        setError("This email address is already linked to an account.");
+        setError("Cette adresse e-mail est déjà liée à un compte.");
         return;
       }
 
@@ -47,7 +47,7 @@ export default function SignUpPage() {
       router.push("/");
       router.refresh();
     } catch {
-      setError("Something went wrong, please try again in a moment.");
+      setError("Quelque chose a planté, réessaie dans un instant.");
     } finally {
       setLoading(false);
     }
@@ -57,10 +57,10 @@ export default function SignUpPage() {
     <div className="animate-fade-up mx-auto max-w-md py-8">
       <div className="mb-8 text-center">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          Sign up
+          Inscription
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-          Create your Bluminoo account
+          Crée ton compte Bluminoo
         </h2>
       </div>
 
@@ -71,7 +71,7 @@ export default function SignUpPage() {
               htmlFor="email"
               className="mb-1.5 block text-xs font-medium uppercase tracking-[0.1em] text-neutral-400"
             >
-              Email
+              E-mail
             </label>
             <input
               id="email"
@@ -87,7 +87,7 @@ export default function SignUpPage() {
               htmlFor="password"
               className="mb-1.5 block text-xs font-medium uppercase tracking-[0.1em] text-neutral-400"
             >
-              Password
+              Mot de passe
             </label>
             <input
               id="password"
@@ -111,14 +111,14 @@ export default function SignUpPage() {
             disabled={loading}
             className="w-full rounded-2xl bg-snap px-4 py-3 text-sm font-semibold text-[#121212] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Creating account…" : "Create my account"}
+            {loading ? "Création du compte…" : "Créer mon compte"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-neutral-400">
-          Already have an account?{" "}
+          Déjà un compte ?{" "}
           <Link href="/sign-in" className="text-primary-soft hover:underline">
-            Sign in
+            Connecte-toi
           </Link>
         </p>
       </Panel>

@@ -26,7 +26,7 @@ import TemplateHeader from "@/components/TemplateHeader";
 export const metadata: Metadata = {
   title: "Red Snap — Bluminoo",
   description:
-    "Send your Bluminoo generations as a Red Snap, straight from your camera roll.",
+    "Envoie tes générations Bluminoo en Red Snap, direct depuis ta pellicule.",
 };
 
 /**
@@ -80,9 +80,9 @@ export default function RedSnapPage() {
             qui n'aurait pas de sens hors de cet écran. */}
         <section className="animate-fade-up flex flex-1 flex-col gap-3 rounded-3xl bg-[#121212] p-4 pt-6">
           <span className="text-center text-[28px] font-semibold leading-tight text-white">
-            Send your AI generations
+            Envoie tes générations IA
             <br />
-            as a Red Snap
+            en Red Snap
           </span>
 
           <div
@@ -106,7 +106,7 @@ export default function RedSnapPage() {
                 // page reste juste) et on dit ce qui manque, plutôt que de
                 // laisser un rectangle noir muet.
                 <p className="absolute inset-0 flex items-center justify-center px-6 text-center text-[14px] leading-snug text-white/40">
-                  The walkthrough video isn&apos;t configured yet.
+                  La vidéo tutoriel n&apos;est pas encore configurée.
                 </p>
               )}
             </div>

@@ -53,7 +53,7 @@ export async function prepareShareFile(blob: Blob): Promise<File> {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("Unable to read image."));
+      image.onerror = () => reject(new Error("Image illisible."));
       image.src = objectUrl;
     });
 
@@ -70,7 +70,7 @@ export async function prepareShareFile(blob: Blob): Promise<File> {
     canvas.width = targetW;
     canvas.height = targetH;
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Unable to prepare share.");
+    if (!ctx) throw new Error("Impossible de préparer le partage.");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, targetW, targetH);
     ctx.drawImage(img, 0, 0, targetW, targetH);
@@ -78,7 +78,7 @@ export async function prepareShareFile(blob: Blob): Promise<File> {
     const shareBlob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, "image/jpeg", SNAP_SHARE_JPEG_QUALITY),
     );
-    if (!shareBlob) throw new Error("Unable to prepare share.");
+    if (!shareBlob) throw new Error("Impossible de préparer le partage.");
 
     return new File([shareBlob], "bluminoo-result.jpg", {
       type: "image/jpeg",
@@ -131,7 +131,7 @@ export async function shareToSnapchat(
   if (!navigator.share) {
     setState({
       error:
-        "Direct sharing is available from a compatible phone. Download the image if needed.",
+        "Le partage direct est disponible depuis un téléphone compatible. Télécharge l'image si besoin.",
     });
     return;
   }
@@ -140,14 +140,14 @@ export async function shareToSnapchat(
   try {
     const response = await fetch(result);
     if (!response.ok) {
-      throw new Error("The result can't be prepared for sharing.");
+      throw new Error("Le résultat ne peut pas être préparé pour le partage.");
     }
     const blob = await response.blob();
     const file = await prepareFile(blob);
 
     if (navigator.canShare && !navigator.canShare({ files: [file] })) {
       throw new Error(
-        "File sharing isn't supported by this browser.",
+        "Le partage de fichiers n'est pas pris en charge par ce navigateur.",
       );
     }
 
@@ -159,7 +159,7 @@ export async function shareToSnapchat(
       error:
         err instanceof Error
           ? err.message
-          : "Sharing the photo isn't possible right now.",
+          : "Le partage de la photo est impossible pour le moment.",
     });
   } finally {
     setState({ sharing: false });
@@ -215,7 +215,7 @@ export async function sendAsRedSnap(
   if (!result) return;
   if (!navigator.share) {
     setState({
-      error: "This feature is available from a compatible phone.",
+      error: "Cette fonction est disponible depuis un téléphone compatible.",
     });
     return;
   }
@@ -224,14 +224,14 @@ export async function sendAsRedSnap(
   try {
     const response = await fetch(result);
     if (!response.ok) {
-      throw new Error("The result can't be prepared.");
+      throw new Error("Le résultat ne peut pas être préparé.");
     }
     const blob = await response.blob();
     const file = await prepareFile(blob);
 
     if (navigator.canShare && !navigator.canShare({ files: [file] })) {
       throw new Error(
-        "File sharing isn't supported by this browser.",
+        "Le partage de fichiers n'est pas pris en charge par ce navigateur.",
       );
     }
 
@@ -247,7 +247,7 @@ export async function sendAsRedSnap(
       error:
         err instanceof Error
           ? err.message
-          : "Saving the photo isn't possible right now.",
+          : "L'enregistrement de la photo est impossible pour le moment.",
     });
   } finally {
     setState({ sendingRedSnap: false });

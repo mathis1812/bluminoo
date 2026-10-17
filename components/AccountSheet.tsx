@@ -67,7 +67,7 @@ export default function AccountSheet({
     <div className="fixed inset-0 z-[100]">
       <button
         type="button"
-        aria-label="Close account"
+        aria-label="Fermer le compte"
         onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-md"
       />
@@ -86,7 +86,7 @@ export default function AccountSheet({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label="Fermer"
           className="absolute right-5 top-[calc(env(safe-area-inset-top)+20px)] flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition active:opacity-70"
         >
           <svg
@@ -108,7 +108,7 @@ export default function AccountSheet({
               id="account-sheet-title"
               className="text-[22px] font-semibold leading-tight text-white"
             >
-              Your account
+              Ton compte
             </h2>
             <p className="break-all text-base leading-6 text-white/70">
               {email}
@@ -120,7 +120,7 @@ export default function AccountSheet({
                   : "bg-white/10 text-white/70"
               }`}
             >
-              {isSubscribed ? "Subscribed" : "Free"}
+              {isSubscribed ? "Abonné" : "Gratuit"}
             </span>
           </div>
 
@@ -129,7 +129,7 @@ export default function AccountSheet({
             onClick={onClose}
             className="flex h-14 w-full items-center justify-center rounded-3xl bg-white text-[17px] font-medium text-black transition active:opacity-70"
           >
-            Subscription & packs
+            Abonnement et packs
           </Link>
 
           <Link
@@ -137,7 +137,7 @@ export default function AccountSheet({
             onClick={onClose}
             className="flex h-14 w-full items-center justify-center rounded-3xl border-[1.5px] border-white/15 bg-black/30 text-[17px] font-medium text-white transition active:opacity-70"
           >
-            Settings
+            Réglages
           </Link>
 
           <button
@@ -160,7 +160,7 @@ export default function AccountSheet({
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" x2="9" y1="12" y2="12" />
             </svg>
-            Sign out
+            Se déconnecter
           </button>
         </div>
       </div>

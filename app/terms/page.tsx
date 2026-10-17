@@ -6,10 +6,10 @@ export default function CgvPage() {
     <div className="animate-fade-up mx-auto max-w-3xl py-8">
       <Panel className="p-6 sm:p-8">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          Terms of sale
+          Conditions générales
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-          General terms and conditions of sale
+          Conditions générales de vente
         </h2>
 
         <LegalIdentityNotice />
@@ -17,120 +17,126 @@ export default function CgvPage() {
         <div className="space-y-6 text-sm leading-relaxed text-neutral-400">
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              1. Purpose
+              1. Objet
             </h3>
             <p>
-              These general terms and conditions of sale (&quot;Terms&quot;)
-              govern subscription to the paid offers of Bluminoo Studio, an
-              online service that generates images and videos using
-              artificial intelligence from photos supplied by the user.
+              Les présentes conditions générales de vente (CGV) régissent la
+              souscription aux offres payantes de Bluminoo Studio, service en
+              ligne permettant de générer des images et vidéos par
+              intelligence artificielle à partir de photos fournies par
+              l&apos;utilisateur.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              2. Offers and pricing
+              2. Offres et tarifs
             </h3>
             <p>
-              Bluminoo Studio offers three subscription tiers, billed either
-              monthly or annually, as the user prefers (the annual offer
-              carries a discount of roughly 20% compared with the monthly
-              rate, billed in a single payment):
+              Bluminoo Studio propose trois formules d&apos;abonnement
+              mensuel :
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>
-                Starter: $9.99 / month or $95.90 / year — 2,000 credits /
-                month
+                Lite : 9,99 € / mois — 2 000 crédits / mois (images
+                en 1K, sans vidéo ni Red Snap)
               </li>
               <li>
-                Essential: $19.99 / month or $191.90 / year — 5,000 credits /
-                month
+                Pro : 19,99 € / mois — 4 500 crédits / mois (images
+                jusqu&apos;en 2K, vidéo et Red Snap)
               </li>
               <li>
-                Ultimate: $39.99 / month or $383.90 / year — 12,000 credits /
-                month
+                Max : 39,99 € / mois — 10 000 crédits / mois (images
+                jusqu&apos;en 4K, vidéo et Red Snap)
               </li>
             </ul>
             <p className="mt-2">
-              For an annual subscription, the credits corresponding to the
-              full year are credited in a single batch upon payment, then
-              reloaded identically at the next annual renewal.
+              Des packs de crédits sont également proposés à l&apos;unité, en
+              paiement unique et sans abonnement : 1 000 crédits pour
+              7,99 €, 2 000 crédits pour 14,99 € et 4 500 crédits pour
+              29,99 €. Ils n&apos;expirent pas et ne donnent accès à
+              aucune fonctionnalité supplémentaire.
             </p>
             <p className="mt-2">
-              Credits are consumed on each successful generation (image or
-              video) and are reset and reloaded at each renewal of the
-              subscription period. Credits not used by the end of a period
-              are neither carried over nor refunded. Prices are shown in US
-              dollars, all taxes included.
+              Les crédits sont consommés à chaque génération réussie (image
+              ou vidéo). Les crédits d&apos;abonnement sont remis à zéro puis
+              rechargés à chaque renouvellement mensuel ; ceux non utilisés
+              en fin de période ne sont ni reportés, ni remboursés. Les
+              prix sont affichés en euros, toutes taxes comprises.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              3. Payment and renewal
+              3. Paiement et renouvellement
             </h3>
             <p>
-              Payment is made by credit card via the Stripe payment
-              processor, which handles card data directly — Bluminoo Studio
-              never has access to the card number. The subscription is for
-              an indefinite term and renews automatically each month by
-              charging the same card, until cancellation.
+              Le paiement s&apos;effectue par carte bancaire via le
+              prestataire Stripe, qui traite directement les données
+              bancaires — Bluminoo Studio n&apos;a jamais accès au numéro de
+              carte. L&apos;abonnement est à durée indéterminée et se
+              renouvelle automatiquement chaque mois par prélèvement de la
+              même carte, jusqu&apos;à résiliation.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              4. Cancellation
+              4. Résiliation
             </h3>
             <p>
-              The user may cancel their subscription at any time from their
-              billing area (accessible via the account page). Cancellation
-              takes effect at the end of the current period already paid
-              for; no pro-rata refund is issued for the current period.
+              L&apos;utilisateur peut résilier son abonnement à tout moment
+              depuis son espace de facturation (accessible via la page
+              Compte). La résiliation prend effet à la fin de la période en
+              cours déjà payée ; aucun remboursement au prorata n&apos;est
+              effectué pour la période en cours.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              5. Right of withdrawal
+              5. Droit de rétractation
             </h3>
             <p>
-              In accordance with Article L221-28 of the French Consumer
-              Code, the right of withdrawal cannot be exercised for digital
-              content supplied on a non-material medium whose performance
-              has begun after the consumer&apos;s prior express consent, and
-              who has also waived their right of withdrawal. By subscribing
-              to a paid offer, the user acknowledges that access to credits
-              is immediate and expressly waives their right of withdrawal
-              from the first use of credits.
+              Conformément à l&apos;article L221-28 du Code de la
+              consommation, le droit de rétractation ne peut être exercé
+              pour les contenus numériques fournis sur un support immatériel
+              dont l&apos;exécution a commencé après accord préalable exprès
+              du consommateur, qui a également renoncé à son droit de
+              rétractation. En souscrivant à une offre payante ou en
+              achetant un pack de crédits, l&apos;utilisateur reconnaît que
+              l&apos;accès aux crédits est immédiat et renonce expressément
+              à son droit de rétractation dès le premier usage de crédits.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              6. Liability
+              6. Responsabilité
             </h3>
             <p>
-              Generated content (images, videos) is produced by third-party
-              artificial intelligence models and may contain imperfections,
-              inaccuracies, or fail to fully match the request. Bluminoo
-              Studio does not guarantee any specific result and cannot be
-              held liable for any use of the generated content that
-              violates the law or the rights of third parties (image
-              rights, intellectual property, trademark infringement, etc.),
-              which is the sole responsibility of the user.
+              Les contenus générés (images, vidéos) le sont par des modèles
+              d&apos;intelligence artificielle tiers et peuvent comporter des
+              imperfections, inexactitudes ou ne pas correspondre
+              parfaitement à la demande. Bluminoo Studio ne garantit pas un
+              résultat spécifique et ne saurait être tenu responsable d&apos;un
+              usage des contenus générés contraire à la loi ou aux droits de
+              tiers (droit à l&apos;image, propriété intellectuelle,
+              contrefaçon de marque, etc.), qui relève de la seule
+              responsabilité de l&apos;utilisateur.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              7. Governing law and disputes
+              7. Droit applicable et litiges
             </h3>
             <p>
-              These Terms are governed by French law. In the event of a
-              dispute, the user may resort to consumer mediation before any
-              legal action. Failing an amicable resolution, the French
-              courts shall have sole jurisdiction.
+              Les présentes CGV sont soumises au droit français. En cas de
+              litige, l&apos;utilisateur peut recourir à une médiation de la
+              consommation avant toute action judiciaire. À défaut de
+              résolution amiable, les tribunaux français seront seuls
+              compétents.
             </p>
           </section>
 
@@ -139,7 +145,7 @@ export default function CgvPage() {
               8. Contact
             </h3>
             <p>
-              For any question regarding these Terms:{" "}
+              Pour toute question relative aux présentes CGV :{" "}
               <a
                 href="mailto:mathisvergne27@gmail.com"
                 className="text-primary-soft underline underline-offset-2 hover:text-primary"

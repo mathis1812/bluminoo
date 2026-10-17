@@ -77,7 +77,7 @@ export default function ResultViewer({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Full size result"
+      aria-label="Résultat en taille réelle"
       className="fixed inset-0 z-50 flex flex-col bg-black"
     >
       {/* Même bouton de retour que `TemplateHeader` — chevron, 42 px, même
@@ -87,7 +87,7 @@ export default function ResultViewer({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Back"
+          aria-label="Retour"
           className="flex h-[42px] items-center gap-1.5 rounded-full border border-[#2d2d2d] bg-[#161616] pl-2.5 pr-4 text-[15px] font-medium text-white transition active:opacity-80"
         >
           <svg
@@ -102,7 +102,7 @@ export default function ResultViewer({
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Back
+          Retour
         </button>
       </div>
 

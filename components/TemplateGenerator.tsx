@@ -206,7 +206,7 @@ export default function TemplateGenerator({
         if (isSubscribed) void ensureUploaded(img);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Unable to prepare the image.",
+          err instanceof Error ? err.message : "Impossible de préparer l'image.",
         );
       }
     },
@@ -225,7 +225,7 @@ export default function TemplateGenerator({
     // Amorce l'AudioContext dans le geste utilisateur pour iOS Safari.
     unlockAudioContext();
     if (!prepared) {
-      setError("Please upload a photo first.");
+      setError("Importe d'abord une photo.");
       return;
     }
 
@@ -262,19 +262,19 @@ export default function TemplateGenerator({
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Generation failed. Please try again.");
+        setError(data?.error || "La génération a échoué. Réessaie.");
         return;
       }
       if (data?.imageUrl) {
         setResult(data.imageUrl);
       } else {
-        setError("Unexpected response from the server. Please try again.");
+        setError("Réponse inattendue du serveur. Réessaie.");
       }
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Network error during generation. Check your connection.",
+          : "Erreur réseau pendant la génération. Vérifie ta connexion.",
       );
     } finally {
       setLoading(false);
@@ -298,13 +298,13 @@ export default function TemplateGenerator({
               <button
                 type="button"
                 onClick={() => setViewerOpen(true)}
-                aria-label="View full size"
+                aria-label="Voir en taille réelle"
                 className="absolute inset-0 h-full w-full cursor-zoom-in"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={result}
-                  alt={`Your ${template.label} result`}
+                  alt={`Ton résultat « ${template.label} »`}
                   className="animate-magic-reveal absolute inset-0 h-full w-full object-cover"
                 />
               </button>
@@ -314,7 +314,7 @@ export default function TemplateGenerator({
             <>
               <Image
                 src={exampleImage}
-                alt={`Result — ${template.label}`}
+                alt={`Résultat — ${template.label}`}
                 fill
                 priority
                 sizes="100vw"
@@ -348,16 +348,16 @@ export default function TemplateGenerator({
           {paywalled && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/50 px-8 text-center">
               <p className="text-[19px] font-semibold text-white">
-                Your scene is ready
+                Ta scène est prête
               </p>
               <p className="text-[15px] leading-[1.5] text-white/70">
-                Subscribe to unlock it and generate as many as you like.
+                Abonne-toi pour la débloquer et en générer autant que tu veux.
               </p>
               <Link
                 href="/pricing"
                 className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
               >
-                See the plans
+                Voir les formules
               </Link>
             </div>
           )}
@@ -408,7 +408,7 @@ export default function TemplateGenerator({
       {viewerOpen && result && (
         <ResultViewer
           resultUrl={result}
-          alt={`Your ${template.label} result`}
+          alt={`Ton résultat « ${template.label} »`}
           hasRedSnap={hasRedSnap}
           canShare={canShare}
           onReset={reset}
@@ -440,7 +440,7 @@ export default function TemplateGenerator({
         ) : (
           <>
             <p className="text-[22px] font-semibold leading-tight text-white">
-              Import a photo
+              Importer une photo
             </p>
 
             {tips.length > 0 && (
@@ -479,13 +479,13 @@ export default function TemplateGenerator({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={prepared.previewUrl}
-                    alt="The photo you uploaded"
+                    alt="La photo que tu as importée"
                     className="h-full w-full object-cover"
                   />
                   <button
                     type="button"
                     onClick={reset}
-                    aria-label="Remove the photo"
+                    aria-label="Retirer la photo"
                     className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition active:opacity-70"
                   >
                     <svg
@@ -505,7 +505,7 @@ export default function TemplateGenerator({
                 <button
                   type="button"
                   onClick={() => inputRef.current?.click()}
-                  aria-label="Choose a photo"
+                  aria-label="Choisir une photo"
                   className="relative aspect-[9/11] w-[24%] overflow-hidden rounded-2xl bg-[#111111]"
                 >
                   <svg
@@ -553,7 +553,7 @@ export default function TemplateGenerator({
               disabled={!prepared || loading}
               className="mt-3 flex h-14 w-full items-center justify-center gap-2.5 rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] transition active:opacity-90 disabled:opacity-60"
             >
-              Generate
+              Générer
               <span className="flex items-center gap-1 text-[17px] font-bold tabular-nums">
                 <svg
                   width="17"

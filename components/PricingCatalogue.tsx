@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { openAuthSheet } from "@/components/AuthSheet";
-import { PLANS, TOPUPS, formatPrice, type PlanId, type TopupId } from "@/lib/stripe";
+import {
+  PLANS,
+  TOPUPS,
+  billingFor,
+  formatPrice,
+  type Billing,
+  type PlanId,
+  type TopupId,
+} from "@/lib/stripe";
+import { useCurrency } from "@/lib/use-currency";
 import {
   hasRedSnap as planHasRedSnap,
   isVideoOpen,
@@ -79,31 +88,36 @@ type Feature = {
  * incluses restent visibles mais barrées, comme sur le modèle — les cacher
  * ferait disparaître la raison de monter d'un palier.
  */
-function subscriptionFeatures(planId: PlanId): Feature[] {
+function subscriptionFeatures(planId: PlanId, billing: Billing): Feature[] {
   return [
     {
-      label: "Red Snap access",
+      label: "Accès à Red Snap",
       included: planHasRedSnap(planId),
       tone: "red",
     },
-    { label: "All effects unlocked", included: true },
+    { label: "Tous les effets débloqués", included: true },
     {
-      label: `Images up to ${PLANS[planId].imageResolution}`,
+      label: `Images jusqu'en ${PLANS[planId].imageResolution}`,
       included: true,
       strong: true,
     },
-    { label: "Videos with sound, 4 to 8s", included: isVideoOpen(planId) },
-    { label: "Credits renewed weekly", included: true },
+    { label: "Vidéos avec son, de 4 à 8 s", included: isVideoOpen(planId) },
+    {
+      label: `Crédits renouvelés chaque ${billing === "month" ? "mois" : "semaine"}`,
+      included: true,
+    },
   ];
 }
 
 const TOPUP_FEATURES: Feature[] = [
-  { label: "Added to your balance instantly", included: true },
-  { label: "Credits never expire", included: true },
-  { label: "One-time payment, no subscription", included: true },
+  { label: "Ajoutés à ton solde instantanément", included: true },
+  { label: "Les crédits n'expirent jamais", included: true },
+  { label: "Paiement unique, sans abonnement", included: true },
 ];
 
 export default function PricingCatalogue() {
+  const currency = useCurrency();
+  const billing = billingFor(currency);
   const [tab, setTab] = useState<"subscription" | "topup">("subscription");
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("pro");
   const [selectedTopup, setSelectedTopup] = useState<TopupId>("medium");
@@ -135,7 +149,7 @@ export default function PricingCatalogue() {
           openAuthSheet("signup");
           return;
         }
-        setError(data?.error || "Unable to start checkout. Please try again.");
+        setError(data?.error || "Impossible de lancer le paiement. Réessaie.");
         return;
       }
       if (data?.url) {
@@ -149,7 +163,7 @@ export default function PricingCatalogue() {
         window.location.href = data.url;
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError("Erreur réseau. Réessaie.");
     } finally {
       setLoading(false);
     }
@@ -178,7 +192,7 @@ export default function PricingCatalogue() {
             tab === "subscription" ? "text-white" : "text-white/50"
           }`}
         >
-          Subscriptions
+          Abonnements
         </button>
         <button
           type="button"
@@ -189,7 +203,7 @@ export default function PricingCatalogue() {
             tab === "topup" ? "text-white" : "text-white/50"
           }`}
         >
-          Credits
+          Crédits
         </button>
       </div>
 
@@ -204,6 +218,7 @@ export default function PricingCatalogue() {
         {tab === "subscription"
           ? SUBSCRIPTION_TIERS.map(({ id, badge }) => {
               const plan = PLANS[id];
+              const offer = plan[billing];
               const isSelected = selectedPlan === id;
               const tint = isSelected ? "#0285fe" : "rgba(255,255,255,0.15)";
               return (
@@ -235,7 +250,7 @@ export default function PricingCatalogue() {
                         <path d={LIGHTNING_PATH} />
                       </svg>
                       <span className="text-[20px] font-bold leading-none tabular-nums text-white">
-                        {plan.creditsPerWeek}
+                        {offer.credits}
                       </span>
                     </span>
                     <span
@@ -243,8 +258,10 @@ export default function PricingCatalogue() {
                       style={{ background: tint }}
                     >
                       <PriceCardNotches tint={tint} />
-                      {formatPrice(plan.priceUsd)}
-                      <span className="ml-1 text-[12px] font-medium">/ wk</span>
+                      {formatPrice(offer.price, currency)}
+                      <span className="ml-1 text-[12px] font-medium">
+                        {billing === "month" ? "/ mois" : "/ sem."}
+                      </span>
                     </span>
                   </span>
                 </button>
@@ -283,7 +300,7 @@ export default function PricingCatalogue() {
                       style={{ background: tint }}
                     >
                       <PriceCardNotches tint={tint} />
-                      {formatPrice(pack.priceUsd)}
+                      {formatPrice(pack.price, currency)}
                     </span>
                   </span>
                 </button>
@@ -293,7 +310,7 @@ export default function PricingCatalogue() {
 
       <ul className="flex flex-col gap-3.5">
         {(tab === "subscription"
-          ? subscriptionFeatures(selectedPlan)
+          ? subscriptionFeatures(selectedPlan, billing)
           : TOPUP_FEATURES
         ).map((feature) => (
           <li
@@ -349,12 +366,12 @@ export default function PricingCatalogue() {
           disabled={loading}
           className="flex h-14 w-full items-center justify-center rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] shadow-[0_0_18px_rgba(255,252,0,0.45),0_0_44px_rgba(255,252,0,0.22)] transition active:opacity-80 disabled:opacity-50"
         >
-          {loading ? "Loading…" : "Continue"}
+          {loading ? "Chargement…" : "Continuer"}
         </button>
         <p className="text-center text-[13px] leading-5 text-white/40">
           {tab === "subscription"
-            ? "Billed weekly · Cancel anytime"
-            : "One-time payment · No expiration"}
+            ? `Facturé chaque ${billing === "month" ? "mois" : "semaine"} · Résiliable à tout moment`
+            : "Paiement unique · N'expire jamais"}
         </p>
       </div>
     </div>

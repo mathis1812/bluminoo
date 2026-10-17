@@ -197,13 +197,13 @@ export default function StudioCard({
               <button
                 type="button"
                 onClick={onOpenViewer}
-                aria-label="View full size"
+                aria-label="Voir en taille réelle"
                 className="h-full w-full cursor-zoom-in"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={result}
-                  alt="Your generated scene"
+                  alt="Ta scène générée"
                   className="animate-magic-reveal h-full w-full object-cover"
                 />
               </button>
@@ -220,16 +220,16 @@ export default function StudioCard({
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/50 px-8 text-center">
                 <p className="text-[19px] font-semibold text-white">
-                  Your scene is ready
+                  Ta scène est prête
                 </p>
                 <p className="text-[15px] leading-[1.5] text-white/60">
-                  Subscribe to unlock it and generate as many as you like.
+                  Abonne-toi pour la débloquer et en générer autant que tu veux.
                 </p>
                 <Link
                   href="/pricing"
                   className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
                 >
-                  See the plans
+                  Voir les formules
                 </Link>
               </div>
             </div>
@@ -244,13 +244,13 @@ export default function StudioCard({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={prepared.previewUrl}
-                alt="The photo you uploaded"
+                alt="La photo que tu as importée"
                 className="h-full w-full object-cover"
               />
               <button
                 type="button"
                 onClick={onReset}
-                aria-label="Remove the photo"
+                aria-label="Retirer la photo"
                 className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition active:opacity-70"
               >
                 <svg
@@ -288,7 +288,7 @@ export default function StudioCard({
                 <path d="M21 15l-5-5L5 21" />
               </svg>
               <span className="px-4 text-center text-[18px] font-semibold">
-                Import a photo
+                Importer une photo
               </span>
             </button>
           )}

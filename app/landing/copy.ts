@@ -9,25 +9,14 @@ import type { FaqItem } from "@/components/FaqAccordion";
  * typage plutot que d'afficher un trou sur la page.
  */
 
-export type Locale = "en" | "fr";
-
-/** Cookie pose par le bouton FR/EN : le choix explicite du visiteur. */
-export const LOCALE_COOKIE = "lang";
-
-/** Premiere langue du header (celle que le navigateur prefere) : fr* → fr. */
-export function localeFromAcceptLanguage(header: string | null): Locale {
-  const first = header?.split(",")[0]?.trim().toLowerCase() ?? "";
-  return first.startsWith("fr") ? "fr" : "en";
-}
-
-/** Le bouton FR/EN l'emporte sur la langue du telephone ; valeur inconnue ignoree. */
-export function resolveLocale(
-  cookie: string | undefined,
-  acceptLanguage: string | null,
-): Locale {
-  if (cookie === "fr" || cookie === "en") return cookie;
-  return localeFromAcceptLanguage(acceptLanguage);
-}
+// Detection de langue partagee avec les prix et le paiement : lib/locale.ts.
+import type { Locale } from "@/lib/locale";
+export {
+  LOCALE_COOKIE,
+  localeFromAcceptLanguage,
+  resolveLocale,
+  type Locale,
+} from "@/lib/locale";
 
 export type SnapCopy = { alt: string; from: string; reply: string };
 

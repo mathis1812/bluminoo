@@ -33,7 +33,7 @@ export default function ManageSubscriptionButton({
 
       if (!res.ok || !data.url) {
         setError(
-          data.error ?? "Something went wrong, please try again in a moment.",
+          data.error ?? "Quelque chose a planté, réessaie dans un instant.",
         );
         setLoading(false);
         return;
@@ -52,7 +52,7 @@ export default function ManageSubscriptionButton({
 
       window.location.href = data.url;
     } catch {
-      setError("Something went wrong, please try again in a moment.");
+      setError("Quelque chose a planté, réessaie dans un instant.");
       setLoading(false);
     }
   }
@@ -66,10 +66,10 @@ export default function ManageSubscriptionButton({
         className="text-sm font-medium text-primary-soft underline underline-offset-2 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading
-          ? "Redirecting…"
+          ? "Redirection…"
           : targetPlan
-            ? "Switch to this plan"
-            : "Manage my subscription"}
+            ? "Passer à cette formule"
+            : "Gérer mon abonnement"}
       </button>
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       {notice && portalUrl && (
@@ -79,7 +79,7 @@ export default function ManageSubscriptionButton({
             href={portalUrl}
             className="inline-block rounded-2xl border border-white/10 px-4 py-2 text-xs font-medium text-neutral-300 transition hover:border-white/20 hover:text-white"
           >
-            Continue to billing portal
+            Continuer vers le portail de facturation
           </a>
         </div>
       )}

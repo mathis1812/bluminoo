@@ -65,7 +65,7 @@ export default function SiteHeader() {
             href="/settings"
             className="rounded-full bg-white px-5 py-2.5 text-[15px] font-semibold text-black transition hover:bg-white/90"
           >
-            My account
+            Mon compte
           </Link>
         ) : (
           // Ouvre la feuille de connexion plutôt que de naviguer : /sign-in
@@ -76,7 +76,7 @@ export default function SiteHeader() {
             onClick={() => openAuthSheet("signin")}
             className="rounded-full bg-white px-5 py-2.5 text-[15px] font-semibold text-black transition hover:bg-white/90"
           >
-            Sign in
+            Connexion
           </button>
         ))}
     </header>

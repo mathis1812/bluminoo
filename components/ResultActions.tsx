@@ -126,7 +126,7 @@ export default function ResultActions({
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
       <button type="button" onClick={download} className={LIGHT_BUTTON}>
-        {canShare ? "Share" : "Download"}
+        {canShare ? "Partager" : "Télécharger"}
       </button>
 
       {onEdited && (
@@ -135,7 +135,7 @@ export default function ResultActions({
           onClick={() => setEditing(true)}
           className={LIGHT_BUTTON}
         >
-          Edit
+          Retoucher
         </button>
       )}
 
@@ -155,13 +155,13 @@ export default function ResultActions({
           className={SNAP_BUTTON}
         >
           <GhostIcon />
-          {sendingRedSnap ? "Saving…" : "Red Snap"}
+          {sendingRedSnap ? "Enregistrement…" : "Red Snap"}
           <NewSnapSquare />
         </button>
       ) : (
         <Link href="/pricing" className={SNAP_BUTTON}>
           <GhostIcon />
-          Unlock Red Snap
+          Débloquer Red Snap
         </Link>
       )}
 
@@ -176,16 +176,16 @@ export default function ResultActions({
         <div className="mt-2 w-full">
           {SHOW_SNAP_STEPS && (
             <ol className="mx-auto flex max-w-[22rem] list-decimal flex-col gap-1 pl-5 text-left text-[14px] leading-5 text-white/45">
-              <li>Green screen, then pick the photo you just saved</li>
-              <li>Step out of the frame</li>
-              <li>Take the shot, then send it</li>
+              <li>Écran vert, puis choisis la photo que tu viens d’enregistrer</li>
+              <li>Sors du cadre</li>
+              <li>Prends le snap, puis envoie-le</li>
             </ol>
           )}
 
           {snapchatBlocked && (
             <a href={SNAPCHAT_APP_URL} className={`${SNAP_BUTTON} mt-3 w-full`}>
               <GhostIcon />
-              Open Snapchat
+              Ouvrir Snapchat
             </a>
           )}
         </div>
@@ -199,7 +199,7 @@ export default function ResultActions({
         onClick={onReset}
         className="flex h-12 items-center justify-center rounded-3xl px-4 text-[16px] font-medium text-white/50 transition active:opacity-70"
       >
-        New photo
+        Nouvelle photo
       </button>
     </div>
   );

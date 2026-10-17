@@ -127,7 +127,7 @@ export async function persistVideoFromUrl(
       clearTimeout(timer);
     }
     if (!res.ok) {
-      throw new Error(`Failed to download the video (${res.status}).`);
+      throw new Error(`Échec du téléchargement de la vidéo (${res.status}).`);
     }
 
     const mimeType =

@@ -10,7 +10,7 @@ import { Analytics } from "@vercel/analytics/next";
 const SITE_URL = "https://www.bluminoo.com";
 const SITE_TITLE = "Bluminoo Studio";
 const SITE_DESCRIPTION =
-  "Create a hyper-realistic photo or video of the life you dream about — a place, a scene, a moment — and post it to your story to stun everyone you know.";
+  "Crée une photo ou une vidéo hyper-réaliste de la vie dont tu rêves — un lieu, une scène, un moment — et poste-la en story pour bluffer tout le monde.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_TITLE,
-    locale: "en_US",
+    locale: "fr_FR",
     type: "website",
   },
   twitter: {
@@ -72,7 +72,7 @@ export default function RootLayout({
     // suppressHydrationWarning : le script ci-dessus pose `data-intro` sur
     // <html> avant l'hydratation, donc le balisage rendu par le serveur et
     // celui trouvé par React diffèrent forcément sur cet attribut.
-    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+    <html lang="fr" className={GeistSans.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
       </head>

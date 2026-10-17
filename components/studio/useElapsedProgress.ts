@@ -14,10 +14,10 @@ export const IMAGE_EXPECTED_SECONDS = 30;
 const LOADING_MESSAGE_SECONDS = 2.6;
 
 export const GENERATION_LOADING_MESSAGES = [
-  "Analyzing the light…",
-  "Adjusting the reflections…",
-  "Adding the finishing touches…",
-  "Finalizing the render…",
+  "Analyse de la lumière…",
+  "Ajustement des reflets…",
+  "Dernières retouches…",
+  "Finalisation du rendu…",
 ];
 
 /**

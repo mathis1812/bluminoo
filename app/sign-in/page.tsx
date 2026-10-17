@@ -27,9 +27,9 @@ export default function SignInPage() {
 
       if (signInError) {
         if (signInError.status === 400) {
-          setError("Incorrect email or password.");
+          setError("E-mail ou mot de passe incorrect.");
         } else {
-          setError("Something went wrong, please try again in a moment.");
+          setError("Quelque chose a planté, réessaie dans un instant.");
         }
         return;
       }
@@ -40,7 +40,7 @@ export default function SignInPage() {
       router.push("/");
       router.refresh();
     } catch {
-      setError("Something went wrong, please try again in a moment.");
+      setError("Quelque chose a planté, réessaie dans un instant.");
     } finally {
       setLoading(false);
     }
@@ -50,10 +50,10 @@ export default function SignInPage() {
     <div className="animate-fade-up mx-auto max-w-md py-8">
       <div className="mb-8 text-center">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          Sign in
+          Connexion
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-          Welcome back
+          Content de te revoir
         </h2>
       </div>
 
@@ -64,7 +64,7 @@ export default function SignInPage() {
               htmlFor="email"
               className="mb-1.5 block text-xs font-medium uppercase tracking-[0.1em] text-neutral-400"
             >
-              Email
+              E-mail
             </label>
             <input
               id="email"
@@ -80,7 +80,7 @@ export default function SignInPage() {
               htmlFor="password"
               className="mb-1.5 block text-xs font-medium uppercase tracking-[0.1em] text-neutral-400"
             >
-              Password
+              Mot de passe
             </label>
             <input
               id="password"
@@ -103,14 +103,14 @@ export default function SignInPage() {
             disabled={loading}
             className="w-full rounded-2xl bg-snap px-4 py-3 text-sm font-semibold text-[#121212] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Connexion…" : "Me connecter"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-neutral-400">
-          Don&apos;t have an account yet?{" "}
+          Pas encore de compte ?{" "}
           <Link href="/sign-up" className="text-primary-soft hover:underline">
-            Sign up
+            Inscris-toi
           </Link>
         </p>
       </Panel>

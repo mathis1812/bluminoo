@@ -6,10 +6,10 @@ export default function ConfidentialitePage() {
     <div className="animate-fade-up mx-auto max-w-3xl py-8">
       <Panel className="p-6 sm:p-8">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          Privacy
+          Confidentialité
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-          Privacy policy
+          Politique de confidentialité
         </h2>
 
         <LegalIdentityNotice />
@@ -17,12 +17,11 @@ export default function ConfidentialitePage() {
         <div className="space-y-6 text-sm leading-relaxed text-neutral-400">
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              1. Data controller
+              1. Responsable du traitement
             </h3>
             <p>
-              The controller responsible for the processing of personal
-              data collected on Bluminoo Studio is Mathis Vergne, who can be
-              reached at{" "}
+              Le responsable du traitement des données à caractère personnel
+              collectées sur Bluminoo Studio est Mathis Vergne, joignable à{" "}
               <a
                 href="mailto:mathisvergne27@gmail.com"
                 className="text-primary-soft underline underline-offset-2 hover:text-primary"
@@ -35,111 +34,118 @@ export default function ConfidentialitePage() {
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              2. Data collected
+              2. Données collectées
             </h3>
             <ul className="list-disc space-y-1 pl-5">
               <li>
-                Email address and (hashed) password, when an account is
-                created.
+                Adresse e-mail et mot de passe (haché), lors de la création
+                d&apos;un compte.
               </li>
               <li>
-                Photos uploaded for image or video generation, temporarily
-                transmitted to third-party artificial intelligence
-                providers for processing (see section 4).
+                Photos téléversées pour la génération d&apos;images ou de
+                vidéos, transmises temporairement à des prestataires
+                d&apos;intelligence artificielle tiers pour traitement (voir
+                section 4).
               </li>
               <li>
-                Payment data (card number, etc.), collected and processed
-                directly by Stripe — never by Bluminoo Studio.
+                Données de paiement (numéro de carte, etc.), collectées et
+                traitées directement par Stripe — jamais par Bluminoo
+                Studio.
               </li>
               <li>
-                Credit balance and subscription history, associated with
-                your account.
+                Solde de crédits et historique d&apos;abonnement, associés à
+                votre compte.
               </li>
             </ul>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              3. Purposes of processing
+              3. Finalités du traitement
             </h3>
             <p>
-              This data is used to: create and secure your account, provide
-              the image/video generation service, manage your subscription
-              and credit balance, and respond to your support requests.
+              Ces données sont utilisées pour : créer et sécuriser votre
+              compte, fournir le service de génération d&apos;images/vidéos,
+              gérer votre abonnement et votre solde de crédits, et répondre
+              à vos demandes de support.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              4. Subprocessors and transfers
+              4. Sous-traitants et transferts
             </h3>
-            <p>The following providers process data on our behalf:</p>
+            <p>Les prestataires suivants traitent des données pour notre compte :</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>
-                <strong>Supabase</strong> — database hosting, account
-                authentication, and storage of the photos you upload as well
-                as your generation results.
+                <strong>Supabase</strong> — hébergement de la base de données,
+                authentification des comptes et stockage des photos que vous
+                téléversez ainsi que de vos résultats de génération.
               </li>
               <li>
-                <strong>Vercel</strong> — application hosting.
+                <strong>Vercel</strong> — hébergement de l&apos;application.
               </li>
               <li>
-                <strong>Stripe</strong> — payment and card data processing.
+                <strong>Stripe</strong> — traitement des paiements et des données bancaires.
               </li>
               <li>
-                <strong>Google</strong> — image generation through the Gemini
-                API (Nano Banana Pro / Gemini 3 Pro Image). The photos you
-                submit are sent to this provider for the time needed to
-                produce the result.
+                <strong>Google</strong> — génération des images via l&apos;API
+                Gemini (Nano Banana Pro / Gemini 3 Pro Image). Les photos que
+                vous soumettez sont transmises à ce prestataire le temps
+                nécessaire à la production du résultat.
               </li>
               <li>
-                <strong>fal.ai</strong> — video generation (Kling O1). The
-                videos you submit are sent to this provider for the time
-                needed to produce the result.
+                <strong>fal.ai</strong> — génération des vidéos (Kling O1). Les
+                contenus que vous soumettez sont transmis à ce prestataire
+                le temps nécessaire à la production du résultat.
               </li>
             </ul>
             <p className="mt-2">
-              Some of these providers may be located outside the European
-              Union (in particular in the United States); any resulting
-              data transfer relies on the safeguards provided by these
-              providers (standard contractual clauses or equivalent).
+              Certains de ces prestataires peuvent être situés hors de
+              l&apos;Union européenne (notamment aux États-Unis) ; le
+              transfert de données s&apos;appuie alors sur les garanties
+              prévues par ces prestataires (clauses contractuelles types ou
+              équivalent).
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              5. Retention period
+              5. Durée de conservation
             </h3>
             <p>
-              Account data is retained for as long as the account remains
-              active. Photos you upload for a generation are stored in our own
-              storage, associated with your account, and are transmitted to the
-              AI provider only for the duration of processing. They are
-              automatically deleted 7 days after they are uploaded. Successful
-              generation results (images and videos) are stored in your
-              Gallery, also associated with your account, and are kept until
-              your account is deleted. You may request the removal of either at
-              any time.
+              Les données de compte sont conservées tant que le compte est
+              actif. Les photos téléversées pour une génération sont
+              stockées dans notre propre espace de stockage, associées à
+              votre compte, et ne sont transmises aux prestataires d&apos;IA
+              que le temps du traitement. Elles sont supprimées
+              automatiquement 7 jours après leur téléversement. Les
+              résultats de génération réussis (images et vidéos) sont
+              conservés dans votre Galerie, également associée à votre
+              compte, jusqu&apos;à la suppression de celui-ci. Vous pouvez
+              demander la suppression des unes comme des autres à tout
+              moment.
             </p>
           </section>
 
           <section>
             <h3 className="mb-2 text-base font-semibold text-neutral-100">
-              6. Your rights
+              6. Vos droits
             </h3>
             <p>
-              In accordance with the GDPR, you have the right to access,
-              rectify, erase, restrict, and object to the processing of
-              your personal data, as well as a right to data portability.
-              You may exercise these rights by contacting us at{" "}
+              Conformément au RGPD, vous disposez d&apos;un droit
+              d&apos;accès, de rectification, d&apos;effacement, de limitation
+              et d&apos;opposition concernant vos données personnelles, ainsi
+              que d&apos;un droit à la portabilité. Vous pouvez exercer ces
+              droits en nous contactant à{" "}
               <a
                 href="mailto:mathisvergne27@gmail.com"
                 className="text-primary-soft underline underline-offset-2 hover:text-primary"
               >
                 mathisvergne27@gmail.com
               </a>
-              . You also have the right to lodge a complaint with the CNIL
-              (www.cnil.fr).
+              . Vous disposez également du droit d&apos;introduire une
+              réclamation auprès de la CNIL (www.cnil.fr).
             </p>
           </section>
 
@@ -148,10 +154,10 @@ export default function ConfidentialitePage() {
               7. Cookies
             </h3>
             <p>
-              The site only uses technical cookies that are strictly
-              necessary for the service to function (maintaining your login
-              session via Supabase). No advertising or third-party tracking
-              cookies are used.
+              Le site utilise uniquement des cookies techniques strictement
+              nécessaires au fonctionnement du service (maintien de votre
+              session de connexion via Supabase). Aucun cookie publicitaire
+              ou de traçage tiers n&apos;est utilisé.
             </p>
           </section>
         </div>

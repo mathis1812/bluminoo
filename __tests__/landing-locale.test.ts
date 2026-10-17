@@ -7,9 +7,10 @@ describe("resolveLocale", () => {
     expect(resolveLocale("fr", "en-US")).toBe("fr");
   });
 
-  it("ignore un cookie absent ou invalide", () => {
+  it("sans choix explicite, tout le monde est en francais (lancement FR)", () => {
     expect(resolveLocale(undefined, "fr-FR")).toBe("fr");
-    expect(resolveLocale("de", "en-US")).toBe("en");
+    expect(resolveLocale(undefined, "en-US")).toBe("fr");
+    expect(resolveLocale("de", "en-US")).toBe("fr");
   });
 });
 

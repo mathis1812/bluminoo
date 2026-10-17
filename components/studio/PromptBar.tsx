@@ -14,14 +14,19 @@ import {
 } from "@/lib/generation-tiers";
 import type { PlanId } from "@/lib/stripe";
 
-const PROMPT_PLACEHOLDER = "Describe the scene you want…";
+const MODE_LABEL: Record<GenerationMode, string> = {
+  photo: "Photo",
+  video: "Vidéo",
+};
+
+const PROMPT_PLACEHOLDER = "Décris la scène que tu veux…";
 /**
  * Placeholder court pour l'état plié : le champ y est étroit (Templates
  * occupe la gauche), et la phrase longue passait sur deux lignes en se
  * coupant. Le modèle fait pareil — « Modifier… » plié, phrase entière
  * déplié.
  */
-const PROMPT_PLACEHOLDER_SHORT = "Edit…";
+const PROMPT_PLACEHOLDER_SHORT = "Modifier…";
 
 /**
  * Panneau d'aide, ouvert par le (i) en haut à droite du champ. Sur le
@@ -30,10 +35,10 @@ const PROMPT_PLACEHOLDER_SHORT = "Edit…";
  * ici et pas dans un composant de bulle séparé. Contenu traduit du modèle,
  * pas inventé.
  */
-const HELP_TITLE = "For a better result";
+const HELP_TITLE = "Pour un meilleur résultat";
 const HELP_LINES = [
-  "Just describe what you want to change, nothing else. The rest of the image is preserved automatically.",
-  "Also use a sharp, well-lit and well-framed photo: it makes all the difference.",
+  "Décris juste ce que tu veux changer, rien d'autre. Le reste de l'image est conservé automatiquement.",
+  "Utilise aussi une photo nette, bien éclairée et bien cadrée : ça change tout.",
 ];
 
 /**
@@ -216,7 +221,7 @@ export default function PromptBar({
           disabled={!hasTemplates || showTools}
           className="mr-2 flex h-16 w-max shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-snap px-5 text-[15px] font-semibold text-[#121212] transition active:opacity-70 disabled:pointer-events-none disabled:opacity-40"
         >
-          Templates
+          Modèles
         </button>
       </div>
 
@@ -254,7 +259,7 @@ export default function PromptBar({
               </div>
               <button
                 type="button"
-                aria-label="Close"
+                aria-label="Fermer"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setInfoOpen(false)}
                 className="absolute right-3.5 top-4 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-primary-deep text-white transition active:opacity-70"
@@ -286,7 +291,7 @@ export default function PromptBar({
               placeholder={
                 showTools ? PROMPT_PLACEHOLDER : PROMPT_PLACEHOLDER_SHORT
               }
-              aria-label="Describe the scene you want"
+              aria-label="Décris la scène que tu veux"
               // transition-[min-height] : sur le modèle, c'est la barre qui
               // grandit en douceur (550ms) qui donne l'impression que les
               // outils "montent" en apparaissant — eux ne font qu'un fondu
@@ -304,7 +309,7 @@ export default function PromptBar({
             {showTools && (
               <button
                 type="button"
-                aria-label="How to get a better result"
+                aria-label="Comment obtenir un meilleur résultat"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setInfoOpen(true)}
                 className="animate-tools-in absolute right-2 top-[10px] z-20 flex h-10 w-10 items-center justify-center text-white/45 transition active:opacity-70"
@@ -323,7 +328,7 @@ export default function PromptBar({
                 type="button"
                 onClick={onGenerate}
                 disabled={!canSubmit}
-                aria-label={`Generate for ${cost} credits`}
+                aria-label={`Générer pour ${cost} crédits`}
                 className="absolute right-1.5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-[#333333] p-1.5 transition active:opacity-70 disabled:opacity-60"
               >
                 <span className="flex h-full w-full items-center justify-center rounded-full bg-white/15 text-white">
@@ -375,7 +380,7 @@ export default function PromptBar({
                   <div
                     className="flex h-12 shrink-0 items-center rounded-full bg-[#333333] p-1"
                     role="radiogroup"
-                    aria-label="Generation mode"
+                    aria-label="Mode de génération"
                   >
                     {(["photo", "video"] as const).map((m) => {
                       const active = mode === m;
@@ -391,7 +396,7 @@ export default function PromptBar({
                           aria-hidden={collapsed || undefined}
                           tabIndex={collapsed ? -1 : undefined}
                           title={
-                            locked ? "Video is available on Pro and Max" : undefined
+                            locked ? "La vidéo est disponible avec Pro et Max" : undefined
                           }
                           onClick={() => setMode(m)}
                           className={`flex h-10 min-w-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full text-[14px] font-semibold capitalize transition-[max-width,padding,background-color,color] duration-[400ms,400ms,300ms,300ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),ease,ease] ${
@@ -406,7 +411,7 @@ export default function PromptBar({
                                 : "text-white/40 active:opacity-70"
                           }`}
                         >
-                          {m}
+                          {MODE_LABEL[m]}
                           {locked && (
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
                               <rect width="14" height="10" x="5" y="11" rx="2" />
@@ -428,8 +433,8 @@ export default function PromptBar({
                     aria-label={
                       resolutionOpen
                         ? isVideo
-                          ? "Video duration"
-                          : "Image resolution"
+                          ? "Durée de la vidéo"
+                          : "Résolution de l'image"
                         : undefined
                     }
                   >
@@ -461,8 +466,8 @@ export default function PromptBar({
                                 "aria-haspopup": true,
                                 "aria-expanded": false,
                                 "aria-label": isVideo
-                                  ? `Duration: ${label}`
-                                  : `Resolution: ${label}`,
+                                  ? `Durée : ${label}`
+                                  : `Résolution : ${label}`,
                               })}
                           className={`flex h-10 min-w-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full text-[14px] font-semibold tabular-nums transition-[max-width,padding,background-color,color] duration-[400ms,400ms,300ms,300ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),ease,ease] ${
                             collapsed
@@ -498,7 +503,7 @@ export default function PromptBar({
                   type="button"
                   onClick={onGenerate}
                   disabled={!canSubmit}
-                  aria-label={`Generate for ${cost} credits`}
+                  aria-label={`Générer pour ${cost} crédits`}
                   className="flex h-12 shrink-0 items-center gap-1.5 rounded-full bg-[#333333] pl-3.5 pr-1.5 transition active:opacity-70 disabled:opacity-60"
                 >
                   <span className="flex items-center gap-1 text-[15px] font-bold tabular-nums text-white">

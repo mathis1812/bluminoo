@@ -62,17 +62,17 @@ export default function EditPanel({
         body: JSON.stringify({
           sourceImageUrl: sourceUrl,
           editPrompt: trimmed,
-          label: label ? `${label} — edit` : "Edit",
+          label: label ? `${label} — retouche` : "Retouche",
         }),
       });
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Edit failed. Please try again.");
+        setError(data?.error || "La retouche a échoué. Réessaie.");
         return;
       }
       if (!data?.imageUrl) {
-        setError("Unexpected response from the server. Please try again.");
+        setError("Réponse inattendue du serveur. Réessaie.");
         return;
       }
       setDescription("");
@@ -81,7 +81,7 @@ export default function EditPanel({
       setError(
         err instanceof Error
           ? err.message
-          : "Network error during the edit. Check your connection.",
+          : "Erreur réseau pendant la retouche. Vérifie ta connexion.",
       );
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export default function EditPanel({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={sourceUrl}
-          alt="Image being edited"
+          alt="Image en cours de retouche"
           className="h-auto w-full object-contain"
         />
 
@@ -128,8 +128,8 @@ export default function EditPanel({
         maxLength={500}
         rows={2}
         disabled={loading}
-        placeholder="Describe what you want to change…"
-        aria-label="Describe what you want to change"
+        placeholder="Décris ce que tu veux changer…"
+        aria-label="Décris ce que tu veux changer"
         className="w-full resize-none rounded-2xl bg-white/5 px-4 py-3 text-[15px] leading-snug text-white outline-none ring-1 ring-white/10 placeholder:text-white/40 focus:ring-white/25 disabled:opacity-60"
       />
 
@@ -146,7 +146,7 @@ export default function EditPanel({
           disabled={loading}
           className="h-11 rounded-full px-5 text-[15px] font-semibold text-white/70 transition-opacity active:opacity-70 disabled:opacity-40"
         >
-          Cancel
+          Annuler
         </button>
 
         <button
@@ -155,7 +155,7 @@ export default function EditPanel({
           disabled={!canSubmit}
           className="flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[15px] font-semibold text-black transition-opacity active:opacity-80 disabled:opacity-40"
         >
-          {loading ? "Editing…" : "Edit"}
+          {loading ? "Retouche…" : "Retoucher"}
           <span aria-hidden>·</span>
           <span>{EDIT_COST}</span>
         </button>
