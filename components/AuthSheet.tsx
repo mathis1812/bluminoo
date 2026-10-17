@@ -37,18 +37,18 @@ const COPY: Record<
   { title: string; subtitle: string; action: string; pending: string; switchTo: string }
 > = {
   signin: {
-    title: "Sign in",
-    subtitle: "Enter your email and password to open your studio.",
-    action: "Sign in",
-    pending: "Signing in…",
-    switchTo: "Create an account",
+    title: "Connexion",
+    subtitle: "Entre ton e-mail et ton mot de passe pour ouvrir ton studio.",
+    action: "Me connecter",
+    pending: "Connexion…",
+    switchTo: "Créer un compte",
   },
   signup: {
-    title: "Create your account",
-    subtitle: "Pick an email and a password, and your studio is ready.",
-    action: "Create my account",
-    pending: "Creating…",
-    switchTo: "I already have an account",
+    title: "Crée ton compte",
+    subtitle: "Choisis un e-mail et un mot de passe, ton studio est prêt.",
+    action: "Créer mon compte",
+    pending: "Création…",
+    switchTo: "J'ai déjà un compte",
   },
 };
 
@@ -111,8 +111,8 @@ export default function AuthSheet() {
         if (signInError) {
           setError(
             signInError.status === 400
-              ? "Incorrect email or password."
-              : "Something went wrong, please try again in a moment.",
+              ? "E-mail ou mot de passe incorrect."
+              : "Quelque chose a planté, réessaie dans un instant.",
           );
           return;
         }
@@ -125,8 +125,8 @@ export default function AuthSheet() {
         if (signUpError) {
           setError(
             signUpError.message.toLowerCase().includes("password")
-              ? "Password must be at least 6 characters long."
-              : "Something went wrong, please try again in a moment.",
+              ? "Le mot de passe doit faire au moins 6 caractères."
+              : "Quelque chose a planté, réessaie dans un instant.",
           );
           return;
         }
@@ -136,7 +136,7 @@ export default function AuthSheet() {
         // tableau d'identités vide. Sans ce contrôle, un doublon passerait
         // pour une inscription réussie.
         if (data.user?.identities && data.user.identities.length === 0) {
-          setError("This email address is already linked to an account.");
+          setError("Cette adresse e-mail est déjà liée à un compte.");
           return;
         }
       }
@@ -150,7 +150,7 @@ export default function AuthSheet() {
       router.push("/");
       router.refresh();
     } catch {
-      setError("Something went wrong, please try again in a moment.");
+      setError("Quelque chose a planté, réessaie dans un instant.");
     } finally {
       setLoading(false);
     }
@@ -164,7 +164,7 @@ export default function AuthSheet() {
     <div className="fixed inset-0 z-[100]">
       <button
         type="button"
-        aria-label="Close"
+        aria-label="Fermer"
         onClick={close}
         className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-md"
       />
@@ -183,7 +183,7 @@ export default function AuthSheet() {
         <button
           type="button"
           onClick={close}
-          aria-label="Close"
+          aria-label="Fermer"
           className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition active:opacity-70"
         >
           <svg
@@ -217,8 +217,8 @@ export default function AuthSheet() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@email.com"
-            aria-label="Email"
+            placeholder="toi@email.com"
+            aria-label="E-mail"
             className="h-14 w-full rounded-3xl border-[1.5px] border-white/15 bg-black/30 px-4 text-base text-white caret-white outline-none placeholder:text-white/35 focus:border-white/40"
           />
           <input
@@ -231,8 +231,8 @@ export default function AuthSheet() {
             }
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            aria-label="Password"
+            placeholder="Mot de passe"
+            aria-label="Mot de passe"
             className="h-14 w-full rounded-3xl border-[1.5px] border-white/15 bg-black/30 px-4 text-base text-white caret-white outline-none placeholder:text-white/35 focus:border-white/40"
           />
 
@@ -263,21 +263,21 @@ export default function AuthSheet() {
         </button>
 
         <p className="mt-5 text-center text-[13px] leading-[1.5] text-white/35">
-          By continuing, you agree to our{" "}
+          En continuant, tu acceptes nos{" "}
           <Link
             href="/terms"
             onClick={close}
             className="underline underline-offset-2"
           >
-            Terms
+            CGU
           </Link>{" "}
-          and{" "}
+          et notre{" "}
           <Link
             href="/privacy"
             onClick={close}
             className="underline underline-offset-2"
           >
-            Privacy Policy
+            Politique de confidentialité
           </Link>
           .
         </p>

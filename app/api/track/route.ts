@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as TrackBody;
   } catch {
     return NextResponse.json(
-      { error: "Invalid request: unreadable JSON body." },
+      { error: "Requête invalide : corps JSON illisible." },
       { status: 400 },
     );
   }
@@ -45,14 +45,14 @@ export async function POST(req: NextRequest) {
 
   if (!event || !ALLOWED_EVENT_TYPES.includes(event as EventType)) {
     return NextResponse.json(
-      { error: "Invalid event type." },
+      { error: "Type d'événement invalide." },
       { status: 400 },
     );
   }
 
   if (ctaId && !ALLOWED_CTA_IDS.includes(ctaId as CtaId)) {
     return NextResponse.json(
-      { error: "Invalid CTA identifier." },
+      { error: "Identifiant de CTA invalide." },
       { status: 400 },
     );
   }
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     return NextResponse.json(
-      { error: "Unable to record the event." },
+      { error: "Impossible d'enregistrer l'événement." },
       { status: 500 },
     );
   }

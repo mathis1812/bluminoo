@@ -30,7 +30,7 @@ export default function TemplateHeader({
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex max-w-app items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+12px)]">
       <Link
         href={backHref}
-        aria-label="Back"
+        aria-label="Retour"
         className="pointer-events-auto flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#2d2d2d] bg-[#161616] text-white transition active:opacity-80"
       >
         <svg

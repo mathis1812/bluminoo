@@ -1,7 +1,10 @@
 /**
- * Langue et devise du visiteur, une seule regle pour toute l'app : le bouton
- * FR/EN de la landing (cookie) l'emporte, sinon la langue preferee du
- * navigateur. Francais → euros, le reste → dollars.
+ * Langue et devise du visiteur, une seule regle pour toute l'app.
+ *
+ * Lancement France : tout le monde est en francais, paie en euros, au mois.
+ * Le bouton FR/EN de la landing (cookie) ne change que la langue de la
+ * landing. Pour relancer les US : remettre la detection par le navigateur
+ * dans resolveLocale et le dollar dans currencyForLocale.
  *
  * Module pur (ni React ni Stripe) : importe aussi bien par les pages
  * serveur, la route de paiement que les composants client.
@@ -19,15 +22,20 @@ export function localeFromAcceptLanguage(header: string | null): Locale {
   return first.startsWith("fr") ? "fr" : "en";
 }
 
-/** Le bouton FR/EN l'emporte sur la langue du telephone ; valeur inconnue ignoree. */
+/**
+ * Le bouton FR/EN l'emporte ; sinon francais pour tous, quelle que soit la
+ * langue du telephone (lancement France). `acceptLanguage` reste en
+ * parametre pour la relance US : localeFromAcceptLanguage(acceptLanguage).
+ */
 export function resolveLocale(
   cookie: string | undefined,
   acceptLanguage: string | null,
 ): Locale {
   if (cookie === "fr" || cookie === "en") return cookie;
-  return localeFromAcceptLanguage(acceptLanguage);
+  return "fr";
 }
 
+/** Euros pour tous pendant le lancement France, meme sur la landing EN. */
 export function currencyForLocale(locale: Locale): Currency {
-  return locale === "fr" ? "eur" : "usd";
+  return "eur";
 }

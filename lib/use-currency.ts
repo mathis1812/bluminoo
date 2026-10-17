@@ -12,12 +12,12 @@ import {
  * Devise a afficher dans les composants client, avec la meme regle que la
  * route de paiement (lib/locale.ts) : le prix affiche est celui facture.
  *
- * Demarre en dollars, comme le rendu serveur, puis bascule apres montage :
+ * Demarre en euros (lancement France), puis relit apres montage :
  * lire cookie et langue du navigateur pendant le rendu casserait
  * l'hydratation.
  */
 export function useCurrency(): Currency {
-  const [currency, setCurrency] = useState<Currency>("usd");
+  const [currency, setCurrency] = useState<Currency>("eur");
 
   useEffect(() => {
     const cookie = document.cookie

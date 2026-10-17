@@ -41,7 +41,7 @@ export default function RechargeSheet({
     <div className="fixed inset-0 z-[100]">
       <button
         type="button"
-        aria-label="Close"
+        aria-label="Fermer"
         onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-md"
       />
@@ -49,7 +49,7 @@ export default function RechargeSheet({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Recharge"
+        aria-label="Recharger"
         // pt sur la racine, et non sur la bannière : la poignée et le bouton
         // de fermeture sont positionnés en absolu par rapport à celle-ci, donc
         // la rembourrer les décollerait de l'image qu'ils doivent survoler.
@@ -76,7 +76,7 @@ export default function RechargeSheet({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label="Fermer"
             className="absolute right-6 top-6 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white backdrop-blur-md transition active:opacity-70"
           >
             <svg

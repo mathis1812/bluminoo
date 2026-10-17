@@ -30,7 +30,7 @@ export default function TemplateShelf() {
       {featured && (
         <Link
           href={`/templates/category/${featured.slug}`}
-          aria-label={`${featured.title} — see all templates`}
+          aria-label={`${featured.title} — voir tous les modèles`}
           // aspect-video et non 4/3 : la vedette du modèle est un bandeau
           // 16/9, nettement moins haut que ce qui était posé ici.
           // `md:aspect-[21/9]` : a la largeur du cadre sur ordinateur, un
@@ -68,7 +68,7 @@ export default function TemplateShelf() {
             {featured.title}
           </span>
           <span className="absolute right-2.5 top-2.5 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-[13px] font-semibold text-white backdrop-blur-md">
-            Try it
+            Essayer
           </span>
         </Link>
       )}
@@ -85,7 +85,7 @@ export default function TemplateShelf() {
               href={`/templates/category/${category.slug}`}
               className="flex shrink-0 items-center gap-0.5 text-[13px] font-medium text-[#8e8e8e] transition active:opacity-70"
             >
-              See all
+              Tout voir
               <svg
                 aria-hidden
                 viewBox="0 0 24 24"

@@ -2,23 +2,23 @@ import Panel from "@/components/Panel";
 
 const FAQ_ITEMS = [
   {
-    question: "How does integration into a real location work?",
+    question: "Comment fonctionne l'intégration dans un lieu réel ?",
     answer:
-      "Add 1 to 3 photos of the place you want to appear in (a restaurant, a rooftop, anywhere you have a picture of). Bluminoo Studio analyzes the light, materials, and mood of the location to blend you into it photorealistically, with no need to write a detailed description.",
+      "Ajoute 1 à 3 photos du lieu où tu veux apparaître (un restaurant, un rooftop, n'importe quel endroit dont tu as une image). Bluminoo Studio analyse la lumière, les matériaux et l'ambiance du lieu pour t'y intégrer de façon photoréaliste, sans avoir à écrire de description détaillée.",
   },
   {
-    question: "Which photo formats are accepted?",
+    question: "Quels formats de photo sont acceptés ?",
     answer:
-      "JPG, PNG, and WebP, up to 10 MB. Images larger than 2 MB are automatically compressed before upload.",
+      "JPG, PNG et WebP, jusqu'à 10 Mo. Les images plus lourdes que 2 Mo sont automatiquement compressées avant l'envoi.",
   },
   {
-    question: "How long does a generation take?",
-    answer: "About 30 seconds.",
+    question: "Combien de temps prend une génération ?",
+    answer: "Environ 30 secondes.",
   },
   {
-    question: "Are my photos kept?",
+    question: "Mes photos sont-elles conservées ?",
     answer:
-      "Your successful renders are saved to your Gallery, tied to your account — accessible from any device once signed in. The privacy policy details the subprocessors used to handle your photos.",
+      "Tes rendus réussis sont sauvegardés dans ta Galerie, associée à ton compte — accessibles depuis n'importe quel appareil après connexion. La politique de confidentialité détaille les sous-traitants utilisés pour le traitement des photos.",
   },
 ];
 
@@ -27,19 +27,20 @@ export default function AProposPage() {
     <div className="animate-fade-up mx-auto max-w-3xl py-8">
       <Panel className="mb-6 p-6 sm:p-8">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          About
+          À propos
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
           Bluminoo Studio
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-neutral-400">
-          Bluminoo Studio turns a photo into an ultra-realistic scene,
-          designed to impress everyone around you. Describe the setting you
-          want and the AI places you in it, preserving your face, your pose
-          and the light of the original shot — ready to post to your story.
+          Bluminoo Studio transforme une photo en scène de vie
+          ultra-réaliste, pensée pour impressionner ton entourage. Décris le
+          décor de ton choix et l&apos;IA t&apos;y place, en préservant ton
+          visage, ta pose et la lumière de la photo d&apos;origine — prête à
+          poster en story.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-          Powered by Gemini 3 Pro Image (Google API).
+          Propulsé par Gemini 3 Pro Image (API Google).
         </p>
       </Panel>
 
@@ -66,7 +67,7 @@ export default function AProposPage() {
           Contact
         </h3>
         <p className="text-sm text-neutral-500">
-          A question, a problem?{" "}
+          Une question, un problème ?{" "}
           <a
             href="mailto:mathisvergne27@gmail.com"
             className="text-primary-soft underline underline-offset-2 hover:text-primary"

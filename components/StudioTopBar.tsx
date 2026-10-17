@@ -58,7 +58,7 @@ export default function StudioTopBar({
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            aria-label="Open the menu"
+            aria-label="Ouvrir le menu"
             aria-haspopup="dialog"
             aria-expanded={menuOpen}
             className="pointer-events-auto flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#2d2d2d] bg-[#161616] text-white transition active:opacity-80"
@@ -78,7 +78,7 @@ export default function StudioTopBar({
           <button
             type="button"
             onClick={() => setAccountOpen(true)}
-            aria-label="Your account"
+            aria-label="Ton compte"
             aria-haspopup="dialog"
             aria-expanded={accountOpen}
             className="pointer-events-auto flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#2d2d2d] bg-[#161616] text-[15px] font-semibold text-white transition active:opacity-80"
@@ -117,8 +117,8 @@ export default function StudioTopBar({
           onClick={() => setRechargeOpen(true)}
           aria-label={
             credits !== null
-              ? `${credits} credits — see the plans`
-              : "Your credits — see the plans"
+              ? `${credits} crédits — voir les formules`
+              : "Tes crédits — voir les formules"
           }
           aria-haspopup="dialog"
           className="pointer-events-auto flex h-[42px] w-[92px] shrink-0 items-center justify-center gap-1 rounded-full border border-[#2d2d2d] bg-[#161616] text-white transition active:opacity-80"
@@ -140,7 +140,7 @@ export default function StudioTopBar({
                 changement de crédits, les chiffres n'ayant pas la même
                 largeur dans Geist. */}
             <span className="text-[15px] font-semibold tabular-nums">
-              {credits !== null ? credits.toLocaleString("en-US") : "—"}
+              {credits !== null ? credits.toLocaleString("fr-FR") : "—"}
             </span>
           </button>
       </header>

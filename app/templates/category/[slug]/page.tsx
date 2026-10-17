@@ -22,7 +22,7 @@ export function generateMetadata({ params }: Props): Metadata {
   if (!category) return {};
   return {
     title: `${category.title} — Bluminoo`,
-    description: `${category.title} templates: pick a look, upload your photo, generate.`,
+    description: `Modèles ${category.title} : choisis un style, importe ta photo, génère.`,
   };
 }
 
@@ -80,7 +80,7 @@ export default function TemplateCategoryPage({ params }: Props) {
             >
               <path d="M12 5v14M5 12h14" />
             </svg>
-            <span className="text-[14px] font-medium">Other</span>
+            <span className="text-[14px] font-medium">Autre</span>
           </Link>
         </div>
       </div>

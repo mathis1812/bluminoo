@@ -149,7 +149,7 @@ describe("shareToSnapchat", () => {
 
     expect(state.sharing).toBe(false);
     expect(state.error).toBe(
-      "File sharing isn't supported by this browser.",
+      "Le partage de fichiers n'est pas pris en charge par ce navigateur.",
     );
   });
 
@@ -162,7 +162,7 @@ describe("shareToSnapchat", () => {
 
     expect(state.sharing).toBe(false);
     expect(state.error).toBe(
-      "The result can't be prepared for sharing.",
+      "Le résultat ne peut pas être préparé pour le partage.",
     );
   });
 });
@@ -279,7 +279,7 @@ describe("sendAsRedSnap", () => {
 
     expect(state.sendingRedSnap).toBe(false);
     expect(state.error).toBe(
-      "File sharing isn't supported by this browser.",
+      "Le partage de fichiers n'est pas pris en charge par ce navigateur.",
     );
     expect(redirectFn).not.toHaveBeenCalled();
   });
@@ -293,7 +293,7 @@ describe("sendAsRedSnap", () => {
     });
 
     expect(state.sendingRedSnap).toBe(false);
-    expect(state.error).toBe("The result can't be prepared.");
+    expect(state.error).toBe("Le résultat ne peut pas être préparé.");
     expect(redirectFn).not.toHaveBeenCalled();
   });
 });

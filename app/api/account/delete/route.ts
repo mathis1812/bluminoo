@@ -26,7 +26,7 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sign in to delete your account." },
+      { error: "Connecte-toi pour supprimer ton compte." },
       { status: 401 },
     );
   }

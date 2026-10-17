@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as GenerateBody;
   } catch {
     return NextResponse.json(
-      { error: "Invalid request: unreadable JSON body." },
+      { error: "Requête invalide : corps JSON illisible." },
       { status: 400 },
     );
   }
@@ -168,14 +168,14 @@ export async function POST(req: NextRequest) {
   if (isEditRequest) {
     if (typeof templateSlug === "string" && templateSlug.trim()) {
       return NextResponse.json(
-        { error: "An edit cannot also request a template." },
+        { error: "Une retouche ne peut pas demander un template en même temps." },
         { status: 400 },
       );
     }
     if (editRequest.length > MAX_EDIT_PROMPT_LENGTH) {
       return NextResponse.json(
         {
-          error: `Description too long (max ${MAX_EDIT_PROMPT_LENGTH} characters).`,
+          error: `Description trop longue (${MAX_EDIT_PROMPT_LENGTH} caractères maximum).`,
         },
         { status: 400 },
       );
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
     );
     if (!resolved) {
       return NextResponse.json(
-        { error: "Unknown template. Pick one from the templates list." },
+        { error: "Template inconnu. Choisis-en un dans la liste des templates." },
         { status: 400 },
       );
     }
@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
 
   if (!sourceImageUrl || typeof sourceImageUrl !== "string") {
     return NextResponse.json(
-      { error: "Missing image. Upload a photo and try again." },
+      { error: "Image manquante. Envoie une photo et réessaie." },
       { status: 400 },
     );
   }
@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
 
   if (placeUrls.length > MAX_PLACE_IMAGES) {
     return NextResponse.json(
-      { error: `Maximum ${MAX_PLACE_IMAGES} place photos.` },
+      { error: `${MAX_PLACE_IMAGES} photos de lieu maximum.` },
       { status: 400 },
     );
   }
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sign in to generate an image." },
+      { error: "Connecte-toi pour générer une image." },
       { status: 401 },
     );
   }
@@ -309,7 +309,7 @@ export async function POST(req: NextRequest) {
       requested === "high" || requested === "max" ? requested : "normal";
     if (!isQualityOpen(quality, planId)) {
       return NextResponse.json(
-        { error: "This resolution isn't included in your plan." },
+        { error: "Cette résolution n'est pas incluse dans ton offre." },
         { status: 403 },
       );
     }
@@ -337,7 +337,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Failed to check credits:", err);
     return NextResponse.json(
-      { error: "Internal error while checking credits." },
+      { error: "Erreur interne lors de la vérification des crédits." },
       { status: 500 },
     );
   }
@@ -473,9 +473,9 @@ export async function POST(req: NextRequest) {
     const message =
       err instanceof Error
         ? err.message
-        : "Unknown error while generating the image.";
+        : "Erreur inconnue pendant la génération de l'image.";
     return NextResponse.json(
-      { error: `Gemini generation service error. ${message}` },
+      { error: `Erreur du service de génération Gemini. ${message}` },
       { status: 502 },
     );
   }
@@ -489,7 +489,7 @@ export async function POST(req: NextRequest) {
       user.id,
       bytes,
       mimeType,
-      label?.trim() || "Image generation",
+      label?.trim() || "Génération d'image",
     );
     return NextResponse.json({ imageUrl });
   } catch (err) {

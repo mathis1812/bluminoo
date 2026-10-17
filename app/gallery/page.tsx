@@ -36,7 +36,7 @@ export default async function GalleryPage() {
 
   return (
     <>
-      <TemplateHeader backHref="/" title="Gallery" />
+      <TemplateHeader backHref="/" title="Galerie" />
 
       <div className="animate-fade-up flex min-h-dvh flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
         {entries && entries.length > 0 ? (
@@ -44,10 +44,10 @@ export default async function GalleryPage() {
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
             <p className="text-[17px] font-semibold text-white">
-              Nothing here yet
+              Rien ici pour l’instant
             </p>
             <p className="max-w-[280px] text-[14px] leading-snug text-white/50">
-              Every successful generation is saved here automatically.
+              Chaque génération réussie est enregistrée ici automatiquement.
             </p>
           </div>
         )}

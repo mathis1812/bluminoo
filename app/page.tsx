@@ -67,7 +67,7 @@ export default function Home() {
         planId={account.planId}
         email={account.userEmail}
         accountInitial={account.accountInitial}
-        title={screen === "templates" ? "Templates" : undefined}
+        title={screen === "templates" ? "Modèles" : undefined}
         onNavigateStudio={() => setScreen("studio")}
         onNavigateTemplates={() => setScreen("templates")}
         currentScreen={screen}
@@ -117,7 +117,7 @@ export default function Home() {
             {viewerOpen && studio.result && studio.resultKind !== "video" && (
               <ResultViewer
                 resultUrl={studio.result}
-                alt="Your generated scene"
+                alt="Ta scène générée"
                 hasRedSnap={account.hasRedSnap}
                 canShare={canShare}
                 onReset={studio.reset}

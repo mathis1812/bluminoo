@@ -56,7 +56,7 @@ function readFileAsDataUrl(file: File | Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error("Unable to read the file."));
+    reader.onerror = () => reject(new Error("Impossible de lire le fichier."));
     reader.readAsDataURL(file);
   });
 }
@@ -156,7 +156,7 @@ function encodeAtStep(
   canvas.width = Math.round(width * scale);
   canvas.height = Math.round(height * scale);
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Compression failed (canvas unavailable).");
+  if (!ctx) throw new Error("Échec de la compression (canvas indisponible).");
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
   return canvas.toDataURL("image/jpeg", quality);
@@ -174,7 +174,7 @@ async function compressImage(file: File): Promise<PreparedImage> {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("Unreadable image."));
+      image.onerror = () => reject(new Error("Image illisible."));
       image.src = objectUrl;
     });
 
@@ -282,7 +282,7 @@ export async function uploadImage(file: File): Promise<string> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    throw new Error("Please sign in before uploading a photo.");
+    throw new Error("Connecte-toi avant d'envoyer une photo.");
   }
 
   const path = `${user.id}/${crypto.randomUUID()}.${extensionForMimeType(file.type)}`;
@@ -290,14 +290,14 @@ export async function uploadImage(file: File): Promise<string> {
     .from(UPLOAD_BUCKET)
     .upload(path, file, { contentType: file.type });
   if (error) {
-    throw new Error(error.message || "Image upload failed.");
+    throw new Error(error.message || "Échec de l'envoi de l'image.");
   }
 
   const { data, error: signError } = await supabase.storage
     .from(UPLOAD_BUCKET)
     .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
   if (signError || !data?.signedUrl) {
-    throw new Error(signError?.message || "Image upload failed.");
+    throw new Error(signError?.message || "Échec de l'envoi de l'image.");
   }
   return data.signedUrl;
 }
@@ -307,7 +307,7 @@ export async function prepareAndUpload(image: PreparedImage): Promise<string> {
   const blob = await (await fetch(image.previewUrl)).blob();
   if (blob.size > MAX_UPLOAD_BYTES) {
     throw new Error(
-      "Image too large after compression (max 4MB). Try a simpler photo.",
+      "Image trop lourde après compression (4 Mo maximum). Essaie une photo plus simple.",
     );
   }
   return uploadImage(new File([blob], "photo.jpg", { type: image.mimeType }));

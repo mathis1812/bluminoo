@@ -77,7 +77,7 @@ async function downloadImage(
 ): Promise<{ mimeType: string; bytes: Buffer }> {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`Failed to download the reference image (${res.status}).`);
+    throw new Error(`Échec du téléchargement de l'image de référence (${res.status}).`);
   }
   const mimeType = res.headers.get("content-type") || "image/png";
   const bytes = Buffer.from(await res.arrayBuffer());
@@ -201,7 +201,7 @@ export async function generateGeminiImage(
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       throw new Error(
-        `Gemini generation timed out after ${Math.round(timeoutMs / 1000)}s. Please try again.`,
+        `La génération Gemini a dépassé ${Math.round(timeoutMs / 1000)} s. Réessaie.`,
       );
     }
     throw err;
@@ -215,24 +215,24 @@ export async function generateGeminiImage(
     json = JSON.parse(raw);
   } catch {
     throw new Error(
-      `Unreadable Gemini response (HTTP ${res.status}): ${raw.slice(0, 300) || "(empty body)"}`,
+      `Réponse Gemini illisible (HTTP ${res.status}) : ${raw.slice(0, 300) || "(corps vide)"}`,
     );
   }
 
   if (!res.ok) {
-    throw new Error(`Gemini API error (${res.status}): ${raw.slice(0, 300)}`);
+    throw new Error(`Erreur de l'API Gemini (${res.status}) : ${raw.slice(0, 300)}`);
   }
 
   if (json.promptFeedback?.blockReason) {
     throw new Error(
-      `Generation blocked by Gemini (${json.promptFeedback.blockReason}).`,
+      `Génération bloquée par Gemini (${json.promptFeedback.blockReason}).`,
     );
   }
 
   const parts = json.candidates?.[0]?.content?.parts ?? [];
   const imagePart = parts.find((p) => p.inlineData?.data);
   if (!imagePart?.inlineData?.data) {
-    throw new Error("Generation succeeded but no image was returned.");
+    throw new Error("La génération a réussi mais aucune image n'a été renvoyée.");
   }
 
   return {

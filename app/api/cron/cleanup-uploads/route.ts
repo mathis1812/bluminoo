@@ -27,13 +27,13 @@ export async function GET(req: NextRequest) {
   if (!secret) {
     console.error("CRON_SECRET is not set; refusing to run the upload sweep.");
     return NextResponse.json(
-      { error: "Server misconfigured: missing CRON_SECRET." },
+      { error: "Serveur mal configuré : CRON_SECRET manquant." },
       { status: 500 },
     );
   }
 
   if (req.headers.get("authorization") !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
   }
 
   try {
@@ -48,6 +48,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("Upload sweep failed:", err);
-    return NextResponse.json({ error: "Upload sweep failed." }, { status: 500 });
+    return NextResponse.json({ error: "Le nettoyage des uploads a échoué." }, { status: 500 });
   }
 }

@@ -3,10 +3,10 @@ import { currencyForLocale, resolveLocale } from "@/lib/locale";
 import { PLANS, billingFor, formatPrice } from "@/lib/stripe";
 
 describe("devise du visiteur", () => {
-  it("un visiteur FR paie en euros, les autres en dollars", () => {
+  it("tout le monde paie en euros pendant le lancement France", () => {
     expect(currencyForLocale(resolveLocale(undefined, "fr-FR,fr;q=0.9"))).toBe("eur");
-    expect(currencyForLocale(resolveLocale(undefined, "en-US"))).toBe("usd");
-    expect(currencyForLocale(resolveLocale("en", "fr-FR"))).toBe("usd");
+    expect(currencyForLocale(resolveLocale(undefined, "en-US"))).toBe("eur");
+    expect(currencyForLocale(resolveLocale("en", "fr-FR"))).toBe("eur");
   });
 });
 

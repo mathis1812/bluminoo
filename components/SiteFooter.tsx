@@ -11,15 +11,15 @@ import { hasOwnHeader } from "@/lib/app-shell-routes";
  * plus atteignables par la navigation.
  */
 const PRODUCT_LINKS = [
-  { href: "/gallery", label: "Gallery" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/about", label: "About" },
+  { href: "/gallery", label: "Galerie" },
+  { href: "/pricing", label: "Tarifs" },
+  { href: "/about", label: "À propos" },
 ] as const;
 
 const LEGAL_LINKS = [
-  { href: "/legal", label: "Legal" },
-  { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy" },
+  { href: "/legal", label: "Mentions légales" },
+  { href: "/terms", label: "CGU" },
+  { href: "/privacy", label: "Confidentialité" },
 ] as const;
 
 /**
@@ -37,11 +37,11 @@ export default function SiteFooter() {
 
   return (
     <footer className="px-6 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-2 text-center text-[13px] text-white/35">
-      <p>© {new Date().getFullYear()} Bluminoo Studio. All rights reserved.</p>
+      <p>© {new Date().getFullYear()} Bluminoo Studio. Tous droits réservés.</p>
       {/* La landing parle de Snapchat et en reprend le jaune : cette ligne
           evite qu'on prenne Bluminoo pour un produit officiel de Snap. */}
       <p className="mt-1">
-        Bluminoo is not affiliated with, endorsed by, or sponsored by Snap Inc.
+        Bluminoo n’est ni affilié à Snap Inc., ni approuvé ni parrainé par Snap Inc.
       </p>
       <nav className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
         {links.map((link, index) => (

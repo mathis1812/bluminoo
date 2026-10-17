@@ -41,7 +41,7 @@ export default function TemplateVariantPicker({
       <div className="flex min-h-0 flex-1 items-center justify-center py-4">
         <Image
           src={preview}
-          alt={`Result — ${template.label}`}
+          alt={`Résultat — ${template.label}`}
           width={800}
           height={978}
           sizes="(max-width: 460px) 92vw, 420px"
@@ -106,7 +106,7 @@ export default function TemplateVariantPicker({
           href={`/templates/${template.slug}/${selected}`}
           className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] transition active:opacity-90"
         >
-          Continue
+          Continuer
           <svg
             aria-hidden
             width="19"

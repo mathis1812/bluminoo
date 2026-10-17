@@ -28,7 +28,7 @@ export function generateMetadata({ params }: Props): Metadata {
   if (!template || !variant) return {};
   return {
     title: `${template.label} — ${variant.label} — Bluminoo`,
-    description: `Turn your photo into a ${template.label.toLowerCase()} scene in seconds.`,
+    description: `Transforme ta photo avec le modèle « ${template.label} » en quelques secondes.`,
   };
 }
 

@@ -91,28 +91,28 @@ type Feature = {
 function subscriptionFeatures(planId: PlanId, billing: Billing): Feature[] {
   return [
     {
-      label: "Red Snap access",
+      label: "Accès à Red Snap",
       included: planHasRedSnap(planId),
       tone: "red",
     },
-    { label: "All effects unlocked", included: true },
+    { label: "Tous les effets débloqués", included: true },
     {
-      label: `Images up to ${PLANS[planId].imageResolution}`,
+      label: `Images jusqu'en ${PLANS[planId].imageResolution}`,
       included: true,
       strong: true,
     },
-    { label: "Videos with sound, 4 to 8s", included: isVideoOpen(planId) },
+    { label: "Vidéos avec son, de 4 à 8 s", included: isVideoOpen(planId) },
     {
-      label: `Credits renewed ${billing === "month" ? "monthly" : "weekly"}`,
+      label: `Crédits renouvelés chaque ${billing === "month" ? "mois" : "semaine"}`,
       included: true,
     },
   ];
 }
 
 const TOPUP_FEATURES: Feature[] = [
-  { label: "Added to your balance instantly", included: true },
-  { label: "Credits never expire", included: true },
-  { label: "One-time payment, no subscription", included: true },
+  { label: "Ajoutés à ton solde instantanément", included: true },
+  { label: "Les crédits n'expirent jamais", included: true },
+  { label: "Paiement unique, sans abonnement", included: true },
 ];
 
 export default function PricingCatalogue() {
@@ -149,7 +149,7 @@ export default function PricingCatalogue() {
           openAuthSheet("signup");
           return;
         }
-        setError(data?.error || "Unable to start checkout. Please try again.");
+        setError(data?.error || "Impossible de lancer le paiement. Réessaie.");
         return;
       }
       if (data?.url) {
@@ -163,7 +163,7 @@ export default function PricingCatalogue() {
         window.location.href = data.url;
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError("Erreur réseau. Réessaie.");
     } finally {
       setLoading(false);
     }
@@ -192,7 +192,7 @@ export default function PricingCatalogue() {
             tab === "subscription" ? "text-white" : "text-white/50"
           }`}
         >
-          Subscriptions
+          Abonnements
         </button>
         <button
           type="button"
@@ -203,7 +203,7 @@ export default function PricingCatalogue() {
             tab === "topup" ? "text-white" : "text-white/50"
           }`}
         >
-          Credits
+          Crédits
         </button>
       </div>
 
@@ -260,7 +260,7 @@ export default function PricingCatalogue() {
                       <PriceCardNotches tint={tint} />
                       {formatPrice(offer.price, currency)}
                       <span className="ml-1 text-[12px] font-medium">
-                        {billing === "month" ? "/ mo" : "/ wk"}
+                        {billing === "month" ? "/ mois" : "/ sem."}
                       </span>
                     </span>
                   </span>
@@ -366,12 +366,12 @@ export default function PricingCatalogue() {
           disabled={loading}
           className="flex h-14 w-full items-center justify-center rounded-3xl bg-snap text-[17px] font-semibold text-[#121212] shadow-[0_0_18px_rgba(255,252,0,0.45),0_0_44px_rgba(255,252,0,0.22)] transition active:opacity-80 disabled:opacity-50"
         >
-          {loading ? "Loading…" : "Continue"}
+          {loading ? "Chargement…" : "Continuer"}
         </button>
         <p className="text-center text-[13px] leading-5 text-white/40">
           {tab === "subscription"
-            ? `Billed ${billing === "month" ? "monthly" : "weekly"} · Cancel anytime`
-            : "One-time payment · No expiration"}
+            ? `Facturé chaque ${billing === "month" ? "mois" : "semaine"} · Résiliable à tout moment`
+            : "Paiement unique · N'expire jamais"}
         </p>
       </div>
     </div>

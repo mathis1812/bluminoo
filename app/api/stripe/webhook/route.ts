@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
   if (!signature || !webhookSecret) {
     return NextResponse.json(
-      { error: "Missing webhook configuration." },
+      { error: "Configuration du webhook manquante." },
       { status: 500 },
     );
   }
@@ -53,9 +53,9 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Invalid signature.";
+    const message = err instanceof Error ? err.message : "Signature invalide.";
     return NextResponse.json(
-      { error: `Invalid webhook: ${message}` },
+      { error: `Webhook invalide : ${message}` },
       { status: 400 },
     );
   }
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       claimError,
     );
     return NextResponse.json(
-      { error: "Unable to record the event, please retry." },
+      { error: "Impossible d'enregistrer l'événement, réessaie." },
       { status: 500 },
     );
   }
@@ -325,7 +325,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Profile update failed, please try again." },
+      { error: "La mise à jour du profil a échoué, réessaie." },
       { status: 500 },
     );
   }

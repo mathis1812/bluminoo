@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sign in to continue." },
+      { error: "Connecte-toi pour continuer." },
       { status: 401 },
     );
   }
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as CheckoutBody;
   } catch {
     return NextResponse.json(
-      { error: "Invalid request: unreadable JSON body." },
+      { error: "Requête invalide : corps JSON illisible." },
       { status: 400 },
     );
   }
@@ -79,9 +79,9 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Stripe error.";
+      const message = err instanceof Error ? err.message : "Erreur Stripe.";
       return NextResponse.json(
-        { error: `Unable to create the Stripe customer. ${message}` },
+        { error: `Impossible de créer le client Stripe. ${message}` },
         { status: 502 },
       );
     }
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
   if (body.kind === "topup") {
     const packId = body.pack as TopupId | undefined;
     if (!packId || !(packId in TOPUPS)) {
-      return NextResponse.json({ error: "Unknown pack." }, { status: 400 });
+      return NextResponse.json({ error: "Pack inconnu." }, { status: 400 });
     }
 
     try {
@@ -124,9 +124,9 @@ export async function POST(req: NextRequest) {
       });
       return NextResponse.json({ url: session.url });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Stripe error.";
+      const message = err instanceof Error ? err.message : "Erreur Stripe.";
       return NextResponse.json(
-        { error: `Unable to create the payment session. ${message}` },
+        { error: `Impossible de créer la session de paiement. ${message}` },
         { status: 502 },
       );
     }
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
 
   const planId = body.plan as PlanId | undefined;
   if (!planId || !(planId in PLANS)) {
-    return NextResponse.json({ error: "Unknown plan." }, { status: 400 });
+    return NextResponse.json({ error: "Offre inconnue." }, { status: 400 });
   }
 
   if (profile?.plan) {
@@ -166,9 +166,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Stripe error.";
+    const message = err instanceof Error ? err.message : "Erreur Stripe.";
     return NextResponse.json(
-      { error: `Unable to create the payment session. ${message}` },
+      { error: `Impossible de créer la session de paiement. ${message}` },
       { status: 502 },
     );
   }

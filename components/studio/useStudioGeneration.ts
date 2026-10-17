@@ -155,7 +155,7 @@ export function useStudioGeneration({
         if (isSubscribed) void ensureUploaded(img);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Unable to prepare the image.",
+          err instanceof Error ? err.message : "Impossible de préparer l'image.",
         );
       }
     },
@@ -187,13 +187,13 @@ export function useStudioGeneration({
     // Amorce l'AudioContext dans le geste utilisateur pour iOS Safari.
     unlockAudioContext();
     if (!prepared) {
-      setError("Please upload an image first.");
+      setError("Importe d'abord une image.");
       return;
     }
     // La description est désormais la seule indication de scène : sans
     // elle, le modèle n'a rien sur quoi s'appuyer.
     if (!userNote.trim()) {
-      setError("Describe the scene you want.");
+      setError("Décris la scène que tu veux.");
       return;
     }
 
@@ -226,13 +226,13 @@ export function useStudioGeneration({
                   sourceImageUrl,
                   prompt: userNote.trim(),
                   duration: videoDuration,
-                  label: "Video generation",
+                  label: "Génération vidéo",
                 }
               : {
                   sourceImageUrl,
                   prompt: userNote.trim(),
                   quality,
-                  label: "Image generation",
+                  label: "Génération d'image",
                 },
           ),
         },
@@ -240,7 +240,7 @@ export function useStudioGeneration({
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Generation failed. Please try again.");
+        setError(data?.error || "La génération a échoué. Réessaie.");
         return;
       }
       // Les deux routes ne renvoient pas la même clé : `imageUrl` pour
@@ -253,13 +253,13 @@ export function useStudioGeneration({
         setResult(url as string);
         void refreshCredits();
       } else {
-        setError("Unexpected response from the server. Please try again.");
+        setError("Réponse inattendue du serveur. Réessaie.");
       }
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Network error during generation. Check your connection.",
+          : "Erreur réseau pendant la génération. Vérifie ta connexion.",
       );
     } finally {
       setLoading(false);

@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.FAL_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Missing API key. Set FAL_KEY in your environment variables." },
+      { error: "Clé API manquante. Définis FAL_KEY dans tes variables d'environnement." },
       { status: 500 },
     );
   }
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as GenerateVideoBody;
   } catch {
     return NextResponse.json(
-      { error: "Invalid request: unreadable JSON body." },
+      { error: "Requête invalide : corps JSON illisible." },
       { status: 400 },
     );
   }
@@ -69,21 +69,21 @@ export async function POST(req: NextRequest) {
 
   if (!sourceImageUrl || typeof sourceImageUrl !== "string") {
     return NextResponse.json(
-      { error: "Missing source photo. Upload an image and try again." },
+      { error: "Photo source manquante. Envoie une image et réessaie." },
       { status: 400 },
     );
   }
 
   if (!prompt || !prompt.trim()) {
     return NextResponse.json(
-      { error: "Describe the motion you want in the video." },
+      { error: "Décris le mouvement que tu veux dans la vidéo." },
       { status: 400 },
     );
   }
 
   if (prompt.trim().length > MAX_PROMPT_LENGTH) {
     return NextResponse.json(
-      { error: `Description too long (max ${MAX_PROMPT_LENGTH} characters).` },
+      { error: `Description trop longue (${MAX_PROMPT_LENGTH} caractères maximum).` },
       { status: 400 },
     );
   }
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
   if (!VIDEO_DURATIONS.includes(duration as VideoDuration)) {
     return NextResponse.json(
       {
-        error: `Invalid duration. Choose ${VIDEO_DURATIONS.join(", ")} seconds.`,
+        error: `Durée invalide. Choisis parmi ${VIDEO_DURATIONS.join(", ")} secondes.`,
       },
       { status: 400 },
     );
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sign in to generate a video." },
+      { error: "Connecte-toi pour générer une vidéo." },
       { status: 401 },
     );
   }
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
   // compte sans palier obtiendrait la génération la plus chère du produit.
   if (!isVideoOpen(planId)) {
     return NextResponse.json(
-      { error: "Video is available on the Pro and Max plans." },
+      { error: "La vidéo est disponible avec les offres Pro et Max." },
       { status: 403 },
     );
   }
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Failed to check credits:", err);
     return NextResponse.json(
-      { error: "Internal error while checking credits." },
+      { error: "Erreur interne lors de la vérification des crédits." },
       { status: 500 },
     );
   }
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
     const storedUrl = await persistVideoFromUrl(
       user.id,
       resultUrl,
-      label?.trim() || "Video generation",
+      label?.trim() || "Génération vidéo",
     );
     return NextResponse.json({ videoUrl: storedUrl });
   } catch (err) {
@@ -198,16 +198,16 @@ export async function POST(req: NextRequest) {
         `Video generation timed out for user ${user.id}; fal task still running: ${task?.statusUrl}`,
       );
       return NextResponse.json(
-        { error: "Generation took too long. Try again in a few moments." },
+        { error: "La génération a pris trop de temps. Réessaie dans quelques instants." },
         { status: 504 },
       );
     }
     const message =
       err instanceof Error
         ? err.message
-        : "Unknown error while generating the video.";
+        : "Erreur inconnue pendant la génération de la vidéo.";
     return NextResponse.json(
-      { error: `fal.ai video service error. ${message}` },
+      { error: `Erreur du service vidéo fal.ai. ${message}` },
       { status: 502 },
     );
   }

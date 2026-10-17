@@ -44,7 +44,7 @@ function formatRenewal(iso: string | null): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString("en-US", { day: "numeric", month: "long" });
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
 /** Encadré commun à toutes les sections, repris tel quel du modèle. */
@@ -58,7 +58,7 @@ export default function SubscriptionPage() {
   // a lire sur la subscription si un abonne US consulte depuis un navigateur FR.
   const currency = useCurrency();
   const billing = billingFor(currency);
-  const unit = billing === "month" ? "month" : "week";
+  const unit = billing === "month" ? "mois" : "sem.";
   const [credits, setCredits] = useState<number | null>(null);
   const [planId, setPlanId] = useState<PlanId | null>(null);
   const [renewal, setRenewal] = useState<string | null>(null);
@@ -117,12 +117,12 @@ export default function SubscriptionPage() {
         });
         const data = await res.json().catch(() => null);
         if (!res.ok || !data?.url) {
-          setError(data?.error || "Something went wrong. Please try again.");
+          setError(data?.error || "Quelque chose a planté. Réessaie.");
           return;
         }
         window.location.href = data.url;
       } catch {
-        setError("Network error. Please try again.");
+        setError("Erreur réseau. Réessaie.");
       } finally {
         setPending(null);
       }
@@ -146,7 +146,7 @@ export default function SubscriptionPage() {
 
   return (
     <>
-      <TemplateHeader backHref="/" title="Subscription" />
+      <TemplateHeader backHref="/" title="Abonnement" />
 
       <main className="flex min-h-dvh flex-col gap-3 bg-black px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
         {/* Solde, avec la jauge du forfait. */}
@@ -165,7 +165,7 @@ export default function SubscriptionPage() {
             >
               <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
             </svg>
-            {loaded ? (credits ?? 0).toLocaleString("en-US") : "—"} credits
+            {loaded ? (credits ?? 0).toLocaleString("fr-FR") : "—"} crédits
             {loaded && credits !== null && (
               <span className="text-[13px] font-medium text-white/50">
                 ≈ {photosFor(credits)} photos
@@ -189,7 +189,7 @@ export default function SubscriptionPage() {
         {plan ? (
           <section className={`${CARD} gap-1`}>
             <span className="text-[13px] font-semibold uppercase tracking-wide text-white/40">
-              Your plan
+              Ta formule
             </span>
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-[17px] font-medium text-white">
@@ -197,13 +197,13 @@ export default function SubscriptionPage() {
                 <span className="text-[13px] text-white/50"> / {unit}</span>
               </span>
               <span className="text-[13px] leading-5 text-white/50">
-                {plan.credits.toLocaleString("en-US")} credits · ≈{" "}
+                {plan.credits.toLocaleString("fr-FR")} crédits · ≈{" "}
                 {photosFor(plan.credits)} photos
               </span>
             </span>
             {renewal && (
               <span className="text-[13px] leading-5 text-white/50">
-                Next top-up on {renewal}
+                Prochaine recharge le {renewal}
               </span>
             )}
           </section>
@@ -211,13 +211,13 @@ export default function SubscriptionPage() {
           loaded && (
             <section className={`${CARD} gap-3`}>
               <span className="text-[17px] font-medium text-white">
-                No active subscription
+                Aucun abonnement actif
               </span>
               <span className="text-[13px] leading-5 text-white/50">
-                Subscribe to unlock higher resolutions, video and Red Snap.
+                Abonne-toi pour débloquer les hautes résolutions, la vidéo et Red Snap.
               </span>
               <Link href="/pricing" className={ACTION_BUTTON}>
-                See the plans
+                Voir les formules
               </Link>
             </section>
           )
@@ -229,14 +229,14 @@ export default function SubscriptionPage() {
             <span className="text-[17px] font-medium text-white">
               +
               {(nextPlan.credits - plan.credits).toLocaleString(
-                "en-US",
+                "fr-FR",
               )}{" "}
-              credits <span className="text-[13px] text-white/50">/ {unit}</span>{" "}
-              for {formatPrice(nextPlan.price - plan.price, currency)} more
+              crédits <span className="text-[13px] text-white/50">/ {unit}</span>{" "}
+              pour {formatPrice(nextPlan.price - plan.price, currency)} de plus
             </span>
             <span className="text-[13px] leading-5 text-white/50">
               {formatPrice(nextPlan.price, currency)} / {unit} ·{" "}
-              {nextPlan.credits.toLocaleString("en-US")} credits · ≈{" "}
+              {nextPlan.credits.toLocaleString("fr-FR")} crédits · ≈{" "}
               {photosFor(nextPlan.credits)} photos
             </span>
             <button
@@ -249,10 +249,10 @@ export default function SubscriptionPage() {
               }
               className={ACTION_BUTTON}
             >
-              {pending === "upgrade" ? "Opening…" : "Change plan"}
+              {pending === "upgrade" ? "Ouverture…" : "Changer de formule"}
             </button>
             <span className="text-[13px] leading-5 text-white/50">
-              Takes effect immediately, prorated for the current {unit}.
+              Effet immédiat, au prorata {unit === "mois" ? "du mois" : "de la semaine"} en cours.
             </span>
           </section>
         )}
@@ -264,14 +264,14 @@ export default function SubscriptionPage() {
             <section key={packId} className={`${CARD} gap-3`}>
               <span className="flex items-baseline justify-between gap-3">
                 <span className="text-[17px] font-medium text-white">
-                  {pack.credits.toLocaleString("en-US")} credits
+                  {pack.credits.toLocaleString("fr-FR")} crédits
                   <span className="text-[13px] text-white/50">
                     {" "}
                     — {formatPrice(pack.price, currency)}
                   </span>
                 </span>
                 <span className="text-[13px] leading-5 text-white/50">
-                  never expires
+                  n’expire jamais
                 </span>
               </span>
               <button
@@ -285,7 +285,7 @@ export default function SubscriptionPage() {
                 }
                 className={ACTION_BUTTON}
               >
-                {pending === packId ? "Opening…" : "Top up"}
+                {pending === packId ? "Ouverture…" : "Recharger"}
               </button>
             </section>
           );
@@ -304,13 +304,14 @@ export default function SubscriptionPage() {
             onClick={() => goToStripe("portal", "/api/stripe/portal", {})}
             className="mt-1 self-center py-2 text-base text-white/60 underline underline-offset-4 transition active:opacity-70 disabled:opacity-40"
           >
-            {pending === "portal" ? "Opening…" : "Manage my subscription"}
+            {pending === "portal" ? "Ouverture…" : "Gérer mon abonnement"}
           </button>
         )}
 
         <p className="px-2 pt-1 text-center text-[13px] leading-5 text-white/40">
-          Subscription credits reset at each renewal and do not carry over.
-          Top-up credits are kept with no time limit.
+          Les crédits de l’abonnement sont remis à zéro à chaque renouvellement
+          et ne se reportent pas. Les crédits rechargés sont conservés sans
+          limite de durée.
         </p>
       </main>
     </>

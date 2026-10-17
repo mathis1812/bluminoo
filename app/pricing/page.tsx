@@ -9,7 +9,7 @@ import PricingCatalogue from "@/components/PricingCatalogue";
 export default function PricingPage() {
   return (
     <>
-      <TemplateHeader backHref="/" title="Pricing" />
+      <TemplateHeader backHref="/" title="Tarifs" />
 
       <div className="animate-fade-up mx-auto flex min-h-dvh w-full max-w-sheet flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-[calc(env(safe-area-inset-top)+76px)]">
         <PricingCatalogue />

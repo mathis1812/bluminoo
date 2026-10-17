@@ -63,7 +63,7 @@ const ICON_PROPS = {
 const NAV_ITEMS: NavItem[] = [
   {
     href: "/",
-    label: "Create",
+    label: "Créer",
     screen: "studio",
     isActive: (p, s) => p === "/" && (s ?? "studio") === "studio",
     icon: (
@@ -75,7 +75,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/",
-    label: "Templates",
+    label: "Modèles",
     screen: "templates",
     isActive: (p, s) => p === "/" && s === "templates",
     icon: (
@@ -89,7 +89,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/gallery",
-    label: "Gallery",
+    label: "Galerie",
     isActive: (p) => p.startsWith("/gallery"),
     icon: (
       <svg {...ICON_PROPS}>
@@ -161,7 +161,7 @@ export default function MenuSheet({
     <div className="fixed inset-0 z-[100]">
       <button
         type="button"
-        aria-label="Close the menu"
+        aria-label="Fermer le menu"
         onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-md"
       />
@@ -180,7 +180,7 @@ export default function MenuSheet({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label="Fermer"
           className="absolute right-5 top-[calc(env(safe-area-inset-top)+20px)] flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition active:opacity-70"
         >
           <svg
@@ -223,22 +223,22 @@ export default function MenuSheet({
                   {/* Espace écrit explicitement : laissé au découpage de
                       lignes de JSX, il dépendrait de l'indentation. */}
                   <span className="tabular-nums">
-                    {credits.toLocaleString("en-US")}
+                    {credits.toLocaleString("fr-FR")}
                   </span>
-                  {" credits"}
+                  {" crédits"}
                 </span>
                 <Link
                   href="/pricing"
                   onClick={onClose}
                   className="shrink-0 rounded-full bg-snap px-3.5 py-2 text-[14px] font-semibold text-[#121212] transition active:opacity-80"
                 >
-                  Top up
+                  Recharger
                 </Link>
               </>
             ) : (
               <>
                 <span className="text-[18px] font-semibold leading-7 text-white/70">
-                  Not signed in
+                  Non connecté
                 </span>
                 <button
                   type="button"
@@ -248,7 +248,7 @@ export default function MenuSheet({
                   }}
                   className="shrink-0 rounded-full bg-snap px-3.5 py-2 text-[14px] font-semibold text-[#121212] transition active:opacity-80"
                 >
-                  Sign in
+                  Me connecter
                 </button>
               </>
             )}
@@ -324,15 +324,15 @@ export default function MenuSheet({
             className="mt-2 flex h-[96px] items-center justify-between gap-3 rounded-3xl bg-snapred px-5 transition active:opacity-90"
           >
             <span className="text-[18px] font-semibold leading-tight text-white">
-              Send your AI generations
+              Envoie tes générations IA
               <br />
-              as a Red Snap
+              en Red Snap
             </span>
             {/* Pastille blanche sur le rouge : le bleu y perdait son contraste
                 et ramenait une troisieme couleur sur une carte qui n'en
                 demande pas. */}
             <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white py-2 pl-5 pr-4 text-[15px] font-semibold text-snapred">
-              See
+              Voir
               <svg
                 width="16"
                 height="16"

@@ -37,7 +37,7 @@ async function parseFalJson<T>(
     return { json: JSON.parse(raw) as T, raw };
   } catch {
     throw new Error(
-      `Unreadable fal.ai response ${context} (HTTP ${res.status}): ${raw.slice(0, 300) || "(empty body)"}`,
+      `Réponse fal.ai illisible ${context} (HTTP ${res.status}) : ${raw.slice(0, 300) || "(corps vide)"}`,
     );
   }
 }
@@ -70,7 +70,7 @@ export async function createFalTask(
 
   if (!res.ok || !json.request_id || !json.status_url || !json.response_url) {
     throw new Error(
-      `fal.ai error (${res.status}) creating the task: ${raw.slice(0, 300)}`,
+      `Erreur fal.ai (${res.status}) à la création de la tâche : ${raw.slice(0, 300)}`,
     );
   }
   return { statusUrl: json.status_url, responseUrl: json.response_url };
@@ -96,7 +96,7 @@ export async function pollFalTask(
 
     if (!statusRes.ok) {
       throw new Error(
-        `fal.ai error (${statusRes.status}) polling the task: ${statusRaw.slice(0, 300)}`,
+        `Erreur fal.ai (${statusRes.status}) au suivi de la tâche : ${statusRaw.slice(0, 300)}`,
       );
     }
 
@@ -106,12 +106,12 @@ export async function pollFalTask(
         await parseFalJson<FalResultResponse>(resultRes, "fetching the result");
       if (!resultRes.ok) {
         throw new Error(
-          `fal.ai error (${resultRes.status}) fetching the result: ${resultRaw.slice(0, 300)}`,
+          `Erreur fal.ai (${resultRes.status}) à la récupération du résultat : ${resultRaw.slice(0, 300)}`,
         );
       }
       const url = resultJson.images?.[0]?.url ?? resultJson.video?.url;
       if (!url) {
-        throw new Error("The task succeeded but no result was returned.");
+        throw new Error("La tâche a réussi mais aucun résultat n'a été renvoyé.");
       }
       return url;
     }

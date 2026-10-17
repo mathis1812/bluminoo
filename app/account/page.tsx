@@ -24,11 +24,11 @@ function buildSupportMailto(
   email: string,
 ): string {
   const subject = isPriority
-    ? `[Priority support] ${planName} — ${email}`
+    ? `[Support prioritaire] ${planName} — ${email}`
     : `[Support] ${email}`;
   const body = isPriority
-    ? `Hi,\n\nPlan: ${planName}\nAccount: ${email}\n\nDescribe your request here:\n`
-    : `Hi,\n\nAccount: ${email}\n\nDescribe your request here:\n`;
+    ? `Salut,\n\nFormule : ${planName}\nCompte : ${email}\n\nDécris ta demande ici :\n`
+    : `Salut,\n\nCompte : ${email}\n\nDécris ta demande ici :\n`;
   return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
@@ -61,7 +61,7 @@ export default async function AccountPage() {
     user.email ?? "",
   );
   const renewalDate = profile?.current_period_end
-    ? new Date(profile.current_period_end).toLocaleDateString("en-US", {
+    ? new Date(profile.current_period_end).toLocaleDateString("fr-FR", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -72,10 +72,10 @@ export default async function AccountPage() {
     <div className="animate-fade-up mx-auto max-w-4xl py-8">
       <div className="mb-8 text-center">
         <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-primary">
-          My account
+          Mon compte
         </p>
         <h2 className="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-          Welcome back
+          Content de te revoir
         </h2>
       </div>
 
@@ -102,10 +102,10 @@ export default async function AccountPage() {
               </span>
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  Personal Information
+                  Informations personnelles
                 </h3>
                 <p className="text-xs text-neutral-500">
-                  Your basic details on Bluminoo Studio.
+                  Tes infos de base sur Bluminoo Studio.
                 </p>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default async function AccountPage() {
             <dl className="mt-6 space-y-4 text-sm">
               <div>
                 <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
-                  Email
+                  E-mail
                 </dt>
                 <dd className="mt-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-white">
                   {user.email}
@@ -121,10 +121,10 @@ export default async function AccountPage() {
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
-                  Role
+                  Rôle
                 </dt>
                 <dd className="mt-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-white">
-                  User
+                  Utilisateur
                 </dd>
               </div>
             </dl>
@@ -132,41 +132,41 @@ export default async function AccountPage() {
 
           <Panel className="p-6">
             <h3 className="text-sm font-semibold text-white">
-              Top up your credits
+              Recharge tes crédits
             </h3>
             <p className="mt-1 text-xs text-neutral-500">
-              Renew your subscription to top up your credits, or move up a
-              plan to unlock a higher resolution.
+              Renouvelle ton abonnement pour recharger tes crédits, ou passe à
+              une formule supérieure pour débloquer une meilleure résolution.
             </p>
             <Link
               href="/pricing"
               className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-snap px-4 py-3 text-sm font-semibold text-[#121212] transition hover:opacity-90"
             >
-              See plans
+              Voir les formules
             </Link>
           </Panel>
 
           <Panel className="p-6">
             <h3 className="text-sm font-semibold text-white">
-              {isPriority ? "Priority support" : "Need help?"}
+              {isPriority ? "Support prioritaire" : "Besoin d'aide ?"}
             </h3>
             <p className="mt-1 text-xs text-neutral-500">
               {isPriority
-                ? "Your message is flagged as priority, with your plan and account already filled in — no need to explain it all again."
-                : "Write to us and we'll get back to you as soon as possible. Priority support (front-of-queue reply) is reserved for the Essential and Ultimate plans."}
+                ? "Ton message est signalé comme prioritaire, avec ta formule et ton compte déjà renseignés : pas besoin de tout réexpliquer."
+                : "Écris-nous, on te répond dès que possible. Le support prioritaire (réponse en tête de file) est réservé aux formules payantes."}
             </p>
             <a
               href={supportMailto}
               className="mt-4 inline-flex w-full items-center justify-center rounded-2xl border border-primary/40 px-4 py-3 text-sm font-semibold text-primary-soft transition hover:border-primary hover:text-primary"
             >
-              Contact support
+              Contacter le support
             </a>
           </Panel>
         </div>
 
         <div className="space-y-6">
           <AccountStatCard
-            title="Credits"
+            title="Crédits"
             icon={
               <svg
                 width="16"
@@ -199,16 +199,16 @@ export default async function AccountPage() {
               }
             >
               {profileError
-                ? "Unable to load your balance right now."
+                ? "Impossible de charger ton solde pour le moment."
                 : profile?.credits ?? 0}
             </p>
             {!profileError && (
-              <p className="mt-1 text-xs text-neutral-500">credits remaining</p>
+              <p className="mt-1 text-xs text-neutral-500">crédits restants</p>
             )}
           </AccountStatCard>
 
           <AccountStatCard
-            title="Subscription"
+            title="Abonnement"
             icon={
               <svg
                 width="16"
@@ -223,11 +223,11 @@ export default async function AccountPage() {
             }
           >
             <p className="text-xl font-semibold text-white">
-              {planName ?? "Free Plan"}
+              {planName ?? "Formule gratuite"}
             </p>
             {renewalDate && (
               <p className="mt-1 text-xs text-neutral-500">
-                Renews on {renewalDate}
+                Renouvelé le {renewalDate}
               </p>
             )}
             <div className="mt-4">
@@ -238,7 +238,7 @@ export default async function AccountPage() {
                   href="/pricing"
                   className="flex w-full items-center justify-center rounded-2xl border border-primary/40 px-4 py-3 text-sm font-semibold text-primary-soft transition hover:border-primary hover:text-primary"
                 >
-                  See plans
+                  Voir les formules
                 </Link>
               )}
             </div>
