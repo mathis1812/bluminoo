@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Panel from "@/components/Panel";
+import { readAcquisition } from "@/lib/acquisition";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignUpPage() {
@@ -23,6 +24,7 @@ export default function SignUpPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: { data: readAcquisition() },
       });
 
       if (signUpError) {
