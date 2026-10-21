@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RevealBurst } from "@/components/MagicSparkles";
 import GeneratingCard from "@/components/studio/GeneratingCard";
+import PaywallOverlay from "@/components/studio/PaywallOverlay";
 import {
   GENERATION_LOADING_MESSAGES,
   IMAGE_EXPECTED_SECONDS,
@@ -346,20 +346,7 @@ export default function TemplateGenerator({
           )}
 
           {paywalled && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/50 px-8 text-center">
-              <p className="text-[19px] font-semibold text-white">
-                Ta scène est prête
-              </p>
-              <p className="text-[15px] leading-[1.5] text-white/70">
-                Abonne-toi pour la débloquer et en générer autant que tu veux.
-              </p>
-              <Link
-                href="/pricing"
-                className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
-              >
-                Voir les formules
-              </Link>
-            </div>
+            <PaywallOverlay previewUrl={prepared?.previewUrl ?? exampleImage} />
           )}
         </div>
 

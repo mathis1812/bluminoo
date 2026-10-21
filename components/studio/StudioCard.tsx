@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { RevealBurst } from "@/components/MagicSparkles";
 import GeneratingCard from "./GeneratingCard";
+import PaywallOverlay from "./PaywallOverlay";
 import type { GenerationMode } from "@/lib/generation-tiers";
 import type { PreparedImage } from "@/lib/studio-image";
 import { GENERATION_LOADING_MESSAGES } from "./useElapsedProgress";
 
-/** Visuel d'exemple affiché flouté derrière le paywall. */
+/** Repli flouté derrière le paywall si la photo du visiteur manque. */
 const PAYWALL_PREVIEW_IMAGE = "/landing/rooftop.jpg";
 
 /**
@@ -210,29 +210,9 @@ export default function StudioCard({
               <RevealBurst />
             </>
           ) : paywalled ? (
-            <div className="relative h-full w-full">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={PAYWALL_PREVIEW_IMAGE}
-                alt=""
-                aria-hidden
-                className="h-full w-full scale-105 object-cover blur-xl"
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/50 px-8 text-center">
-                <p className="text-[19px] font-semibold text-white">
-                  Ta scène est prête
-                </p>
-                <p className="text-[15px] leading-[1.5] text-white/60">
-                  Abonne-toi pour la débloquer et en générer autant que tu veux.
-                </p>
-                <Link
-                  href="/pricing"
-                  className="mt-1 flex h-12 items-center justify-center rounded-3xl bg-snap px-6 text-[16px] font-semibold text-[#121212] transition active:opacity-90"
-                >
-                  Voir les formules
-                </Link>
-              </div>
-            </div>
+            <PaywallOverlay
+              previewUrl={prepared?.previewUrl ?? PAYWALL_PREVIEW_IMAGE}
+            />
           ) : loading ? (
             <GeneratingCard
               message={GENERATION_LOADING_MESSAGES[loadingMessageIndex]}
