@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { captureAcquisition, readAcquisition } from "@/lib/acquisition";
 import { createClient } from "@/lib/supabase/client";
 
 /**
@@ -68,6 +69,10 @@ export default function AuthSheet() {
   }, []);
 
   useEffect(() => {
+    // Monté sur toutes les pages par le layout : c'est ici que la source
+    // d'arrivée (lien en bio TikTok…) est notée, quelle que soit l'entrée.
+    captureAcquisition();
+
     const onOpen = (event: Event) => {
       const next = (event as CustomEvent<AuthMode>).detail;
       setMode(next === "signup" ? "signup" : "signin");
@@ -120,6 +125,7 @@ export default function AuthSheet() {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: { data: readAcquisition() },
         });
 
         if (signUpError) {
