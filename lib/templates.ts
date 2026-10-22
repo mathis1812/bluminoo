@@ -311,6 +311,36 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
           },
         ],
       },
+      {
+        // Visuels générés le 22/10 avec le modèle de prod et les prompts de
+        // `lib/template-prompts.ts`, à partir de photos « avant » elles aussi
+        // générées — aucun lieu ni aucune personne réels.
+        slug: "police",
+        label: "Police",
+        cardImage: "/templates/police-card.jpg",
+        exampleImage: "/templates/police-devant.jpg",
+        beforeImage: "/templates/police-devant-before.jpg",
+        tips: ["Façade entière", "Bon angle"],
+        variantQuestion: "Quelle situation ?",
+        defaultVariantSlug: "devant",
+        variants: [
+          {
+            slug: "devant",
+            label: "Descente à la maison",
+            choiceImage: "/templates/police-devant-choice.jpg",
+            exampleImage: "/templates/police-devant.jpg",
+            beforeImage: "/templates/police-devant-before.jpg",
+          },
+          {
+            slug: "arrestation",
+            label: "Menottes aux poignets",
+            choiceImage: "/templates/police-arrestation-choice.jpg",
+            exampleImage: "/templates/police-arrestation.jpg",
+            beforeImage: "/templates/police-arrestation-before.jpg",
+            tips: ["Corps entier", "Fond visible"],
+          },
+        ],
+      },
     ],
   },
   {

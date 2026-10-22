@@ -133,6 +133,19 @@ const PRANK_PROMPTS: Record<string, PromptEntry> = {
       ),
     },
   },
+  // Ajoute des policiers alors que REALISM_CORE dit « no added people » :
+  // testé le 22/10, le changement demandé l'emporte et les rendus restent
+  // crédibles — le cœur commun n'a donc pas été touché pour ce gabarit.
+  police: {
+    variants: {
+      devant: buildInPlaceEditPrompt(
+        "a police intervention in front of the house — two marked French Police nationale cars parked in the street with their blue lights flashing and several uniformed French police officers standing at the gate and in the front garden",
+      ),
+      arrestation: buildInPlaceEditPrompt(
+        "the person being arrested by two uniformed French Police nationale officers holding his arms, his hands handcuffed behind his back, a marked French police car with blue lights flashing parked at the curb behind them",
+      ),
+    },
+  },
 };
 
 /** Worlds : prompts complets rédigés à la main, cf. `lib/world-prompts.ts`. */
