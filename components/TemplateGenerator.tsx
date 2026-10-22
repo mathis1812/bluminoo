@@ -4,7 +4,10 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RevealBurst } from "@/components/MagicSparkles";
 import GeneratingCard from "@/components/studio/GeneratingCard";
-import PaywallOverlay from "@/components/studio/PaywallOverlay";
+import {
+  PaywallPreview,
+  PaywallSnapButton,
+} from "@/components/studio/PaywallOverlay";
 import {
   GENERATION_LOADING_MESSAGES,
   IMAGE_EXPECTED_SECONDS,
@@ -346,7 +349,7 @@ export default function TemplateGenerator({
           )}
 
           {paywalled && (
-            <PaywallOverlay previewUrl={prepared?.previewUrl ?? exampleImage} />
+            <PaywallPreview previewUrl={prepared?.previewUrl ?? exampleImage} />
           )}
         </div>
 
@@ -367,6 +370,8 @@ export default function TemplateGenerator({
           }}
         />
       </div>
+
+      {paywalled && <PaywallSnapButton />}
 
       {/* Zone noire entre l'image et le bloc du bas : sur le modèle ce bloc
           est position:fixed, indépendant de la hauteur de l'image. Le flex-1

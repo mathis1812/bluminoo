@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { RevealBurst } from "@/components/MagicSparkles";
 import GeneratingCard from "./GeneratingCard";
-import PaywallOverlay from "./PaywallOverlay";
+import { PaywallPreview, PaywallSnapButton } from "./PaywallOverlay";
 import type { GenerationMode } from "@/lib/generation-tiers";
 import type { PreparedImage } from "@/lib/studio-image";
 import { GENERATION_LOADING_MESSAGES } from "./useElapsedProgress";
@@ -210,7 +210,7 @@ export default function StudioCard({
               <RevealBurst />
             </>
           ) : paywalled ? (
-            <PaywallOverlay
+            <PaywallPreview
               previewUrl={prepared?.previewUrl ?? PAYWALL_PREVIEW_IMAGE}
             />
           ) : loading ? (
@@ -275,6 +275,7 @@ export default function StudioCard({
         </div>
 
         <div ref={belowRef} className="w-full shrink-0">
+          {paywalled && <PaywallSnapButton />}
           {children}
         </div>
       </div>
