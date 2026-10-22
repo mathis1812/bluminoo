@@ -83,6 +83,14 @@ const VEHICLE_PROMPTS: Record<string, PromptEntry> = Object.fromEntries(
   ]),
 );
 
+/**
+ * Où une voiture de police a le droit d'apparaître, commun aux deux
+ * variantes Police : sur la chaussée, jamais sur un trottoir — et nulle part
+ * si la photo ne montre aucune route.
+ */
+const POLICE_CAR_PARKING =
+  "parked on the roadway against the kerb, parallel to it, all four wheels on the asphalt, never on a pavement, pedestrian area, lawn or driveway — only where a car could really have been driven and parked, at the same scale and perspective as the street, partly cut by the frame edge if that is where the road is; if no drivable road is visible, leave the cars out entirely and show only the blue glow of their lights on nearby surfaces";
+
 /** Pranks : édition sur place, certains gabarits déclinés en variantes. */
 const PRANK_PROMPTS: Record<string, PromptEntry> = {
   "voiture-accidentee": {
@@ -130,6 +138,27 @@ const PRANK_PROMPTS: Record<string, PromptEntry> = {
       ),
       invasion: buildInPlaceEditPrompt(
         "dozens of realistic rats covering the floor, an overwhelming infestation",
+      ),
+    },
+  },
+  // Ajoute des policiers alors que REALISM_CORE dit « no added people » :
+  // testé le 22/10, le changement demandé l'emporte et les rendus restent
+  // crédibles — le cœur commun n'a donc pas été touché pour ce gabarit.
+  //
+  // Prompts plus longs que les autres pranks, à contre-courant de la règle
+  // « une phrase vaut mieux » : sans consignes de placement, le modèle
+  // garait la voiture sur le trottoir ou contre la façade, et gardait le
+  // sourire de la photo d'origine pendant l'arrestation. A/B du 22/10 sur
+  // quatre photos (rue, façade sans route, homme, femme) : voitures sur la
+  // chaussée, aucune voiture quand aucune route n'est visible, identité
+  // conservée.
+  police: {
+    variants: {
+      devant: buildInPlaceEditPrompt(
+        `a police intervention in front of the house: two marked French Police nationale cars (white, blue and red livery, blue roof lights flashing) ${POLICE_CAR_PARKING}; three or four uniformed French police officers standing on the pavement and at the gate or front door, feet planted on the ground with contact shadows, sized consistently with the door and gate, spaced apart and never overlapping walls, fences, plants or each other`,
+      ),
+      arrestation: buildInPlaceEditPrompt(
+        `the person being arrested: two uniformed French Police nationale officers standing close on either side, each firmly gripping one of the person's upper arms, the person's hands handcuffed behind their back, their expression tense and worried; a marked French Police nationale car (white, blue and red livery, blue roof lights flashing) behind them, ${POLICE_CAR_PARKING}`,
       ),
     },
   },
