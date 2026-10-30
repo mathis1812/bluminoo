@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
+import { createServiceClient } from "@/lib/supabase/service";
 import LandingView from "./LandingView";
 import { LANDING_COPY, LOCALE_COOKIE, resolveLocale } from "./copy";
 
@@ -43,6 +44,30 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function LandingPage() {
-  return <LandingView locale={currentLocale()} />;
+// Sous ce seuil, le compteur fait plus de tort que de bien : on le cache.
+const MIN_LIVE_COUNT = 50;
+
+/**
+ * Vrai nombre de rendus des dernieres 24 h — jamais un chiffre invente :
+ * une preuve sociale fausse est une pratique commerciale trompeuse
+ * (art. L121-2 du Code de la consommation). `null` = badge masque.
+ */
+async function liveGenerationCount(): Promise<number | null> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // ponytail: count sans index sur created_at seul, ajouter l'index si la table grossit
+  const { count, error } = await createServiceClient()
+    .from("gallery_entries")
+    .select("id", { count: "exact", head: true })
+    .gte("created_at", since);
+  if (error || count === null || count < MIN_LIVE_COUNT) return null;
+  return count;
+}
+
+export default async function LandingPage() {
+  return (
+    <LandingView
+      locale={currentLocale()}
+      liveCount={await liveGenerationCount()}
+    />
+  );
 }

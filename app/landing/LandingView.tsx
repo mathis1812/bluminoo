@@ -184,7 +184,13 @@ function LangSwitch({ locale, label }: { locale: Locale; label: string }) {
   );
 }
 
-export default function LandingView({ locale }: { locale: Locale }) {
+export default function LandingView({
+  locale,
+  liveCount,
+}: {
+  locale: Locale;
+  liveCount: number | null;
+}) {
   const t = LANDING_COPY[locale];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -233,6 +239,25 @@ export default function LandingView({ locale }: { locale: Locale }) {
             <br />
             <span className="text-snap">{t.heroTitle[2]}</span>
           </h1>
+
+          {liveCount !== null && (
+            <p className="mt-6 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3.5 text-[13px] text-white/80">
+              <span aria-hidden className="flex -space-x-1.5">
+                {["bg-snap", "bg-primary", "bg-white/70"].map((bg) => (
+                  <span
+                    key={bg}
+                    className={`h-5 w-5 rounded-full border-2 border-[#0f0f10] ${bg}`}
+                  />
+                ))}
+              </span>
+              <span>
+                <strong className="font-bold text-snap">
+                  {liveCount.toLocaleString(locale === "fr" ? "fr-FR" : "en-US")}
+                </strong>{" "}
+                {t.heroLiveCount}
+              </span>
+            </p>
+          )}
 
           <p className="mt-6 max-w-[34ch] text-[18px] leading-[1.5] text-white/65">
             {t.heroBody}

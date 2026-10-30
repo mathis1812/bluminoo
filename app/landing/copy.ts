@@ -24,6 +24,7 @@ export type LandingCopy = {
   meta: { description: string; ogLocale: string };
   langSwitch: string;
   heroBadge: string;
+  heroLiveCount: string;
   heroTitle: [string, string, string];
   heroBody: string;
   ctaLoggedIn: string;
@@ -76,6 +77,7 @@ const EN: LandingCopy = {
   },
   langSwitch: "Language",
   heroBadge: "Red Snap · no camera roll tag",
+  heroLiveCount: "photos & videos generated in the last 24 h",
   heroTitle: ["Fake it.", "Snap it.", "Nobody knows."],
   heroBody:
     "Generate an ultra-realistic photo in one click and send it straight to Snap — it shows up like you just took it.",
@@ -220,6 +222,7 @@ const FR: LandingCopy = {
   },
   langSwitch: "Langue",
   heroBadge: "Red Snap · sans mention Pellicule",
+  heroLiveCount: "photos / vidéos générées ces dernières 24 h",
   heroTitle: ["Fake-le.", "Snappe-le.", "Personne ne saura."],
   heroBody:
     "Génère une photo ultra-réaliste en un clic et envoie-la direct sur Snap : elle arrive comme si tu venais de la prendre.",
