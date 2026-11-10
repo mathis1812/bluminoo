@@ -1,5 +1,7 @@
 "use client";
 
+import { parseAcquisition } from "@/lib/acquisition";
+
 const TRACK_ENDPOINT = "/api/track";
 const SESSION_STORAGE_KEY = "bluminoo_landing_session_id";
 
@@ -32,15 +34,33 @@ function getSessionId(): string {
   }
 }
 
+// La provenance ne part qu'avec la première page vue après un chargement :
+// document.referrer ne change pas pendant la navigation interne de Next, et
+// chaque page de la visite serait sinon attribuée au site d'origine.
+let isFirstView = true;
+
+function arrival() {
+  const utm = parseAcquisition(window.location.search, "", window.location.hostname);
+  return {
+    referrer: document.referrer,
+    utmSource: utm?.utm_source,
+    utmMedium: utm?.utm_medium,
+    utmCampaign: utm?.utm_campaign,
+  };
+}
+
 function send(event: "page_view" | "cta_click", ctaId?: LandingCtaId) {
   if (typeof window === "undefined") return;
+
+  const isArrival = event === "page_view" && isFirstView;
+  if (event === "page_view") isFirstView = false;
 
   const payload = JSON.stringify({
     event,
     ctaId,
     path: window.location.pathname,
     sessionId: getSessionId(),
-    referrer: document.referrer,
+    ...(isArrival ? arrival() : {}),
   });
 
   // sendBeacon survit à la navigation déclenchée par le clic CTA (un fetch
@@ -61,7 +81,8 @@ function send(event: "page_view" | "cta_click", ctaId?: LandingCtaId) {
   });
 }
 
-export function trackLandingPageView() {
+/** Une page vue, n'importe où sur le site (appelé par components/PageTracker). */
+export function trackPageView() {
   send("page_view");
 }
 

@@ -9,7 +9,6 @@ import TemplatesCarousel from "@/components/TemplatesCarousel";
 import TestimonialMarquee from "@/components/TestimonialMarquee";
 import {
   trackLandingCtaClick,
-  trackLandingPageView,
   type LandingCtaId,
 } from "@/lib/analytics";
 import { createClient } from "@/lib/supabase/client";
@@ -187,10 +186,6 @@ function LangSwitch({ locale, label }: { locale: Locale; label: string }) {
 export default function LandingView({ locale }: { locale: Locale }) {
   const t = LANDING_COPY[locale];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    trackLandingPageView();
-  }, []);
 
   // Un visiteur deja connecte ne doit pas se voir reproposer l'inscription :
   // les CTA l'envoient au studio.

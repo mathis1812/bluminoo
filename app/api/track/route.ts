@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { externalReferrer } from "@/lib/referrer";
+import { cleanUtm, deviceOf, isBot, normalizePath } from "@/lib/track";
 
 export const runtime = "nodejs";
 
@@ -25,14 +26,21 @@ type TrackBody = {
   path?: string;
   sessionId?: string;
   referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
 };
 
 /**
- * Enregistre les visites et clics CTA de /landing dans `landing_events`
- * (voir supabase/migrations/0007_landing_events.sql). Alimenté par
+ * Enregistre les visites de toutes les pages et les clics CTA de la landing
+ * dans `landing_events` (0007, colonnes appareil/utm en 0015). Alimenté par
  * lib/analytics.ts, appelé via navigator.sendBeacon depuis le client.
  */
 export async function POST(req: NextRequest) {
+  const userAgent = req.headers.get("user-agent") ?? "";
+  // Robots et aperçus de liens : pas des visiteurs, rien à compter.
+  if (isBot(userAgent)) return new NextResponse(null, { status: 204 });
+
   let body: TrackBody;
   try {
     body = (await req.json()) as TrackBody;
@@ -43,7 +51,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { event, ctaId, path, sessionId, referrer } = body;
+  const { event, ctaId, path, sessionId, referrer, utmSource, utmMedium, utmCampaign } = body;
 
   if (!event || !ALLOWED_EVENT_TYPES.includes(event as EventType)) {
     return NextResponse.json(
@@ -63,11 +71,15 @@ export async function POST(req: NextRequest) {
   const { error } = await supabase.from("landing_events").insert({
     event_type: event,
     cta_id: ctaId ?? null,
-    path: typeof path === "string" && path ? path.slice(0, 200) : "/landing",
+    path: normalizePath(path) ?? "/landing",
     session_id: typeof sessionId === "string" ? sessionId.slice(0, 100) : null,
     // document.referrer envoyé par le client : l'en-tête Referer de la
     // requête pointe vers la landing elle-même, pas vers le site d'origine.
     referrer: externalReferrer(referrer, req.nextUrl.hostname),
+    device: deviceOf(userAgent),
+    utm_source: cleanUtm(utmSource),
+    utm_medium: cleanUtm(utmMedium),
+    utm_campaign: cleanUtm(utmCampaign),
   });
 
   if (error) {

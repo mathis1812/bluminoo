@@ -6,6 +6,7 @@ import MainShell from "@/components/MainShell";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { Analytics } from "@vercel/analytics/next";
+import PageTracker from "@/components/PageTracker";
 
 const SITE_URL = "https://www.bluminoo.com";
 const SITE_TITLE = "Bluminoo Studio";
@@ -99,6 +100,7 @@ export default function RootLayout({
           <AuthSheet />
         </div>
         <Analytics />
+        <PageTracker />
       </body>
     </html>
   );
