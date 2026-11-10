@@ -40,6 +40,7 @@ function send(event: "page_view" | "cta_click", ctaId?: LandingCtaId) {
     ctaId,
     path: window.location.pathname,
     sessionId: getSessionId(),
+    referrer: document.referrer,
   });
 
   // sendBeacon survit à la navigation déclenchée par le clic CTA (un fetch

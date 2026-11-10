@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { externalReferrer } from "@/lib/referrer";
 
 export const runtime = "nodejs";
 
@@ -23,6 +24,7 @@ type TrackBody = {
   ctaId?: string;
   path?: string;
   sessionId?: string;
+  referrer?: string;
 };
 
 /**
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { event, ctaId, path, sessionId } = body;
+  const { event, ctaId, path, sessionId, referrer } = body;
 
   if (!event || !ALLOWED_EVENT_TYPES.includes(event as EventType)) {
     return NextResponse.json(
@@ -63,7 +65,9 @@ export async function POST(req: NextRequest) {
     cta_id: ctaId ?? null,
     path: typeof path === "string" && path ? path.slice(0, 200) : "/landing",
     session_id: typeof sessionId === "string" ? sessionId.slice(0, 100) : null,
-    referrer: req.headers.get("referer")?.slice(0, 500) ?? null,
+    // document.referrer envoyé par le client : l'en-tête Referer de la
+    // requête pointe vers la landing elle-même, pas vers le site d'origine.
+    referrer: externalReferrer(referrer, req.nextUrl.hostname),
   });
 
   if (error) {
