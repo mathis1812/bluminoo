@@ -40,7 +40,7 @@ function getSessionId(): string {
 let isFirstView = true;
 
 function arrival() {
-  const utm = parseAcquisition(window.location.search, "", window.location.hostname);
+  const utm = parseAcquisition(window.location.search, "", window.location.hostname, navigator.userAgent);
   return {
     referrer: document.referrer,
     utmSource: utm?.utm_source,

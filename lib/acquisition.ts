@@ -23,11 +23,21 @@ const STORAGE_KEY = "bluminoo:acquisition";
 const MAX_LENGTH = 100;
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign"] as const;
 
+// Les navigateurs intégrés des réseaux taisent souvent le référent, mais se
+// signent dans leur user agent. Instagram avant Facebook : même maison.
+const IN_APP: [RegExp, string][] = [
+  [/Instagram/i, "instagram"],
+  [/musical_ly|BytedanceWebview|TikTok/i, "tiktok"],
+  [/Snapchat/i, "snapchat"],
+  [/FBAN|FBAV|FB_IAB/, "facebook"],
+];
+
 /** Extrait la source d'une arrivée, ou `null` si elle n'apprend rien. */
 export function parseAcquisition(
   search: string,
   referrer: string,
   ownHost: string,
+  userAgent = "",
 ): Acquisition | null {
   const params = new URLSearchParams(search);
   const found: Acquisition = {};
@@ -46,6 +56,13 @@ export function parseAcquisition(
     // Référent vide ou illisible : arrivée directe, rien à noter.
   }
 
+  // Sans lien utm, le navigateur intégré dit d'où vient le visiteur.
+  const app = found.utm_source ? undefined : IN_APP.find(([re]) => re.test(userAgent))?.[1];
+  if (app) {
+    found.utm_source = app;
+    found.utm_medium ??= "in-app";
+  }
+
   return Object.keys(found).length > 0 ? found : null;
 }
 
@@ -57,6 +74,7 @@ export function captureAcquisition() {
       location.search,
       document.referrer,
       location.hostname,
+      navigator.userAgent,
     );
     if (found) localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
   } catch {
