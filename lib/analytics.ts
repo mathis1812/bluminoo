@@ -1,6 +1,6 @@
 "use client";
 
-import { parseAcquisition } from "@/lib/acquisition";
+import { isTrackingOff, parseAcquisition } from "@/lib/acquisition";
 
 const TRACK_ENDPOINT = "/api/track";
 const SESSION_STORAGE_KEY = "bluminoo_landing_session_id";
@@ -50,7 +50,7 @@ function arrival() {
 }
 
 function send(event: "page_view" | "cta_click", ctaId?: LandingCtaId) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isTrackingOff()) return;
 
   const isArrival = event === "page_view" && isFirstView;
   if (event === "page_view") isFirstView = false;

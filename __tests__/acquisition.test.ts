@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { parseAcquisition } from "@/lib/acquisition";
+import { isTrackingOff, parseAcquisition } from "@/lib/acquisition";
+
+describe("isTrackingOff", () => {
+  it("?ne_pas_compter=1 coupe la mesure dans ce navigateur, =0 la remet", () => {
+    window.history.replaceState(null, "", "/");
+    expect(isTrackingOff()).toBe(false);
+    window.history.replaceState(null, "", "/?ne_pas_compter=1");
+    expect(isTrackingOff()).toBe(true);
+    window.history.replaceState(null, "", "/pricing");
+    expect(isTrackingOff()).toBe(true);
+    window.history.replaceState(null, "", "/?ne_pas_compter=0");
+    expect(isTrackingOff()).toBe(false);
+  });
+});
 
 const IOS =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";

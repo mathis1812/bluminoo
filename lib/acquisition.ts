@@ -66,6 +66,24 @@ export function parseAcquisition(
   return Object.keys(found).length > 0 ? found : null;
 }
 
+const IGNORE_KEY = "bluminoo:ne-pas-compter";
+
+/**
+ * Mes propres visites faussent de petits chiffres : ouvrir n'importe quelle
+ * page avec `?ne_pas_compter=1` coupe la mesure dans ce navigateur, `=0` la
+ * remet (liens dans la console interne).
+ */
+export function isTrackingOff(): boolean {
+  try {
+    const flag = new URLSearchParams(location.search).get("ne_pas_compter");
+    if (flag === "1") localStorage.setItem(IGNORE_KEY, "1");
+    if (flag === "0") localStorage.removeItem(IGNORE_KEY);
+    return localStorage.getItem(IGNORE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 /** À l'arrivée sur le site : note la source si aucune ne l'est encore. */
 export function captureAcquisition() {
   try {
