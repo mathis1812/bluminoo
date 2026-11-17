@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { recordAttempt } from "@/lib/attempts";
 import { refundCredits, spendCredits } from "@/lib/credits";
 import { persistVideoFromUrl } from "@/lib/gallery-server";
 import { createFalTask, pollFalTask, type FalTask } from "@/lib/fal-jobs";
@@ -47,6 +48,13 @@ type GenerateVideoBody = {
  * le fait avant qu'un seul crédit ne bouge.
  */
 export async function POST(req: NextRequest) {
+  const response = await generateVideo(req);
+  // La console compte chaque tentative et son issue (réussie, crédits manquants, erreur…).
+  await recordAttempt(createClient(), response.status);
+  return response;
+}
+
+async function generateVideo(req: NextRequest): Promise<NextResponse> {
   const apiKey = process.env.FAL_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(

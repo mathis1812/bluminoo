@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { recordAttempt } from "@/lib/attempts";
 import { refundCredits, spendCredits } from "@/lib/credits";
 import { EDIT_COST, IMAGE_GENERATION_COST } from "@/lib/generation-cost";
 import { persistImageBytes } from "@/lib/gallery-server";
@@ -118,6 +119,13 @@ type GenerateBody = {
 const MAX_EDIT_PROMPT_LENGTH = 500;
 
 export async function POST(req: NextRequest) {
+  const response = await generate(req);
+  // La console compte chaque tentative et son issue (réussie, crédits manquants, erreur…).
+  await recordAttempt(createClient(), response.status);
+  return response;
+}
+
+async function generate(req: NextRequest): Promise<NextResponse> {
   const startedAt = Date.now();
   const budgetLeftMs = () =>
     startedAt + maxDuration * 1000 - PERSIST_MARGIN_MS - Date.now();
